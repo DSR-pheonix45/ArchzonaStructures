@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-obsidian: #0D0C0A;
+    --color-charcoal: #141311;
+    --color-chalk: #F7F5F0;
+    --color-cream: #EFEAE2;
+    --color-stone: #D1C7B7;
+    --color-taupe: #8C8273;
+  }
+
+  body {
+    background-color: #0D0C0A;
+    color: #F7F5F0;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* Subtle tactile architectural texture */
+.architectural-grain {
+  background-image: radial-gradient(rgba(209, 199, 183, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Bento Surface Helpers */
+.bento-dark {
+  background-color: #141311;
+  border: 1px solid rgba(209, 199, 183, 0.15);
+  color: #F7F5F0;
+}
+
+.bento-dark:hover {
+  border-color: rgba(209, 199, 183, 0.35);
+}
+
+.bento-cream {
+  background-color: #EFEAE2;
+  border: 1px solid rgba(209, 199, 183, 0.4);
+  color: #0D0C0A;
+}
+
+.bento-cream:hover {
+  border-color: #D1C7B7;
+}
+
+.bento-chalk {
+  background-color: #F7F5F0;
+  border: 1px solid rgba(209, 199, 183, 0.5);
+  color: #0D0C0A;
+}
+
+/* Standard Panels mapped to brand palette */
+.glass-panel {
+  background: rgba(20, 19, 17, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(209, 199, 183, 0.18);
+}
+
+.glass-panel-deep {
+  background: #141311;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(209, 199, 183, 0.22);
+}
+
+.glass-panel-card {
+  background: #141311;
+  border: 1px solid rgba(209, 199, 183, 0.16);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel-card:hover {
+  background: #191816;
+  border-color: rgba(209, 199, 183, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.glow-text {
+  text-shadow: 0 0 20px rgba(247, 245, 240, 0.25);
+}
+
+.glow-text-subtle {
+  text-shadow: 0 0 10px rgba(209, 199, 183, 0.2);
+}
+
+.hud-tag {
+  border: 1px solid rgba(209, 199, 183, 0.25);
+  background: rgba(20, 19, 17, 0.7);
+  color: #D1C7B7;
+}
+
+.hud-tag-active {
+  border: 1px solid #D1C7B7;
+  background: rgba(209, 199, 183, 0.15);
+  color: #F7F5F0;
+}
+
+.font-editorial {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-sans-clean {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Custom architectural scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0D0C0A;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(209, 199, 183, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D1C7B7;
+}

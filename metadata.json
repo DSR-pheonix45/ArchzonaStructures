@@ -1,0 +1,7 @@
+{
+  "name": "Archzona Structures",
+  "description": "Digital architectural experience centre for spaces, materials, outdoor structures, and execution.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
