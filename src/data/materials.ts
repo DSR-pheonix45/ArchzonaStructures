@@ -59,11 +59,11 @@ export const materialsData: Material[] = [
     description: 'Engineered through high-pressure thermosetting resin curing under intense heat, Archzona High-Pressure Laminate exterior panels offer extreme impact resistance, anti-graffiti surfaces, and sharp architectural geometries.',
     heroImage: '/images/materials/hpl_panel.png?v=3',
     spaceImages: [
-      '/images/materials/hpl_panel.png?v=3',
       'https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/hpl_panel.png?v=3',
     ],
     materialImage: '/images/materials/hpl_panel.png?v=3',
-    detailImage: '/images/materials/hpl_panel.png?v=3',
+    detailImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
     whereItWorks: [
       'Ventilated Rainscreen Facades',
       'Villa Feature Elevations',
@@ -103,10 +103,10 @@ export const materialsData: Material[] = [
     description: 'Composed of two skins of architectural aluminium bonded to a mineral-filled fire-retardant core. ACP allows complex curving, crisp routing, folding, and seamless metallic or matte architectural facades with minimal structural load.',
     heroImage: '/images/materials/acp_sheet.png?v=3',
     spaceImages: [
-      '/images/materials/acp_sheet.png?v=3',
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop',
     ],
     materialImage: '/images/materials/acp_sheet.png?v=3',
-    detailImage: '/images/materials/acp_sheet.png?v=3',
+    detailImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop',
     whereItWorks: [
       'Commercial Facades & Showrooms',
       'Canopy Cladding & Fascias',
@@ -144,9 +144,9 @@ export const materialsData: Material[] = [
     heroImage: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200&auto=format&fit=crop',
     spaceImages: [
       'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1598228723793-52759bba239c?q=80&w=1200&auto=format&fit=crop',
     ],
-    materialImage: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200&auto=format&fit=crop',
+    materialImage: 'https://images.unsplash.com/photo-1598228723793-52759bba239c?q=80&w=1200&auto=format&fit=crop',
     detailImage: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200&auto=format&fit=crop',
     whereItWorks: [
       'Resort Cottages & Chalets',
@@ -184,13 +184,13 @@ export const materialsData: Material[] = [
     category: 'ROOFING',
     positioning: 'Premium interlocking architectural roof shingles and high-spec ceramic composite systems.',
     description: 'Lamit roofing systems provide rich textural relief, deep shadow lines, and superior watertight lap-engineering. Created for luxury residential villas, heritage resorts, and modern pitched roof aesthetics.',
-    heroImage: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1200&auto=format&fit=crop',
+    heroImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
     spaceImages: [
-      'https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1598228723793-52759bba239c?q=80&w=1200&auto=format&fit=crop',
     ],
-    materialImage: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1200&auto=format&fit=crop',
-    detailImage: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1200&auto=format&fit=crop',
+    materialImage: 'https://images.unsplash.com/photo-1598228723793-52759bba239c?q=80&w=1200&auto=format&fit=crop',
+    detailImage: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop',
     whereItWorks: [
       'Luxury Villa Pitched Roofs',
       'Heritage Style Resort Pavilions',
@@ -225,11 +225,11 @@ export const materialsData: Material[] = [
     description: 'High-tensile architectural membrane fabrics (PVDF coated polyester / PTFE glass mesh) engineered to stretch across precision steel pylons. Creates organic parabolic curves, hyperbolic sails, and breathable translucent shade.',
     heroImage: '/images/structures/tensile.jpg',
     spaceImages: [
+      '/images/structures/tensile.jpg',
       'https://images.unsplash.com/photo-1567496898669-ee935f5f647a?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop',
     ],
-    materialImage: '/images/structures/tensile.jpg',
-    detailImage: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?q=80&w=1200&auto=format&fit=crop',
+    materialImage: 'https://images.unsplash.com/photo-1567496898669-ee935f5f647a?q=80&w=1200&auto=format&fit=crop',
+    detailImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop',
     whereItWorks: [
       'Poolside Shade Canopies',
       'Rooftop Terrace Lounges',
@@ -381,10 +381,10 @@ export const materialsData: Material[] = [
     description: 'Voody Proboard is a revolutionary high-density composite board engineered specifically for sub-surface wet areas, exterior cladding substrates, bathroom vanity carcass backing, soffits, and termite-prone construction zones.',
     heroImage: '/images/materials/voody_partition.png?v=1',
     spaceImages: [
-      '/images/materials/voody_partition.png?v=1',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
     ],
     materialImage: '/images/materials/voody_partition.png?v=1',
-    detailImage: '/images/materials/voody_partition.png?v=1',
+    detailImage: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1200&auto=format&fit=crop',
     whereItWorks: [
       'Sub-deck Framing & Substrate Plinth',
       'Exterior Soffits & Fascia Backing',
@@ -421,10 +421,10 @@ export const materialsData: Material[] = [
     description: 'An advanced polymer-modified hydraulic mineral matrix applied at only 2-3mm thickness. Delivers monolithic seamless transitions across interior floors, bathrooms, outdoor pool coping, and architectural steps without grout lines.',
     heroImage: '/images/materials/microcement_bench.png?v=1',
     spaceImages: [
-      '/images/materials/microcement_bench.png?v=1',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
     ],
     materialImage: '/images/materials/microcement_bench.png?v=1',
-    detailImage: '/images/materials/microcement_bench.png?v=1',
+    detailImage: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?q=80&w=1200&auto=format&fit=crop',
     whereItWorks: [
       'Seamless Villa Floors & Bathrooms',
       'Feature Headboard & Shower Walls',
