@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpRight, Mail, Phone, MapPin } from 'lucide-react';
+import { ArrowUpRight, Mail, Phone, MapPin, Download } from 'lucide-react';
 import { ViewRoute } from '../types';
 import { ARCHZONA_EMAIL, ARCHZONA_PHONE } from '../utils/quoteWorkflow';
 
@@ -74,13 +74,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </button>
               </li>
               <li>
-                <button
-                  id="footer-nav-shop"
-                  onClick={() => onNavigate({ type: 'shop' })}
-                  className="text-[#D1C7B7]/80 hover:text-[#F7F5F0] transition-colors cursor-pointer text-left"
+                <a
+                  id="footer-nav-catalogue-deck"
+                  href="/Archzona_Product_Catalogue_Deck.pdf"
+                  download="Archzona_Product_Catalogue_Deck.pdf"
+                  className="text-[#D4AF37] font-semibold hover:text-[#F7F5F0] transition-colors cursor-pointer text-left inline-flex items-center gap-1.5"
                 >
-                  SHOP PRODUCT CATALOGUE
-                </button>
+                  <Download className="w-3.5 h-3.5" />
+                  <span>PRODUCT CATALOGUE DECK (PDF)</span>
+                </a>
               </li>
               <li>
                 <button

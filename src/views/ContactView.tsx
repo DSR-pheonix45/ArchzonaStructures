@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MessageSquare, MapPin, Send, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Mail, MessageSquare, MapPin, Send, CheckCircle2, ArrowRight, Paperclip, Upload, X } from 'lucide-react';
 import { ARCHZONA_EMAIL, ARCHZONA_PHONE, generateWhatsAppQuoteUrl } from '../utils/quoteWorkflow';
 
 interface ContactViewProps {
@@ -17,16 +17,32 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
     message: initialSubject ? `Inquiring regarding ${initialSubject}. ` : '',
   });
 
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setAttachedFile(e.target.files[0]);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitted(true);
   };
 
-  const whatsAppDirectUrl = `https://wa.me/919870048082?text=${encodeURIComponent(
-    `Hello Archzona, I am reaching out regarding architectural materials & structure execution.\nName: ${formData.name || 'Client'}\nLocation: ${formData.location || 'Not specified'}\nMessage: ${formData.message || 'Consultation inquiry'}`
-  )}`;
+  const defaultWhatsAppIntro = 'Hello Archzona, I am reaching out regarding architectural materials & structure execution.';
+
+  const whatsAppDirectUrl = `https://wa.me/919870048082?text=${encodeURIComponent(defaultWhatsAppIntro)}`;
+
+  const buildSubmittedWhatsAppUrl = () => {
+    let text = defaultWhatsAppIntro;
+    if (formData.name) text += `\nName: ${formData.name}`;
+    if (formData.location) text += `\nLocation: ${formData.location}`;
+    if (formData.message) text += `\nMessage: ${formData.message}`;
+    if (attachedFile) text += `\n[Attached Drawing: ${attachedFile.name} (${(attachedFile.size / 1024).toFixed(1)} KB)]`;
+    return `https://wa.me/919870048082?text=${encodeURIComponent(text)}`;
+  };
 
   return (
     <div id="contact-view" className="text-[#F7F5F0] pt-28 pb-32 min-h-screen relative">
@@ -60,7 +76,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                   INSTANT ARCHITECTURAL DESK (WHATSAPP)
                 </span>
                 <a
-                  href="https://wa.me/919870048082"
+                  href={whatsAppDirectUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-white hover:bg-emerald-500/20 transition-all cursor-pointer"
@@ -68,7 +84,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                   <MessageSquare className="w-5 h-5 text-emerald-400 shrink-0" />
                   <div>
                     <span className="font-mono font-bold text-sm block text-emerald-300">{ARCHZONA_PHONE}</span>
-                    <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Chat directly with an engineer</span>
+                    <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Naresh K — Co-Founder, Archzona</span>
                   </div>
                 </a>
               </div>
@@ -89,36 +105,19 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                   </div>
                 </a>
               </div>
-
-              {/* Phone Direct */}
-              <div className="space-y-2">
-                <span className="text-[10px] uppercase font-mono text-[#8C8273] block">
-                  VOICE CALL
-                </span>
-                <a
-                  href={`tel:${ARCHZONA_PHONE}`}
-                  className="flex items-center gap-3 p-3.5 bg-[#0D0C0A] rounded-xl border border-[#D1C7B7]/20 text-[#F7F5F0] hover:border-[#D1C7B7] transition-all cursor-pointer"
-                >
-                  <Phone className="w-5 h-5 text-[#D1C7B7] shrink-0" />
-                  <div>
-                    <span className="font-mono text-sm block text-[#F7F5F0]">{ARCHZONA_PHONE}</span>
-                    <span className="text-[11px] text-[#8C8273] font-sans-clean">Mon - Sat: 9:30 AM to 7:00 PM</span>
-                  </div>
-                </a>
-              </div>
             </div>
 
             {/* Experience Studio Location */}
             <div className="p-8 bg-[#141311] rounded-2xl border border-[#D1C7B7]/25 text-[#F7F5F0] space-y-4 shadow-xl">
               <span className="text-xs uppercase tracking-[0.2em] text-[#D1C7B7] font-mono font-semibold block">
-                HEADQUARTERS & DISPLAY WAREHOUSE
+                HEADQUARTERS & OFFICE
               </span>
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-[#D1C7B7] shrink-0 mt-1" />
                 <div className="font-sans-clean text-xs leading-relaxed space-y-1">
-                  <p className="font-serif-title text-xl text-[#F7F5F0]">Archzona Structures Experience Centre</p>
-                  <p className="text-[#D1C7B7]">Western Industrial Zone, Goregaon East</p>
-                  <p className="text-[#D1C7B7]">Mumbai, Maharashtra 400063, India</p>
+                  <p className="font-serif-title text-xl text-[#F7F5F0]">Archzona Structures</p>
+                  <p className="text-[#D1C7B7]">1/19 Ganesh Apt, C.D. Rd, Ram Nagar, Dombivli (E)</p>
+                  <p className="text-[#D1C7B7]">Thane, Maharashtra, India</p>
                   <p className="text-[10px] text-[#8C8273] pt-1">Field installations across Maharashtra, Goa, Gujarat & Pan-India.</p>
                 </div>
               </div>
@@ -143,9 +142,14 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                 <p className="text-xs font-sans-clean text-[#D1C7B7] max-w-md mx-auto leading-relaxed">
                   Thank you, {formData.name || 'Client'}. An Archzona architectural representative will review your inquiry and connect with you shortly.
                 </p>
+                {attachedFile && (
+                  <p className="text-xs font-mono text-[#D4AF37]">
+                    Attached Drawing: {attachedFile.name} ({(attachedFile.size / 1024).toFixed(1)} KB)
+                  </p>
+                )}
                 <div className="pt-2">
                   <a
-                    href={whatsAppDirectUrl}
+                    href={buildSubmittedWhatsAppUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs font-sans-clean uppercase tracking-wider rounded-xl transition-all shadow-md"
@@ -249,12 +253,52 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                     Message or Drawing Notes
                   </label>
                   <textarea
-                    rows={4}
+                    rows={3}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Tell us about the space, expected square footage, timeline, or specific materials you wish to explore..."
                     className="w-full bg-[#0D0C0A] border border-[#D1C7B7]/25 rounded-lg p-2.5 text-xs text-[#F7F5F0] placeholder-[#8C8273] focus:outline-none focus:border-[#D1C7B7] transition-all"
                   />
+                </div>
+
+                {/* FILE UPLOADER FOR CAD DRAWINGS & PDF SPECIFICATIONS */}
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-[10px] uppercase tracking-wider text-[#8C8273] block font-mono">
+                    Attach CAD Drawings or PDF Specifications (Optional)
+                  </label>
+                  
+                  {attachedFile ? (
+                    <div className="flex items-center justify-between p-3 bg-[#0D0C0A] border border-[#D4AF37]/40 rounded-xl text-xs">
+                      <div className="flex items-center space-x-2.5 overflow-hidden">
+                        <Paperclip className="w-4 h-4 text-[#D4AF37] shrink-0" />
+                        <div className="truncate">
+                          <span className="font-mono text-[#F7F5F0] font-semibold block truncate">{attachedFile.name}</span>
+                          <span className="text-[10px] text-[#8C8273]">{(attachedFile.size / 1024).toFixed(1)} KB</span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAttachedFile(null)}
+                        className="p-1 text-[#8C8273] hover:text-red-400 cursor-pointer"
+                        title="Remove file"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex items-center justify-center space-x-2 p-3 bg-[#0D0C0A] border border-dashed border-[#D1C7B7]/30 hover:border-[#D1C7B7]/60 rounded-xl cursor-pointer transition-all group">
+                      <Upload className="w-4 h-4 text-[#8C8273] group-hover:text-[#D1C7B7]" />
+                      <span className="text-xs text-[#8C8273] group-hover:text-[#D1C7B7] font-sans-clean">
+                        Click to upload .pdf, .dwg, .dxf, .cad, .zip, or images
+                      </span>
+                      <input
+                        type="file"
+                        accept=".pdf,.dwg,.dxf,.cad,.zip,.png,.jpg,.jpeg"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
                 </div>
 
                 <div className="pt-2 flex flex-col sm:flex-row gap-3">

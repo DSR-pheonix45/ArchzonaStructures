@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Menu, X } from 'lucide-react';
+import { Search, Menu, X, Download } from 'lucide-react';
 import { ViewRoute } from '../types';
 
 interface NavbarProps {
@@ -32,35 +32,36 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate, onOpen
   return (
     <header
       id="main-navbar"
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 border-b ${
         isScrolled
-          ? 'bg-[#0D0C0A]/95 backdrop-blur-xl py-3 border-b border-[#D1C7B7]/20 text-[#F7F5F0] shadow-2xl'
-          : 'bg-[#0D0C0A]/75 backdrop-blur-lg py-4 border-b border-[#D1C7B7]/10 text-[#F7F5F0]'
+          ? 'bg-[#0D0C0A]/90 backdrop-blur-md border-[#D1C7B7]/20 py-3 shadow-2xl'
+          : 'bg-[#0D0C0A]/40 backdrop-blur-sm border-transparent py-5'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between">
-        {/* Brand Identity */}
+      <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between">
+        {/* Brand Logo & Tagline */}
         <button
-          id="nav-brand-btn"
-          onClick={() => {
-            onNavigate({ type: 'home' });
-            setMobileMenuOpen(false);
-          }}
-          className="text-left group cursor-pointer focus:outline-none flex flex-col justify-center"
+          id="nav-brand-logo-btn"
+          onClick={() => onNavigate({ type: 'home' })}
+          className="flex items-center gap-3 text-left group cursor-pointer shrink-0"
         >
-          <span className="font-serif-title text-2xl md:text-[28px] font-light tracking-[0.26em] text-[#F7F5F0] leading-tight group-hover:text-[#D1C7B7] transition-colors">
-            ARCHZONA
-          </span>
-          <span className="text-[9px] tracking-[0.4em] uppercase text-[#C5A880] font-mono leading-none mt-1">
-            STRUCTURES
-          </span>
+          <img
+            src="/logo.png?v=1"
+            alt="Archzona Logo"
+            className="w-8 h-8 object-contain shrink-0 group-hover:scale-110 transition-transform duration-300"
+          />
+          <div className="flex flex-col">
+            <span className="font-serif-title text-2xl sm:text-3xl font-light tracking-[0.25em] text-[#F7F5F0] group-hover:text-[#D1C7B7] transition-colors">
+              ARCHZONA
+            </span>
+            <span className="font-mono text-[9px] tracking-[0.38em] text-[#C5A880] uppercase -mt-1 font-semibold">
+              STRUCTURES
+            </span>
+          </div>
         </button>
 
-        {/* Primary Desktop Navigation: EXPLORE | MATERIALS | STRUCTURES | SERVICES */}
-        <nav
-          id="desktop-primary-nav"
-          className="hidden lg:flex items-center px-8 py-2.5 rounded-full bg-[#141311]/70 border border-[#D1C7B7]/25 backdrop-blur-md space-x-8"
-        >
+        {/* Primary Desktop Navigation Links */}
+        <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
           {navLinks.map((link) => {
             const active = isActive(link.route.type);
             return (
@@ -68,20 +69,23 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate, onOpen
                 key={link.label}
                 id={`nav-link-${link.label.toLowerCase()}`}
                 onClick={() => onNavigate(link.route)}
-                className={`text-[11px] uppercase tracking-[0.22em] font-sans-clean transition-colors duration-200 cursor-pointer ${
+                className={`text-xs uppercase tracking-[0.2em] font-sans-clean transition-all cursor-pointer relative py-1 ${
                   active
                     ? 'text-[#F7F5F0] font-semibold'
-                    : 'text-[#8C8273] hover:text-[#F7F5F0]'
+                    : 'text-[#D1C7B7]/75 hover:text-[#F7F5F0]'
                 }`}
               >
-                {link.label}
+                <span>{link.label}</span>
+                {active && (
+                  <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#D1C7B7] rounded-full animate-fadeIn" />
+                )}
               </button>
             );
           })}
         </nav>
 
-        {/* Right Action Items: [SEARCH] [ SHOP ] [ CONTACT ] */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
+        {/* Right Action Items: [SEARCH] [ CATALOGUE DECK ] [ SHOP ] [ CONTACT ] */}
+        <div className="flex items-center space-x-3">
           {/* Universal Search Trigger */}
           <button
             id="nav-search-btn"
@@ -93,7 +97,19 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate, onOpen
             <Search className="w-4 h-4" />
           </button>
 
-          {/* SHOP Button - cart count number removed as requested */}
+          {/* CATALOGUE DECK Direct Download Button */}
+          <a
+            id="nav-catalogue-deck-btn"
+            href="/Archzona_Product_Catalogue_Deck.pdf"
+            download="Archzona_Product_Catalogue_Deck.pdf"
+            className="hidden xl:inline-flex items-center space-x-1.5 text-[11px] uppercase tracking-[0.18em] px-4 py-2 rounded-full border border-[#D4AF37]/50 bg-[#D4AF37]/15 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0D0C0A] transition-all cursor-pointer font-sans-clean font-bold shadow-sm"
+            title="Download Official Archzona Product Catalogue Deck PDF"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>DOWNLOAD CATALOGUE</span>
+          </a>
+
+          {/* SHOP Button */}
           <button
             id="nav-shop-btn"
             onClick={() => onNavigate({ type: 'shop' })}
@@ -156,16 +172,28 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate, onOpen
           </div>
 
           <div className="pt-4 border-t border-[#D1C7B7]/15 flex flex-col space-y-3">
+            <a
+              id="mobile-nav-catalogue-deck-btn"
+              href="/Archzona_Product_Catalogue_Deck.pdf"
+              download="Archzona_Product_Catalogue_Deck.pdf"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full text-center py-3 rounded-full border border-[#D4AF37]/50 text-xs tracking-[0.2em] uppercase font-sans-clean text-[#0D0C0A] bg-[#D4AF37] font-bold flex items-center justify-center space-x-2"
+            >
+              <Download className="w-4 h-4" />
+              <span>DOWNLOAD CATALOGUE DECK (PDF)</span>
+            </a>
+
             <button
               id="mobile-nav-shop-btn"
               onClick={() => {
                 onNavigate({ type: 'shop' });
                 setMobileMenuOpen(false);
               }}
-              className="w-full text-center py-3 rounded-full border border-[#D1C7B7]/30 text-xs tracking-[0.2em] uppercase font-sans-clean text-[#F7F5F0] bg-[#141311]"
+              className="w-full text-center py-3 rounded-full border border-[#D4AF37]/40 text-xs tracking-[0.2em] uppercase font-sans-clean text-[#D4AF37] bg-[#D4AF37]/10 flex items-center justify-center space-x-2 font-semibold"
             >
-              SHOP CATALOGUE
+              <span>SHOP (COMING SOON)</span>
             </button>
+
             <button
               id="mobile-nav-contact-btn"
               onClick={() => {

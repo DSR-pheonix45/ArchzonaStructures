@@ -25,8 +25,8 @@ export const productsData: Product[] = [
       'Warranty': '15 Years Residential / 10 Years Commercial',
     },
     images: [
+      '/images/materials/wpc_plank_sample.png?v=5',
       'https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'Technical Data Sheet & Load Spans', type: 'PDF', size: '1.4 MB' },
@@ -56,8 +56,8 @@ export const productsData: Product[] = [
       'Warranty': '15 Years Warranty',
     },
     images: [
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/wpc_plank_sample.png?v=5',
+      'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'Technical Data Sheet', type: 'PDF', size: '1.2 MB' },
@@ -86,8 +86,8 @@ export const productsData: Product[] = [
       'UV Resistance': 'Delta E < 2.0 after 3000hrs xenon arc',
     },
     images: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/wpc_cladding.png?v=5',
+      '/images/materials/wpc_building_clad.jpg?v=5',
     ],
     documents: [
       { title: 'Facade Cladding Detail Drawing (CAD/PDF)', type: 'PDF', size: '3.1 MB' },
@@ -115,7 +115,8 @@ export const productsData: Product[] = [
       'Weathering': 'Zero rotting, zero warping under monsoon cycles',
     },
     images: [
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/wpc_plank_sample.png?v=5',
+      '/images/materials/wpc_cladding.png?v=5',
     ],
     documents: [
       { title: 'Louver Batten Span & Deflection Calculations', type: 'PDF', size: '1.6 MB' },
@@ -146,8 +147,8 @@ export const productsData: Product[] = [
       'Tensile Strength': '> 80 MPa',
     },
     images: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/hpl_panel.png?v=3',
+      'https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'HPL Rainscreen Sub-framing Guide', type: 'PDF', size: '2.5 MB' },
@@ -174,7 +175,8 @@ export const productsData: Product[] = [
       'Chemical Resistance': 'Immune to acid rain, salt spray, cleaning solvents',
     },
     images: [
-      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/hpl_panel.png?v=3',
+      'https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'Architectural Specification Manual', type: 'PDF', size: '3.4 MB' },
@@ -201,7 +203,8 @@ export const productsData: Product[] = [
       'Impact': 'Ball drop test 25N certified',
     },
     images: [
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/hpl_panel.png?v=3',
+      'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'Ventilated Facade Windload Analysis', type: 'PDF', size: '2.1 MB' },
@@ -231,7 +234,8 @@ export const productsData: Product[] = [
       'Flexural Elasticity': '≥ 40.0 GPa',
     },
     images: [
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/acp_sheet.png?v=3',
+      'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'Routing & Folding Fabrication Guidelines', type: 'PDF', size: '1.9 MB' },
@@ -258,7 +262,8 @@ export const productsData: Product[] = [
       'Salt Spray Resistance': 'Passed 3000 hours without blistering',
     },
     images: [
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/acp_sheet.png?v=3',
+      'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'Technical Certificate', type: 'PDF', size: '1.1 MB' },
@@ -290,7 +295,6 @@ export const productsData: Product[] = [
     },
     images: [
       'https://images.unsplash.com/photo-1598228723793-52759bba239c?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'Onduline Classic Complete Roofing Manual', type: 'PDF', size: '4.2 MB' },
@@ -462,7 +466,6 @@ export const productsData: Product[] = [
       'Self-Cleaning': 'Rainwater rinses airborne soot and dust cleanly',
     },
     images: [
-      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1567496898669-ee935f5f647a?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
@@ -521,7 +524,7 @@ export const productsData: Product[] = [
     },
     images: [
       'https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'Quick-Step Palazzo Technical Specification', type: 'PDF', size: '2.1 MB' },
@@ -550,7 +553,7 @@ export const productsData: Product[] = [
       'Acoustics': 'Delta Lw 21 dB impact sound deadening',
     },
     images: [
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'SPC Technical Performance Certificate', type: 'PDF', size: '1.4 MB' },
@@ -610,7 +613,7 @@ export const productsData: Product[] = [
       'Alignment': 'Optional gang-bar connection for synchronous rotation',
     },
     images: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/voody_partition.png?v=3',
     ],
     documents: [
       { title: 'Concealed Pivot Engineering Drawing', type: 'PDF', size: '2.2 MB' },
@@ -640,7 +643,7 @@ export const productsData: Product[] = [
       'Screw Withdrawal': '> 1800 N edge holding capacity',
     },
     images: [
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/voody_partition.png?v=3',
     ],
     documents: [
       { title: 'Voody Proboard Technical Datasheet', type: 'PDF', size: '1.7 MB' },
@@ -670,8 +673,7 @@ export const productsData: Product[] = [
       'VOC': '< 15 g/L ultra low emission',
     },
     images: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?q=80&w=1200&auto=format&fit=crop',
+      '/images/materials/microcement_bench.png?v=3',
     ],
     documents: [
       { title: 'Application Guide & Substrate Preparation', type: 'PDF', size: '3.0 MB' },
@@ -702,7 +704,6 @@ export const productsData: Product[] = [
     },
     images: [
       'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop',
     ],
     documents: [
       { title: 'NovaMix Terrazzo Architectural Spec', type: 'PDF', size: '2.4 MB' },

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpRight, ArrowDown, ChevronRight, Layers, Sparkles, Building2, Box, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, ArrowDown, ChevronRight, Layers, Sparkles, Building2, Box, ShieldCheck, Download } from 'lucide-react';
 import { spacesData } from '../data/spaces';
 import { materialsData } from '../data/materials';
 import { structuresData } from '../data/structures';
@@ -251,7 +251,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
                 TO SPACE.
               </h3>
               <p className="text-xs font-sans-clean text-[#8C8273] font-light leading-relaxed">
-                Consult. Curate. Design. Source. Fabricate. Install.
+                Consult. Curate. Engineer. Source. Fabricate. Install.
               </p>
             </div>
             <div className="pt-6 flex justify-end">
@@ -829,7 +829,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
             Archzona is not merely a material warehouse. We partner with project creators across the full lifecycle:
             <br />
             <span className="font-mono text-[#D1C7B7] text-xs tracking-wider">
-              UNDERSTAND → CURATE → DESIGN → SOURCE → BUILD → INSTALL
+              UNDERSTAND → CURATE → ENGINEER → SOURCE → BUILD → INSTALL
             </span>
           </p>
         </div>
@@ -839,7 +839,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
           {[
             { step: '01', name: 'CONSULT', desc: 'Site climate & exposure audit' },
             { step: '02', name: 'CURATE', desc: 'Tactile swatch & lab testing' },
-            { step: '03', name: 'DESIGN', desc: 'Shop drawings & 3D joinery' },
+            { step: '03', name: 'ENGINEER', desc: 'Shop drawings & 3D joinery' },
             { step: '04', name: 'SOURCE', desc: 'Tier-1 authorized factory supply' },
             { step: '05', name: 'FABRICATE', desc: 'CNC routing & pre-assembly' },
             { step: '06', name: 'INSTALL', desc: 'Laser-levelled certified execution' },
@@ -882,6 +882,41 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         </div>
       </section>
 
+      {/* SECTION 06.5 — OFFICIAL PRODUCT CATALOGUE DECK */}
+      <section id="catalogue-deck-section" className="relative py-20 px-6 md:px-10 border-t border-[#D1C7B7]/20 bg-[#12141C]">
+        <div className="max-w-7xl mx-auto rounded-3xl border border-[#D4AF37]/30 bg-[#1A1D28] p-8 md:p-12 relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 p-8 opacity-10 font-serif-title text-8xl text-[#D4AF37] pointer-events-none select-none">
+            DECK
+          </div>
+
+          <div className="relative z-10 max-w-3xl space-y-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/15 text-[10px] uppercase font-mono tracking-[0.25em] text-[#D4AF37] font-bold">
+              <Download className="w-3.5 h-3.5" /> OFFICIAL ARCHZONA PRODUCT CATALOGUE DECK
+            </div>
+
+            <h2 className="font-serif-title text-3xl sm:text-5xl text-[#F7F5F0] leading-tight font-light">
+              Download Complete 26-Page Architectural Specification Deck
+            </h2>
+
+            <p className="text-sm sm:text-base font-sans-clean text-[#D1C7B7]/85 font-light leading-relaxed">
+              Includes comprehensive technical data sheets, profile dimensions, material specifications, and load tables for Onduline Roofing Systems, Lamit Asphalt Shingles, Tensile Fabric Shades, WPC Decking, HPL/ACP Facades, MgSO4 Voody Proboards, and NovaMix Terrazzo Pathways.
+            </p>
+
+            <div className="pt-2 flex items-center gap-4">
+              <a
+                id="home-download-deck-pdf-btn"
+                href="/Archzona_Product_Catalogue_Deck.pdf"
+                download="Archzona_Product_Catalogue_Deck.pdf"
+                className="px-8 py-4 rounded-full bg-[#D4AF37] text-[#0D0C0A] text-xs font-sans-clean font-bold tracking-[0.2em] uppercase hover:bg-[#E5C158] transition-all cursor-pointer inline-flex items-center gap-2 shadow-xl"
+              >
+                <Download className="w-4 h-4" />
+                <span>DOWNLOAD PRODUCT CATALOGUE DECK (PDF)</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* SECTION 07 — BOTTOM SPATIAL CTA */}
       <section className="relative py-24 px-6 md:px-10 border-t border-[#D1C7B7]/20 bg-[#141311]">
         <div className="max-w-5xl mx-auto text-center space-y-8">
@@ -904,13 +939,15 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
               <span>START A PROJECT</span>
               <ArrowUpRight className="w-4 h-4" />
             </button>
-            <button
-              id="cta-browse-shop-btn"
-              onClick={() => onNavigate({ type: 'shop' })}
-              className="px-8 py-4 rounded-full bg-transparent border border-[#D1C7B7]/40 text-[#F7F5F0] text-xs font-mono tracking-[0.2em] uppercase hover:border-[#D1C7B7] hover:bg-white/5 transition-all cursor-pointer"
+            <a
+              id="cta-download-catalogue-deck-btn"
+              href="/Archzona_Product_Catalogue_Deck.pdf"
+              download="Archzona_Product_Catalogue_Deck.pdf"
+              className="px-8 py-4 rounded-full bg-transparent border border-[#D4AF37]/60 text-[#D4AF37] text-xs font-mono tracking-[0.2em] uppercase hover:bg-[#D4AF37] hover:text-[#0D0C0A] transition-all cursor-pointer inline-flex items-center gap-2 font-bold"
             >
-              BROWSE PRODUCT CATALOGUE
-            </button>
+              <Download className="w-4 h-4" />
+              <span>DOWNLOAD CATALOGUE DECK</span>
+            </a>
           </div>
         </div>
       </section>

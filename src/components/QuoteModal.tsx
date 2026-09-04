@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, MessageSquare, Mail, Copy, Check, ArrowRight, Loader2 } from 'lucide-react';
+import { X, CheckCircle2, MessageSquare, Mail, Copy, Check, ArrowRight, Loader2, Paperclip, Upload } from 'lucide-react';
 import { useProjectCart } from '../context/ProjectCartContext';
 import {
   QuoteRequest,
@@ -29,10 +29,17 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, customS
     notes: cart.notes || '',
   });
 
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedResponse, setSubmittedResponse] = useState<any | null>(null);
   const [copiedSchedule, setCopiedSchedule] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setAttachedFile(e.target.files[0]);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -45,6 +52,10 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, customS
     setErrorMsg('');
     setIsSubmitting(true);
 
+    const finalNotes = attachedFile
+      ? `${formData.notes ? formData.notes + '\n' : ''}[Attached Drawing/Spec: ${attachedFile.name} (${(attachedFile.size / 1024).toFixed(1)} KB)]`
+      : formData.notes;
+
     try {
       const quotePayload: QuoteRequest = {
         clientName: formData.clientName,
@@ -55,7 +66,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, customS
         projectLocation: formData.projectLocation,
         projectType: formData.projectType,
         approximateArea: formData.approximateArea,
-        notes: formData.notes,
+        notes: finalNotes,
         items: cart.items,
         customStructureConfig,
       };
@@ -69,6 +80,10 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, customS
     }
   };
 
+  const finalNotesForUrl = attachedFile
+    ? `${formData.notes ? formData.notes + '\n' : ''}[Attached Drawing/Spec: ${attachedFile.name} (${(attachedFile.size / 1024).toFixed(1)} KB)]`
+    : formData.notes;
+
   const handleCopySummary = () => {
     const quotePayload: QuoteRequest = {
       clientName: formData.clientName,
@@ -79,7 +94,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, customS
       projectLocation: formData.projectLocation,
       projectType: formData.projectType,
       approximateArea: formData.approximateArea,
-      notes: formData.notes,
+      notes: finalNotesForUrl,
       items: cart.items,
       customStructureConfig,
     };
@@ -100,7 +115,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, customS
         projectLocation: formData.projectLocation,
         projectType: formData.projectType,
         approximateArea: formData.approximateArea,
-        notes: formData.notes,
+        notes: finalNotesForUrl,
         items: cart.items,
         customStructureConfig,
       });
@@ -343,6 +358,45 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, customS
                     placeholder="Mention specific details like sub-frame requirements, installation services needed, coastal exposure, timeline..."
                     className="w-full bg-[#0D0C0A] border border-[#D1C7B7]/20 rounded-lg p-3 text-sm text-[#F7F5F0] focus:outline-none focus:border-[#D1C7B7] placeholder-[#8C8273] transition-all"
                   />
+                </div>
+
+                {/* File Uploader for CAD drawings & PDF specs */}
+                <div className="sm:col-span-2 space-y-1.5">
+                  <label className="text-[10px] uppercase tracking-wider text-[#8C8273] block font-mono">
+                    Attach CAD Drawings or PDF Specifications (Optional)
+                  </label>
+                  {attachedFile ? (
+                    <div className="flex items-center justify-between p-3 bg-[#0D0C0A] border border-[#D4AF37]/40 rounded-xl text-xs">
+                      <div className="flex items-center space-x-2.5 overflow-hidden">
+                        <Paperclip className="w-4 h-4 text-[#D4AF37] shrink-0" />
+                        <div className="truncate">
+                          <span className="font-mono text-[#F7F5F0] font-semibold block truncate">{attachedFile.name}</span>
+                          <span className="text-[10px] text-[#8C8273]">{(attachedFile.size / 1024).toFixed(1)} KB</span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAttachedFile(null)}
+                        className="p-1 text-[#8C8273] hover:text-red-400 cursor-pointer"
+                        title="Remove file"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex items-center justify-center space-x-2 p-3 bg-[#0D0C0A] border border-dashed border-[#D1C7B7]/30 hover:border-[#D1C7B7]/60 rounded-xl cursor-pointer transition-all group">
+                      <Upload className="w-4 h-4 text-[#8C8273] group-hover:text-[#D1C7B7]" />
+                      <span className="text-xs text-[#8C8273] group-hover:text-[#D1C7B7] font-sans-clean">
+                        Click to attach .pdf, .dwg, .dxf, .cad, .zip, or images
+                      </span>
+                      <input
+                        type="file"
+                        accept=".pdf,.dwg,.dxf,.cad,.zip,.png,.jpg,.jpeg"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
                 </div>
               </div>
 

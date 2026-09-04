@@ -1,10 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { Filter, X, Plus, Check, Search, ArrowUpRight, FileText, Sparkles, Building2, Layers } from 'lucide-react';
-import { productsData } from '../data/products';
-import { spacesData } from '../data/spaces';
-import { materialsData } from '../data/materials';
-import { Product, ViewRoute } from '../types';
-import { useProjectCart } from '../context/ProjectCartContext';
+import React, { useState } from 'react';
+import { Download, ArrowRight, Check, Sparkles, Package, Layers, ShieldCheck, FileText, Mail, ArrowUpRight } from 'lucide-react';
+import { ViewRoute } from '../types';
 
 interface ShopViewProps {
   onOpenProduct: (productSlug: string) => void;
@@ -13,321 +9,203 @@ interface ShopViewProps {
 }
 
 export const ShopView: React.FC<ShopViewProps> = ({
-  onOpenProduct,
   onNavigate,
   onRequestQuote,
 }) => {
-  const { addItem, cart, setIsCartOpen, totalItemsCount } = useProjectCart();
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  // Filters State
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedMaterial, setSelectedMaterial] = useState<string>('All');
-  const [selectedSpace, setSelectedSpace] = useState<string>('All');
-  const [selectedBrand, setSelectedBrand] = useState<string>('All');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-
-  // Quick feedback for added items
-  const [recentlyAddedId, setRecentlyAddedId] = useState<string | null>(null);
-
-  // Extract unique filter lists
-  const allMaterials = useMemo(() => {
-    return ['All', ...Array.from(new Set(productsData.map((p) => p.material)))];
-  }, []);
-
-  const allBrands = useMemo(() => {
-    return ['All', ...Array.from(new Set(productsData.map((p) => p.brand)))];
-  }, []);
-
-  const allSpaces = useMemo(() => {
-    return ['All', ...Array.from(new Set(spacesData.map((s) => s.slug)))];
-  }, []);
-
-  const filteredProducts = useMemo(() => {
-    return productsData.filter((p) => {
-      const matchSearch =
-        searchQuery === '' ||
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.finish.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.material.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchMaterial =
-        selectedMaterial === 'All' || p.material.toLowerCase() === selectedMaterial.toLowerCase();
-
-      const matchSpace =
-        selectedSpace === 'All' || p.spaces.some((s) => s.toLowerCase() === selectedSpace.toLowerCase());
-
-      const matchBrand =
-        selectedBrand === 'All' || p.brand.toLowerCase() === selectedBrand.toLowerCase();
-
-      return matchSearch && matchMaterial && matchSpace && matchBrand;
-    });
-  }, [searchQuery, selectedMaterial, selectedSpace, selectedBrand]);
-
-  const handleQuickAdd = (product: Product, e: React.MouseEvent) => {
-    e.stopPropagation();
-    addItem(product, 50, 200, 'Direct catalog selection');
-    setRecentlyAddedId(product.id);
-    setTimeout(() => setRecentlyAddedId(null), 1800);
-  };
-
-  const hasActiveFilters =
-    selectedMaterial !== 'All' ||
-    selectedSpace !== 'All' ||
-    selectedBrand !== 'All' ||
-    searchQuery !== '';
-
-  const clearAllFilters = () => {
-    setSearchQuery('');
-    setSelectedMaterial('All');
-    setSelectedSpace('All');
-    setSelectedBrand('All');
-    setSelectedCategory('All');
+  const handleNotifySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSuccess(true);
+    }, 800);
   };
 
   return (
-    <div id="shop-view" className="text-[#F7F5F0] pt-28 pb-32 min-h-screen relative">
-      <div className="max-w-7xl mx-auto px-6 md:px-10 space-y-12">
-        {/* Shop Header & Architectural Statement */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#D1C7B7]/20 pb-8">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#D1C7B7]/30 bg-[#141311] text-[10px] uppercase font-mono tracking-[0.25em] text-[#D1C7B7]">
-              <span className="w-2 h-2 rounded-full bg-[#D1C7B7]" />
-              ARCHITECTURAL MATERIAL CATALOGUE
-            </div>
-            <h1 className="font-serif-title text-4xl sm:text-6xl text-[#F7F5F0]">
-              SHOP SPECIFICATIONS.
-            </h1>
-            <p className="text-sm sm:text-base font-sans-clean text-[#D1C7B7]/85 max-w-2xl leading-relaxed font-light">
-              Add products directly to your Project Schedule (My Project). When your specifications are ready, request a consolidated project quote for pricing, batch availability, and turnkey installation.
-            </p>
+    <div id="shop-view" className="text-[#F7F5F0] pt-28 pb-32 min-h-screen relative overflow-hidden bg-[#0D0C0A]">
+      {/* Ambient background glows */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#D4AF37]/5 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-[#D1C7B7]/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-6 md:px-10 relative z-10 space-y-16">
+        
+        {/* Main Teaser Hero */}
+        <div className="text-center space-y-6 max-w-3xl mx-auto pt-6">
+          {/* Status Pill */}
+          <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#D4AF37] text-[11px] uppercase font-mono tracking-[0.25em] shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
+            <span>DIGITAL ARCHITECTURAL STORE // COMING SOON</span>
           </div>
 
-          {/* Project Schedule Floating trigger */}
-          <div className="bg-[#141311] rounded-2xl border border-[#D1C7B7]/25 p-4 shrink-0 flex items-center gap-4 shadow-xl">
-            <div>
-              <span className="text-[10px] uppercase font-mono text-[#D1C7B7] block">
-                MY PROJECT SCHEDULE
-              </span>
-              <span className="font-serif-title text-xl text-[#F7F5F0]">
-                {cart.items.length} Products ({totalItemsCount} Units)
-              </span>
-            </div>
-            <button
-              id="shop-view-open-schedule-btn"
-              onClick={() => setIsCartOpen(true)}
-              className="px-4 py-2.5 bg-[#F7F5F0] hover:bg-[#D1C7B7] text-[#0D0C0A] text-xs font-sans-clean font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md"
-            >
-              Open Schedule
-            </button>
-          </div>
-        </div>
+          <h1 className="font-serif-title text-4xl sm:text-6xl text-[#F7F5F0] leading-[1.1] tracking-tight">
+            ONLINE DIRECT MATERIAL PROCUREMENT IS COMING SOON.
+          </h1>
 
-        {/* Filter Controls Bar */}
-        <div className="bg-[#141311] rounded-2xl border border-[#D1C7B7]/20 p-6 space-y-4">
-          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-            {/* Search within catalog */}
-            <div className="relative w-full lg:w-96">
-              <Search className="w-4 h-4 text-[#D1C7B7] absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                id="shop-search-input"
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products, finish, material..."
-                className="w-full bg-[#0D0C0A] border border-[#D1C7B7]/25 pl-10 pr-4 py-2 text-xs font-sans-clean text-[#F7F5F0] placeholder-[#8C8273] rounded-lg focus:outline-none focus:border-[#D1C7B7] transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8273] hover:text-white"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
+          <p className="text-base sm:text-lg font-sans-clean text-[#D1C7B7]/85 leading-relaxed font-light">
+            We are curating a direct online ordering portal for WPC decking & cladding, HPL compact laminates, Onduline roofing, tensile membranes, microcement systems, and timber acoustic panels with live warehouse inventory and trade pricing.
+          </p>
 
-            {/* Dropdown Filters */}
-            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto text-xs font-sans-clean">
-              {/* Material filter */}
-              <div className="flex items-center gap-2">
-                <span className="text-[#8C8273] uppercase text-[10px] font-mono">Material:</span>
-                <select
-                  id="shop-material-filter"
-                  value={selectedMaterial}
-                  onChange={(e) => setSelectedMaterial(e.target.value)}
-                  className="bg-[#0D0C0A] border border-[#D1C7B7]/25 text-[#F7F5F0] px-3 py-1.5 uppercase font-medium rounded-lg focus:outline-none focus:border-[#D1C7B7]"
-                >
-                  {allMaterials.map((m) => (
-                    <option key={m} value={m} className="bg-[#0D0C0A] text-[#F7F5F0]">
-                      {m.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
+          {/* Email Notification Form */}
+          <div className="pt-4 max-w-lg mx-auto">
+            {isSuccess ? (
+              <div className="p-4 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#D4AF37] flex items-center justify-center space-x-3 text-sm font-sans-clean font-semibold tracking-wide">
+                <Check className="w-5 h-5 shrink-0" />
+                <span>Thank you! You are on our launch notification list.</span>
               </div>
-
-              {/* Space filter */}
-              <div className="flex items-center gap-2">
-                <span className="text-[#8C8273] uppercase text-[10px] font-mono">Space:</span>
-                <select
-                  id="shop-space-filter"
-                  value={selectedSpace}
-                  onChange={(e) => setSelectedSpace(e.target.value)}
-                  className="bg-[#0D0C0A] border border-[#D1C7B7]/25 text-[#F7F5F0] px-3 py-1.5 uppercase font-medium rounded-lg focus:outline-none focus:border-[#D1C7B7]"
-                >
-                  {allSpaces.map((s) => (
-                    <option key={s} value={s} className="bg-[#0D0C0A] text-[#F7F5F0]">
-                      {s.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Brand filter */}
-              <div className="flex items-center gap-2">
-                <span className="text-[#8C8273] uppercase text-[10px] font-mono">Brand:</span>
-                <select
-                  id="shop-brand-filter"
-                  value={selectedBrand}
-                  onChange={(e) => setSelectedBrand(e.target.value)}
-                  className="bg-[#0D0C0A] border border-[#D1C7B7]/25 text-[#F7F5F0] px-3 py-1.5 uppercase font-medium rounded-lg focus:outline-none focus:border-[#D1C7B7]"
-                >
-                  {allBrands.map((b) => (
-                    <option key={b} value={b} className="bg-[#0D0C0A] text-[#F7F5F0]">
-                      {b.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {hasActiveFilters && (
-                <button
-                  id="shop-clear-filters-btn"
-                  onClick={clearAllFilters}
-                  className="text-xs text-[#D1C7B7] hover:text-[#F7F5F0] underline cursor-pointer ml-auto lg:ml-2"
-                >
-                  Reset Filters
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Results Counter */}
-        <div className="flex items-center justify-between text-xs font-sans-clean text-[#8C8273]">
-          <span>
-            Showing <strong className="text-[#F7F5F0]">{filteredProducts.length}</strong> architectural products
-          </span>
-          <span className="text-[11px] uppercase tracking-wider text-[#D1C7B7] font-mono">
-            All items available for consolidated project quotation
-          </span>
-        </div>
-
-        {/* Product Catalog Grid */}
-        {filteredProducts.length === 0 ? (
-          <div className="py-24 text-center space-y-4 border border-[#D1C7B7]/20 bg-[#141311] rounded-2xl">
-            <p className="font-serif-title text-3xl text-[#F7F5F0]">No materials match this filter.</p>
-            <p className="text-xs font-sans-clean text-[#8C8273]">
-              Try resetting filters or searching with different parameters.
-            </p>
-            <button
-              onClick={clearAllFilters}
-              className="px-6 py-2.5 bg-[#F7F5F0] text-[#0D0C0A] font-bold rounded-lg text-xs uppercase tracking-wider font-sans-clean cursor-pointer hover:bg-[#D1C7B7] transition-colors"
-            >
-              Clear All Filters
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => {
-              const isInSchedule = cart.items.some((i) => i.productId === product.id);
-              const isJustAdded = recentlyAddedId === product.id;
-
-              return (
-                <div
-                  key={product.id}
-                  id={`product-grid-card-${product.id}`}
-                  onClick={() => onOpenProduct(product.slug)}
-                  className="bg-[#141311] rounded-2xl border border-[#D1C7B7]/20 p-5 flex flex-col justify-between group cursor-pointer hover:border-[#D1C7B7]/60 transition-all shadow-md"
-                >
-                  <div className="space-y-4">
-                    {/* Image */}
-                    <div className="aspect-[4/3] overflow-hidden rounded-xl bg-black/40 border border-[#D1C7B7]/15 relative">
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                      />
-                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[#D1C7B7] text-[9px] font-mono uppercase border border-[#D1C7B7]/20">
-                        {product.availability}
-                      </span>
-                    </div>
-
-                    {/* Metadata & Names */}
-                    <div>
-                      <div className="flex items-center justify-between text-[10px] font-mono text-[#D1C7B7] uppercase">
-                        <span>{product.brand}</span>
-                        <span>{product.material}</span>
-                      </div>
-                      <h3 className="font-serif-title text-xl text-[#F7F5F0] group-hover:text-[#D1C7B7] transition-colors mt-1 leading-snug">
-                        {product.name}
-                      </h3>
-                    </div>
-
-                    {/* Finish & Specs */}
-                    <div className="space-y-1 text-xs font-sans-clean text-[#8C8273]">
-                      <p className="line-clamp-1">
-                        <strong className="text-[#D1C7B7]">Finish:</strong> {product.finish}
-                      </p>
-                      <p className="line-clamp-1 font-mono text-[11px]">
-                        <strong className="text-[#D1C7B7]">Dims:</strong> {product.dimensions}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Card Actions */}
-                  <div className="pt-5 mt-4 border-t border-[#D1C7B7]/15 space-y-2">
-                    <button
-                      id={`quick-add-btn-${product.id}`}
-                      onClick={(e) => handleQuickAdd(product, e)}
-                      className={`w-full py-2.5 text-xs font-sans-clean font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                        isJustAdded
-                          ? 'bg-emerald-500/20 border border-emerald-400 text-emerald-300'
-                          : isInSchedule
-                          ? 'bg-[#EFEAE2]/15 border border-[#D1C7B7]/40 text-[#F7F5F0]'
-                          : 'bg-[#F7F5F0] hover:bg-[#D1C7B7] text-[#0D0C0A]'
-                      }`}
-                    >
-                      {isJustAdded ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>ADDED TO SCHEDULE</span>
-                        </>
-                      ) : isInSchedule ? (
-                        <>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>IN SCHEDULE (+ADD MORE)</span>
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>ADD TO PROJECT</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      onClick={() => onOpenProduct(product.slug)}
-                      className="w-full text-center text-xs text-[#8C8273] hover:text-[#F7F5F0] underline font-sans-clean cursor-pointer py-1"
-                    >
-                      VIEW SPEC SHEET & CAD
-                    </button>
-                  </div>
+            ) : (
+              <form onSubmit={handleNotifySubmit} className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#D1C7B7]/50" />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter email to get launch invitation & trade pricing..."
+                    className="w-full bg-[#141311] border border-[#D1C7B7]/30 rounded-xl pl-11 pr-4 py-3.5 text-xs text-[#F7F5F0] placeholder-[#D1C7B7]/40 focus:outline-none focus:border-[#D4AF37] transition-all font-sans-clean"
+                  />
                 </div>
-              );
-            })}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-6 py-3.5 bg-[#D4AF37] hover:bg-[#b8952b] text-[#0D0C0A] text-xs font-sans-clean font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-lg shrink-0 flex items-center justify-center space-x-2"
+                >
+                  {isSubmitting ? (
+                    <span>JOINING...</span>
+                  ) : (
+                    <>
+                      <span>NOTIFY ME AT LAUNCH</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
           </div>
-        )}
+        </div>
+
+        {/* Immediate Alternatives Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+          
+          {/* Action 1: Download Catalogue */}
+          <div className="bg-[#141311] border border-[#D1C7B7]/20 rounded-2xl p-6 flex flex-col justify-between space-y-6 hover:border-[#D4AF37]/50 transition-all group">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] flex items-center justify-center">
+                <Download className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif-title text-xl text-[#F7F5F0]">Product Catalogue Deck</h3>
+              <p className="text-xs font-sans-clean text-[#D1C7B7]/70 leading-relaxed font-light">
+                Download the complete Archzona architectural material and structural specification manual (PDF, 2.5 MB).
+              </p>
+            </div>
+            <a
+              id="shop-coming-soon-download-deck-btn"
+              href="/Archzona_Product_Catalogue_Deck.pdf"
+              download="Archzona_Product_Catalogue_Deck.pdf"
+              className="inline-flex items-center justify-between w-full px-4 py-3 rounded-xl border border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#D4AF37] text-xs uppercase font-sans-clean font-bold tracking-wider hover:bg-[#D4AF37] hover:text-[#0D0C0A] transition-all cursor-pointer"
+            >
+              <span>Download PDF Deck</span>
+              <Download className="w-4 h-4" />
+            </a>
+          </div>
+
+          {/* Action 2: Request Swatches & Quote */}
+          <div className="bg-[#141311] border border-[#D1C7B7]/20 rounded-2xl p-6 flex flex-col justify-between space-y-6 hover:border-[#D4AF37]/50 transition-all group">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-[#EFEAE2]/15 border border-[#EFEAE2]/30 text-[#EFEAE2] flex items-center justify-center">
+                <FileText className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif-title text-xl text-[#F7F5F0]">Request Swatches & Quote</h3>
+              <p className="text-xs font-sans-clean text-[#D1C7B7]/70 leading-relaxed font-light">
+                Get express material swatch box dispatches, CAD CAD CAD detailing, and consolidated project quotes today.
+              </p>
+            </div>
+            <button
+              id="shop-coming-soon-request-quote-btn"
+              onClick={onRequestQuote}
+              className="inline-flex items-center justify-between w-full px-4 py-3 rounded-xl bg-[#F7F5F0] hover:bg-[#D1C7B7] text-[#0D0C0A] text-xs uppercase font-sans-clean font-bold tracking-wider transition-all cursor-pointer"
+            >
+              <span>Get Immediate Quote</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Action 3: Explore Materials */}
+          <div className="bg-[#141311] border border-[#D1C7B7]/20 rounded-2xl p-6 flex flex-col justify-between space-y-6 hover:border-[#D4AF37]/50 transition-all group">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-[#D1C7B7]/15 border border-[#D1C7B7]/30 text-[#D1C7B7] flex items-center justify-center">
+                <Layers className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif-title text-xl text-[#F7F5F0]">Explore Material Systems</h3>
+              <p className="text-xs font-sans-clean text-[#D1C7B7]/70 leading-relaxed font-light">
+                Browse detailed technical specifications, characteristics, and application galleries for WPC, HPL, ACP, and Onduline.
+              </p>
+            </div>
+            <button
+              id="shop-coming-soon-explore-materials-btn"
+              onClick={() => onNavigate({ type: 'materials' })}
+              className="inline-flex items-center justify-between w-full px-4 py-3 rounded-xl border border-[#D1C7B7]/30 text-[#D1C7B7] hover:text-[#F7F5F0] hover:border-[#D1C7B7] text-xs uppercase font-sans-clean font-semibold tracking-wider transition-all cursor-pointer"
+            >
+              <span>View Materials</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </button>
+          </div>
+
+        </div>
+
+        {/* Feature Teaser Cards Section */}
+        <div className="border-t border-[#D1C7B7]/15 pt-14 space-y-10">
+          <div className="text-center space-y-2">
+            <h2 className="font-serif-title text-2xl sm:text-3xl text-[#F7F5F0]">
+              WHAT TO EXPECT FROM THE ONLINE STORE
+            </h2>
+            <p className="text-xs font-mono uppercase tracking-[0.2em] text-[#D1C7B7]/60">
+              ENGINEERED FOR ARCHITECTS, DEVELOPERS & CONTRACTORS
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <div className="bg-[#141311]/60 border border-[#D1C7B7]/15 rounded-2xl p-6 space-y-3">
+              <div className="text-xs font-mono text-[#D4AF37] font-semibold">01 // READY WAREHOUSE STOCK</div>
+              <h4 className="font-serif-title text-lg text-[#F7F5F0]">Real-Time Stock Checks</h4>
+              <p className="text-xs font-sans-clean text-[#D1C7B7]/70 leading-relaxed font-light">
+                Check exact available stock quantities and sheet counts in our Thane warehouse before ordering.
+              </p>
+            </div>
+
+            <div className="bg-[#141311]/60 border border-[#D1C7B7]/15 rounded-2xl p-6 space-y-3">
+              <div className="text-xs font-mono text-[#D4AF37] font-semibold">02 // 3D MODELS & CAD FILES</div>
+              <h4 className="font-serif-title text-lg text-[#F7F5F0]">Download 3D & CAD Files</h4>
+              <p className="text-xs font-sans-clean text-[#D1C7B7]/70 leading-relaxed font-light">
+                Download ready-to-use 3D building models (BIM / Revit) and CAD drawings directly into your architectural plans.
+              </p>
+            </div>
+
+            <div className="bg-[#141311]/60 border border-[#D1C7B7]/15 rounded-2xl p-6 space-y-3">
+              <div className="text-xs font-mono text-[#D4AF37] font-semibold">03 // ARCHITECT DISCOUNTS</div>
+              <h4 className="font-serif-title text-lg text-[#F7F5F0]">Wholesale Trade Pricing</h4>
+              <p className="text-xs font-sans-clean text-[#D1C7B7]/70 leading-relaxed font-light">
+                Registered architects, interior studios, and contractors get special bulk trade discounts automatically.
+              </p>
+            </div>
+
+            <div className="bg-[#141311]/60 border border-[#D1C7B7]/15 rounded-2xl p-6 space-y-3">
+              <div className="text-xs font-mono text-[#D4AF37] font-semibold">04 // FREE MATERIAL SAMPLES</div>
+              <h4 className="font-serif-title text-lg text-[#F7F5F0]">Fast Sample Delivery</h4>
+              <p className="text-xs font-sans-clean text-[#D1C7B7]/70 leading-relaxed font-light">
+                Order real physical material samples (WPC, HPL, ACP) delivered directly to your office or home in 48 hours.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   );

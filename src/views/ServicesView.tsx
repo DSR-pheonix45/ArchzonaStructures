@@ -50,7 +50,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                       STAGE {svc.step}
                     </span>
                     <span className="text-[10px] uppercase tracking-wider text-[#8C8273] font-mono">
-                      Full Ownership
+                      Turnkey Execution
                     </span>
                   </div>
 
@@ -104,7 +104,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                 Pre-Engineered Sub-frames
               </span>
               <p className="text-[#D1C7B7]/80 leading-relaxed">
-                We design and calculate aluminum and heavy-gauge galvanized steel joist spans specifically for your soil and deck loads.
+                We engineer and calculate aluminum and heavy-gauge galvanized steel joist spans specifically for your soil and deck loads.
               </p>
             </div>
             <div className="p-4 bg-[#0D0C0A] rounded-xl border border-[#D1C7B7]/20 space-y-2">
