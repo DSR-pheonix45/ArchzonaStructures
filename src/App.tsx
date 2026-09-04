@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { ProjectCartProvider } from './context/ProjectCartContext';
 import { ViewRoute, Product } from './types';
 import { productsData } from './data/products';
@@ -172,6 +173,8 @@ export default function App() {
           onNavigate={handleNavigate}
           onOpenProduct={handleOpenProduct}
         />
+
+        <Analytics />
       </div>
     </ProjectCartProvider>
   );
