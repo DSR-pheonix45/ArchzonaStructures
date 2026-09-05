@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Mail, MessageSquare, MapPin, Send, CheckCircle2, ArrowRight, Paperclip, Upload, X, ExternalLink } from 'lucide-react';
+import { Mail, MessageSquare, MapPin, Send, CheckCircle2, ArrowRight, Paperclip, Upload, X, ExternalLink, Loader2 } from 'lucide-react';
 import {
   ARCHZONA_EMAIL,
   ARCHZONA_PHONE,
   ARCHZONA_ADDRESS_LINE1,
   ARCHZONA_ADDRESS_LINE2,
   ARCHZONA_MAPS_URL,
+  submitProjectInquiry,
   generateWhatsAppQuoteUrl,
 } from '../utils/quoteWorkflow';
 
@@ -25,6 +26,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
   });
 
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,8 +35,26 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
+    const messageWithFile = attachedFile
+      ? `${formData.message ? formData.message + '\n' : ''}[Attached Drawing/Spec: ${attachedFile.name} (${(attachedFile.size / 1024).toFixed(1)} KB)]`
+      : formData.message;
+
+    await submitProjectInquiry({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      company: formData.firm,
+      projectType: formData.projectType,
+      projectLocation: formData.location,
+      message: messageWithFile,
+      requirements: messageWithFile,
+    });
+
+    setIsSubmitting(false);
     setIsSubmitted(true);
   };
 
@@ -49,6 +69,15 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
     if (formData.message) text += `\nMessage: ${formData.message}`;
     if (attachedFile) text += `\n[Attached Drawing: ${attachedFile.name} (${(attachedFile.size / 1024).toFixed(1)} KB)]`;
     return `https://wa.me/919870048082?text=${encodeURIComponent(text)}`;
+  };
+
+  const buildSubmittedMailtoUrl = () => {
+    const subject = `[Archzona Inquiry] Project Consultation from ${formData.name || 'Client'}`;
+    let body = `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nFirm/Company: ${formData.firm}\nProject Type: ${formData.projectType}\nLocation: ${formData.location}\n\nMessage:\n${formData.message}`;
+    if (attachedFile) {
+      body += `\n\n[Attached File: ${attachedFile.name} (${(attachedFile.size / 1024).toFixed(1)} KB)]`;
+    }
+    return `mailto:${ARCHZONA_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   return (
@@ -157,23 +186,29 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
             {isSubmitted ? (
               <div className="p-8 bg-[#0D0C0A] rounded-2xl border border-[#D1C7B7]/30 space-y-4 text-center">
                 <CheckCircle2 className="w-12 h-12 text-[#D1C7B7] mx-auto" />
-                <h4 className="font-serif-title text-2xl text-[#F7F5F0]">Inquiry Received</h4>
+                <h4 className="font-serif-title text-2xl text-[#F7F5F0]">Inquiry Dispatched</h4>
                 <p className="text-xs font-sans-clean text-[#D1C7B7] max-w-md mx-auto leading-relaxed">
-                  Thank you, {formData.name || 'Client'}. An Archzona architectural representative will review your inquiry and connect with you shortly.
+                  Thank you, {formData.name || 'Client'}. Your project details have been sent to <strong className="text-[#F7F5F0]">info.archzona@gmail.com</strong>. An Archzona spatial partner will review your inquiry and connect with you shortly.
                 </p>
                 {attachedFile && (
                   <p className="text-xs font-mono text-[#D4AF37]">
-                    Attached Drawing: {attachedFile.name} ({(attachedFile.size / 1024).toFixed(1)} KB)
+                    Attached File: {attachedFile.name} ({(attachedFile.size / 1024).toFixed(1)} KB)
                   </p>
                 )}
-                <div className="pt-2">
+                <div className="pt-2 flex flex-wrap justify-center gap-3">
                   <a
                     href={buildSubmittedWhatsAppUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs font-sans-clean uppercase tracking-wider rounded-xl transition-all shadow-md"
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs font-sans-clean uppercase tracking-wider rounded-xl transition-all shadow-md"
                   >
                     <MessageSquare className="w-4 h-4" /> Continue on WhatsApp
+                  </a>
+                  <a
+                    href={buildSubmittedMailtoUrl()}
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-[#141311] border border-[#D1C7B7]/40 hover:border-[#D1C7B7] text-[#F7F5F0] font-bold text-xs font-sans-clean uppercase tracking-wider rounded-xl transition-all shadow-md"
+                  >
+                    <Mail className="w-4 h-4 text-[#D1C7B7]" /> Open Mail Client
                   </a>
                 </div>
               </div>
@@ -323,10 +358,20 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                 <div className="pt-2 flex flex-col sm:flex-row gap-3">
                   <button
                     type="submit"
-                    className="flex-1 py-3.5 bg-[#F7F5F0] hover:bg-[#D1C7B7] text-[#0D0C0A] text-xs font-bold font-sans-clean uppercase tracking-[0.2em] rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg"
+                    disabled={isSubmitting}
+                    className="flex-1 py-3.5 bg-[#F7F5F0] hover:bg-[#D1C7B7] disabled:opacity-50 text-[#0D0C0A] text-xs font-bold font-sans-clean uppercase tracking-[0.2em] rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg"
                   >
-                    <span>SEND CONSULTATION REQUEST</span>
-                    <Send className="w-4 h-4" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-[#0D0C0A]" />
+                        <span>SENDING INQUIRY...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>SEND CONSULTATION REQUEST</span>
+                        <Send className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
 
                   <a

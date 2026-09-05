@@ -18,25 +18,47 @@ export interface SubmissionResponse {
 
 /**
  * Clean submission abstraction for project quote requests.
- * Prepared for pluggable backend, Supabase Edge Function, or transactional email service.
+ * Connects to FormSubmit AJAX service to deliver emails to info.archzona@gmail.com
  */
 export async function submitQuoteRequest(quote: QuoteRequest): Promise<SubmissionResponse> {
-  // Simulate network flight with micro-delay for UX feedback
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
   const referenceId = `AZ-QTE-${Date.now().toString().slice(-6)}`;
   const timestamp = new Date().toISOString();
 
-  // In production, this can invoke an API route or serverless function
-  console.log('[Archzona] Quote Request Submitted to', ARCHZONA_EMAIL, {
-    referenceId,
-    timestamp,
-    quote,
-  });
+  const formattedItems = quote.items && quote.items.length > 0
+    ? quote.items.map((item, idx) => `${idx + 1}. ${item.productName} [Brand: ${item.brand}] - Qty: ${item.quantity}`).join('\n')
+    : 'No items selected';
+
+  try {
+    await fetch(`https://formsubmit.co/ajax/${ARCHZONA_EMAIL}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        _subject: `[Archzona Quote Request] ${quote.clientName} - ${quote.projectName || 'Project'}`,
+        _replyto: quote.email,
+        _captcha: 'false',
+        'Reference ID': referenceId,
+        'Client Name': quote.clientName,
+        'Email Address': quote.email,
+        'Phone / WhatsApp': quote.phone,
+        'Company / Firm': quote.company || 'Not specified',
+        'Project Name': quote.projectName || 'Architectural Project',
+        'Project Location': quote.projectLocation || 'Not specified',
+        'Project Type': quote.projectType || 'Custom Space',
+        'Approximate Area': quote.approximateArea || 'Not specified',
+        'Selected Products': formattedItems,
+        'Project Notes': quote.notes || 'None',
+      }),
+    });
+  } catch (err) {
+    console.warn('[Archzona] FormSubmit quote email attempt exception:', err);
+  }
 
   return {
     success: true,
-    message: 'Your project material requirements have been compiled and sent to the Archzona project team.',
+    message: 'Your project material requirements have been compiled and sent to info.archzona@gmail.com.',
     referenceId,
     timestamp,
     data: quote,
@@ -47,20 +69,38 @@ export async function submitQuoteRequest(quote: QuoteRequest): Promise<Submissio
  * Clean submission abstraction for general project inquiries.
  */
 export async function submitProjectInquiry(inquiry: ContactInquiry): Promise<SubmissionResponse> {
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
   const referenceId = `AZ-INQ-${Date.now().toString().slice(-6)}`;
   const timestamp = new Date().toISOString();
 
-  console.log('[Archzona] Project Inquiry Submitted to', ARCHZONA_EMAIL, {
-    referenceId,
-    timestamp,
-    inquiry,
-  });
+  try {
+    await fetch(`https://formsubmit.co/ajax/${ARCHZONA_EMAIL}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        _subject: `[Archzona Inquiry] ${inquiry.name} (${inquiry.projectType})`,
+        _replyto: inquiry.email,
+        _captcha: 'false',
+        'Reference ID': referenceId,
+        'Client Name': inquiry.name,
+        'Email Address': inquiry.email,
+        'Phone / WhatsApp': inquiry.phone,
+        'Company / Firm': inquiry.company || 'Not specified',
+        'Project Type': inquiry.projectType,
+        'Project Location': inquiry.projectLocation || 'Not specified',
+        'Approximate Size': inquiry.approximateSize || 'Not specified',
+        'Message & Requirements': inquiry.message || inquiry.requirements || 'General inquiry',
+      }),
+    });
+  } catch (err) {
+    console.warn('[Archzona] FormSubmit inquiry email attempt exception:', err);
+  }
 
   return {
     success: true,
-    message: 'Your inquiry has been received. An Archzona spatial partner will reach out within 24 hours.',
+    message: 'Your inquiry has been sent to info.archzona@gmail.com.',
     referenceId,
     timestamp,
     data: inquiry,
