@@ -249,16 +249,15 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               </p>
             </div>
 
-            {/* Asymmetrical 8-Space Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8">
+            {/* 3x3 Symmetrical Spaces Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {spacesData.map((space, idx) => {
-                const colSpan = idx % 3 === 0 ? 'lg:col-span-8' : 'lg:col-span-4';
                 return (
                   <div
                     key={space.id}
                     id={`explore-space-card-${space.slug}`}
                     onClick={() => setSelectedSpaceSlug(space.slug)}
-                    className={`${colSpan} group relative h-[380px] sm:h-[420px] overflow-hidden rounded-2xl cursor-pointer border border-[#D1C7B7]/20 bg-[#141311] hover:border-[#D1C7B7]/60 transition-all shadow-md`}
+                    className="group relative h-[380px] sm:h-[420px] overflow-hidden rounded-2xl cursor-pointer border border-[#D1C7B7]/20 bg-[#141311] hover:border-[#D1C7B7]/60 transition-all shadow-md"
                   >
                     <img
                       src={space.heroImage}
