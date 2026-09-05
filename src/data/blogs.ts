@@ -33,7 +33,7 @@ export const blogsData: BlogPost[] = [
     author: {
       name: 'Harish K',
       role: 'Co-Founder & Structural Engineering Specialist',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop',
+      avatar: '/images/team/harish_k.jpg',
     },
     date: 'September 04, 2026',
     readTime: '6 min read',
@@ -152,7 +152,7 @@ export const blogsData: BlogPost[] = [
     author: {
       name: 'Harish K',
       role: 'Co-Founder & Material Engineering Specialist',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop',
+      avatar: '/images/team/harish_k.jpg',
     },
     date: 'August 18, 2026',
     readTime: '8 min read',
