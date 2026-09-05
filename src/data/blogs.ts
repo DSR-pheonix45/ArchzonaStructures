@@ -94,7 +94,7 @@ export const blogsData: BlogPost[] = [
     author: {
       name: 'Naresh K',
       role: 'Co-Founder & Spatial Infrastructure Specialist',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop',
+      avatar: '/images/team/naresh_k.jpg',
     },
     date: 'August 28, 2026',
     readTime: '7 min read',
@@ -206,7 +206,7 @@ export const blogsData: BlogPost[] = [
     author: {
       name: 'Naresh K',
       role: 'Co-Founder & Spatial Infrastructure Specialist',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop',
+      avatar: '/images/team/naresh_k.jpg',
     },
     date: 'August 10, 2026',
     readTime: '5 min read',
