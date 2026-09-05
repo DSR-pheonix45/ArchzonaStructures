@@ -315,7 +315,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
             onClick={() => onNavigate({ type: 'explore' })}
             className="text-xs uppercase tracking-[0.2em] text-[#D1C7B7] font-mono font-semibold border-b border-[#D1C7B7]/50 pb-1 hover:text-[#F7F5F0] hover:border-[#F7F5F0] transition-colors cursor-pointer self-start md:self-end flex items-center gap-2"
           >
-            <span>VIEW ALL 8 SPACES</span>
+            <span>VIEW ALL SPACES</span>
             <ArrowUpRight className="w-4 h-4" />
           </button>
         </div>

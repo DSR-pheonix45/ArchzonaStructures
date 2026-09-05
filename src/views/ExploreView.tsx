@@ -269,7 +269,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                     <div className="absolute bottom-0 left-0 right-0 p-8 text-white space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] tracking-[0.25em] uppercase text-[#D1C7B7] font-mono font-semibold">
-                          ARCHETYPE 0{idx + 1}
+                          ARCHETYPE {String(idx + 1).padStart(2, '0')}
                         </span>
                         <span className="text-xs uppercase font-sans-clean text-[#D1C7B7] group-hover:text-[#F7F5F0] flex items-center gap-1">
                           Open Space Experience <ArrowUpRight className="w-3.5 h-3.5" />

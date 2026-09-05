@@ -151,16 +151,22 @@ export const structuresData: Structure[] = [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop',
     ],
-    applications: ['Bespoke Pavilions', 'Terrazzo Pathways & Walkways', 'Canopies', 'Curtain Wall & Facades', 'Feature Bridges'],
-    spaces: ['resorts', 'villas', 'commercial', 'hospitality', 'gardens'],
+    applications: ['Bespoke Pavilions', 'Terrazzo Pathways & Walkways', 'Canopies', 'Curtain Wall & Facades', 'Smart Stack & Puzzle Parking'],
+    spaces: ['resorts', 'villas', 'commercial', 'hospitality', 'gardens', 'smart-parking'],
     materials: ['terrazzo', 'wpc', 'hpl', 'acp', 'tensile-fabric', 'microcement', 'voody-proboard'],
     configuratorOptions: {
-      sizes: ['Site-Specific Custom Proportions', 'Multi-Level Pavilion', 'Linear Terrazzo Garden Walkway', 'Suspended Boardwalk System'],
+      sizes: ['Site-Specific Custom Proportions', 'Multi-Level Pavilion', 'Linear Terrazzo Garden Walkway', 'Automated Multi-Tier Parking Bay'],
       roofOptions: ['Parametric Ribbed Timber Glazing', 'Louvered Sculptural Screen', 'Perforated ACP Acoustic Skin', 'Monolithic Metal Overhang'],
       materialOptions: ['Italian Marble Terrazzo & Mineral Binder', 'CNC Curved Multi-Ply Timber', 'High-Yield Structural Steel', 'Engineered WPC & Metal Composite'],
       addons: ['Full Parametric Structural Drawings', 'Wind-Tunnel Virtual Simulation', 'Pre-Fabricated Numbered Installation Kits', 'Certified PE Stamping'],
     },
     configurations: [
+      {
+        name: 'Smart Mechanical Parking Systems',
+        description: 'Automated hydraulic stack parking, multi-level puzzle parking matrices, and integrated third-party EV charging infrastructure.',
+        image: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?q=80&w=1000&auto=format&fit=crop',
+        features: ['Stack Parking (2 & 3 Level Hydraulic)', 'Puzzle Parking (Multi-Tier Automated Matrix)', 'EV Charging Station Integration (Third-Party)'],
+      },
       {
         name: 'Terrazzo & Mineral Aggregate Pathways',
         description: 'Seamless, high-density poured or slab terrazzo walkways winding through lush tropical garden landscapes.',
