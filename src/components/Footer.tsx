@@ -103,11 +103,20 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </h4>
             <div className="space-y-3 font-sans-clean text-sm text-[#D1C7B7]">
               <a
-                href={`tel:${ARCHZONA_PHONE.replace(/\s+/g, '')}`}
+                href={`tel:${ARCHZONA_PHONE_NARESH.replace(/\s+/g, '')}`}
                 className="flex items-center space-x-3 hover:text-[#F7F5F0] transition-colors group p-2 rounded-lg hover:bg-[#141311] border border-transparent hover:border-[#D1C7B7]/20"
               >
                 <Phone className="w-4 h-4 text-[#D1C7B7] group-hover:text-[#F7F5F0]" />
-                <span className="font-mono">{ARCHZONA_PHONE}</span>
+                <span className="font-mono">{ARCHZONA_PHONE_NARESH}</span>
+                <span className="text-[10px] text-[#8C8273]">(Naresh K)</span>
+              </a>
+              <a
+                href={`tel:${ARCHZONA_PHONE_HARISH.replace(/\s+/g, '')}`}
+                className="flex items-center space-x-3 hover:text-[#F7F5F0] transition-colors group p-2 rounded-lg hover:bg-[#141311] border border-transparent hover:border-[#D1C7B7]/20"
+              >
+                <Phone className="w-4 h-4 text-[#D1C7B7] group-hover:text-[#F7F5F0]" />
+                <span className="font-mono">{ARCHZONA_PHONE_HARISH}</span>
+                <span className="text-[10px] text-[#8C8273]">(Harish K)</span>
               </a>
               <a
                 href={`mailto:${ARCHZONA_EMAIL}`}

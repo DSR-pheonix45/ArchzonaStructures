@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { Mail, MessageSquare, MapPin, Send, CheckCircle2, ArrowRight, Paperclip, Upload, X, ExternalLink, Loader2 } from 'lucide-react';
+import { Mail, MessageSquare, MapPin, Send, CheckCircle2, ArrowRight, Paperclip, Upload, X, ExternalLink, Loader2, Phone } from 'lucide-react';
 import {
   ARCHZONA_EMAIL,
-  ARCHZONA_PHONE,
+  ARCHZONA_PHONE_NARESH,
+  ARCHZONA_WHATSAPP_NARESH,
+  ARCHZONA_PHONE_HARISH,
+  ARCHZONA_WHATSAPP_HARISH,
   ARCHZONA_ADDRESS_LINE1,
   ARCHZONA_ADDRESS_LINE2,
   ARCHZONA_MAPS_URL,
@@ -106,21 +109,41 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                 DIRECT CHANNELS
               </span>
 
-              {/* WhatsApp Direct */}
-              <div className="space-y-2">
+              {/* Direct WhatsApp & Phone Contact Points */}
+              <div className="space-y-3">
                 <span className="text-[10px] uppercase font-mono text-[#8C8273] block">
-                  INSTANT ARCHITECTURAL DESK (WHATSAPP)
+                  INSTANT ARCHITECTURAL DESKS (DIRECT CONTACT)
                 </span>
+                
+                {/* Contact Point 1: Naresh K */}
                 <a
-                  href={whatsAppDirectUrl}
+                  href={`https://wa.me/${ARCHZONA_WHATSAPP_NARESH}?text=${encodeURIComponent(defaultWhatsAppIntro)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-white hover:bg-emerald-500/20 transition-all cursor-pointer"
+                  className="flex items-center gap-3 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-white hover:bg-emerald-500/20 transition-all cursor-pointer group"
                 >
                   <MessageSquare className="w-5 h-5 text-emerald-400 shrink-0" />
-                  <div>
-                    <span className="font-mono font-bold text-sm block text-emerald-300">{ARCHZONA_PHONE}</span>
+                  <div className="flex-1">
+                    <span className="font-mono font-bold text-sm block text-emerald-300 group-hover:underline">
+                      {ARCHZONA_PHONE_NARESH}
+                    </span>
                     <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Naresh K — Co-Founder, Archzona</span>
+                  </div>
+                </a>
+
+                {/* Contact Point 2: Harish K */}
+                <a
+                  href={`https://wa.me/${ARCHZONA_WHATSAPP_HARISH}?text=${encodeURIComponent(defaultWhatsAppIntro)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-white hover:bg-emerald-500/20 transition-all cursor-pointer group"
+                >
+                  <MessageSquare className="w-5 h-5 text-emerald-400 shrink-0" />
+                  <div className="flex-1">
+                    <span className="font-mono font-bold text-sm block text-emerald-300 group-hover:underline">
+                      {ARCHZONA_PHONE_HARISH}
+                    </span>
+                    <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Harish K — Co-Founder, Archzona</span>
                   </div>
                 </a>
               </div>
