@@ -105,55 +105,57 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             </div>
 
             {/* STEP 2: MATERIALS (Section 14) */}
-            <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-[#D1C7B7]/20 pb-3">
-                <div>
-                  <span className="text-xs uppercase tracking-[0.25em] text-[#D1C7B7] font-mono font-semibold">
-                    02 — RECOMMENDED MATERIALS
-                  </span>
-                  <h3 className="font-serif-title text-3xl text-[#F7F5F0] mt-1">
-                    Tactile Materials Calibrated for {activeSpace.name}
-                  </h3>
+            {relatedMaterials.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-[#D1C7B7]/20 pb-3">
+                  <div>
+                    <span className="text-xs uppercase tracking-[0.25em] text-[#D1C7B7] font-mono font-semibold">
+                      02 — RECOMMENDED MATERIALS
+                    </span>
+                    <h3 className="font-serif-title text-3xl text-[#F7F5F0] mt-1">
+                      Tactile Materials Calibrated for {activeSpace.name}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {relatedMaterials.map((mat) => (
+                    <div
+                      key={mat.id}
+                      id={`space-material-card-${mat.slug}`}
+                      onClick={() => onNavigate({ type: 'materials', materialSlug: mat.slug })}
+                      className="bg-[#141311] rounded-xl p-6 border border-[#D1C7B7]/20 flex flex-col justify-between group cursor-pointer hover:border-[#D1C7B7]/60 transition-all shadow-md"
+                    >
+                      <div className="space-y-4">
+                        <div className="aspect-[4/3] overflow-hidden rounded-lg bg-black/40 border border-[#D1C7B7]/15">
+                          <img
+                            src={mat.heroImage}
+                            alt={mat.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[10px] tracking-wider uppercase text-[#D1C7B7] font-semibold block font-mono">
+                            {mat.category}
+                          </span>
+                          <h4 className="font-serif-title text-2xl text-[#F7F5F0] group-hover:text-[#D1C7B7] transition-colors">
+                            {mat.name}
+                          </h4>
+                        </div>
+                        <p className="text-xs font-sans-clean text-[#8C8273] line-clamp-2">
+                          {mat.positioning}
+                        </p>
+                      </div>
+
+                      <div className="pt-6 border-t border-[#D1C7B7]/15 flex items-center justify-between text-xs font-sans-clean text-[#D1C7B7] font-medium">
+                        <span>Explore Material Details</span>
+                        <ArrowUpRight className="w-4 h-4 text-[#D1C7B7] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {relatedMaterials.map((mat) => (
-                  <div
-                    key={mat.id}
-                    id={`space-material-card-${mat.slug}`}
-                    onClick={() => onNavigate({ type: 'materials', materialSlug: mat.slug })}
-                    className="bg-[#141311] rounded-xl p-6 border border-[#D1C7B7]/20 flex flex-col justify-between group cursor-pointer hover:border-[#D1C7B7]/60 transition-all shadow-md"
-                  >
-                    <div className="space-y-4">
-                      <div className="aspect-[4/3] overflow-hidden rounded-lg bg-black/40 border border-[#D1C7B7]/15">
-                        <img
-                          src={mat.heroImage}
-                          alt={mat.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
-                        />
-                      </div>
-                      <div>
-                        <span className="text-[10px] tracking-wider uppercase text-[#D1C7B7] font-semibold block font-mono">
-                          {mat.category}
-                        </span>
-                        <h4 className="font-serif-title text-2xl text-[#F7F5F0] group-hover:text-[#D1C7B7] transition-colors">
-                          {mat.name}
-                        </h4>
-                      </div>
-                      <p className="text-xs font-sans-clean text-[#8C8273] line-clamp-2">
-                        {mat.positioning}
-                      </p>
-                    </div>
-
-                    <div className="pt-6 border-t border-[#D1C7B7]/15 flex items-center justify-between text-xs font-sans-clean text-[#D1C7B7] font-medium">
-                      <span>Explore Material Details</span>
-                      <ArrowUpRight className="w-4 h-4 text-[#D1C7B7] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            )}
 
             {/* STEP 3: STRUCTURES (Section 14) */}
             <div className="space-y-6">

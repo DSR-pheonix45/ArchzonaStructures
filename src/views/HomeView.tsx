@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowUpRight, ArrowDown, ChevronRight, Layers, Sparkles, Building2, Box, ShieldCheck, Download } from 'lucide-react';
 import { spacesData } from '../data/spaces';
 import { materialsData } from '../data/materials';
@@ -13,6 +13,19 @@ interface HomeViewProps {
 
 export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
   const featuredProject = projectsData[0]; // The Poolside Villa
+
+  // Auto-rotate hero spaces every 4 seconds
+  const [heroSpaceIndex, setHeroSpaceIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroSpaceIndex((prev) => (prev + 1) % spacesData.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const rotatingSpace1 = spacesData[heroSpaceIndex];
+  const rotatingSpace2 = spacesData[(heroSpaceIndex + 1) % spacesData.length];
 
   return (
     <div id="home-view" className="bg-transparent text-[#F7F5F0] overflow-hidden">
@@ -95,47 +108,49 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* Middle Card: POOLSIDE (Image Bento Block) */}
+            {/* Auto-Rotating Space Card 1 */}
             <div
-              id="bento-poolside-card"
-              onClick={() => onNavigate({ type: 'explore', spaceSlug: 'poolside' })}
-              className="relative h-[160px] rounded-2xl overflow-hidden group cursor-pointer border border-[#D1C7B7]/15"
+              id="bento-rotating-space-card-1"
+              onClick={() => onNavigate({ type: 'explore', spaceSlug: rotatingSpace1.slug })}
+              className="relative h-[160px] rounded-2xl overflow-hidden group cursor-pointer border border-[#D1C7B7]/20 hover:border-[#D1C7B7]/60 transition-all shadow-md"
             >
               <img
-                src="https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?q=80&w=900&auto=format&fit=crop"
-                alt="Poolside environment"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                key={rotatingSpace1.id}
+                src={rotatingSpace1.heroImage}
+                alt={rotatingSpace1.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out animate-fadeIn"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0D0C0A]/90 via-[#0D0C0A]/30 to-transparent" />
               <div className="absolute bottom-4 left-5 right-5 flex items-center justify-between text-[#F7F5F0]">
                 <div>
                   <span className="text-[9px] uppercase font-mono tracking-widest text-[#D1C7B7] block">
-                    ARCHETYPE // 01
+                    ARCHETYPE // {String(heroSpaceIndex + 1).padStart(2, '0')}
                   </span>
-                  <span className="font-serif-title text-xl text-[#F7F5F0]">POOLSIDE</span>
+                  <span className="font-serif-title text-xl text-[#F7F5F0] uppercase">{rotatingSpace1.name}</span>
                 </div>
                 <ArrowUpRight className="w-4 h-4 text-[#D1C7B7] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </div>
             </div>
 
-            {/* Bottom Card: VILLA (Image Bento Block) */}
+            {/* Auto-Rotating Space Card 2 */}
             <div
-              id="bento-villa-card"
-              onClick={() => onNavigate({ type: 'explore', spaceSlug: 'villas' })}
-              className="relative h-[160px] rounded-2xl overflow-hidden group cursor-pointer border border-[#D1C7B7]/15"
+              id="bento-rotating-space-card-2"
+              onClick={() => onNavigate({ type: 'explore', spaceSlug: rotatingSpace2.slug })}
+              className="relative h-[160px] rounded-2xl overflow-hidden group cursor-pointer border border-[#D1C7B7]/20 hover:border-[#D1C7B7]/60 transition-all shadow-md"
             >
               <img
-                src="https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=900&auto=format&fit=crop"
-                alt="Villa environment"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                key={rotatingSpace2.id}
+                src={rotatingSpace2.heroImage}
+                alt={rotatingSpace2.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out animate-fadeIn"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0D0C0A]/90 via-[#0D0C0A]/30 to-transparent" />
               <div className="absolute bottom-4 left-5 right-5 flex items-center justify-between text-[#F7F5F0]">
                 <div>
                   <span className="text-[9px] uppercase font-mono tracking-widest text-[#D1C7B7] block">
-                    ARCHETYPE // 02
+                    ARCHETYPE // {String(((heroSpaceIndex + 1) % spacesData.length) + 1).padStart(2, '0')}
                   </span>
-                  <span className="font-serif-title text-xl text-[#F7F5F0]">VILLA</span>
+                  <span className="font-serif-title text-xl text-[#F7F5F0] uppercase">{rotatingSpace2.name}</span>
                 </div>
                 <ArrowUpRight className="w-4 h-4 text-[#D1C7B7] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </div>

@@ -117,7 +117,7 @@ export const spacesData: Space[] = [
       'EV Charging Services (Third-Party Integration)',
       'Perimeter Steel Framing & Shade Canopies',
     ],
-    materials: ['acp', 'hpl', 'voody-proboard', 'tensile-fabric', 'wpc'],
+    materials: [],
     structures: ['custom-structures', 'tensile-structures', 'pergola'],
     featuredProjects: ['horizon-sky-terrace'],
   },
