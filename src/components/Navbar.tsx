@@ -27,7 +27,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate, onOpen
     { label: 'MATERIALS', route: { type: 'materials' as const } },
     { label: 'STRUCTURES', route: { type: 'structures' as const } },
     { label: 'SERVICES', route: { type: 'services' as const } },
-    { label: 'BLOGS', route: { type: 'blogs' as const } },
   ];
 
   return (
