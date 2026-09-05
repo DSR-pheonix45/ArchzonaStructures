@@ -45,20 +45,21 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "LocalBusiness",
+      "@type": ["LocalBusiness", "GeneralContractor", "HomeAndConstructionBusiness"],
       "@id": "https://archzonastructures.com/#organization",
       "name": "Archzona Structures",
       "legalName": "Archzona Structures",
       "url": "https://archzonastructures.com/",
       "logo": "https://archzonastructures.com/logo.png",
       "image": "https://archzonastructures.com/logo.png",
-      "description": "Digital architectural experience centre, building materials supplier, outdoor shade structures, tensile parking canopies, and smart hydraulic parking system installer.",
+      "description": "Premier gazebo builder, bioclimatic pergola manufacturer, tensile car parking shade canopy supplier, and automated smart parking system installer in Dombivli East, Thane.",
       "telephone": ["+919820048805", "+919702051858"],
       "email": "info.archzona@gmail.com",
+      "priceRange": "$$",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "105, Prism Industrial Estate, near Pendharkar College, Dombivli E",
-        "addressLocality": "Thane",
+        "addressLocality": "Dombivli East, Thane",
         "addressRegion": "Maharashtra",
         "postalCode": "421203",
         "addressCountry": "IN"
@@ -69,6 +70,14 @@
         "longitude": 72.9781
       },
       "hasMap": "https://maps.app.goo.gl/2ZGJW9GQhbkKXW6s7",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          "opens": "09:30",
+          "closes": "19:00"
+        }
+      ],
       "founder": [
         {
           "@type": "Person",
@@ -80,14 +89,55 @@
         }
       ],
       "areaServed": [
-        "Thane",
         "Dombivli",
-        "Mumbai",
+        "Thane",
+        "Kalyan",
         "Navi Mumbai",
+        "Mumbai",
         "Maharashtra",
         "India"
       ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Outdoor Structures & Smart Infrastructure Services",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Gazebo Builder & Custom Wooden/Composite Gazebos",
+              "description": "Design, engineering, and turnkey installation of outdoor gazebos in Dombivli and Thane."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Bioclimatic Louvered Pergola Installation",
+              "description": "Motorized aluminum louvered pergolas with automated rain sensors and wind deflection."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Tensile Fabric Car Parking Shade Canopy Manufacturing",
+              "description": "PVDF architectural membrane car parking shelters offering 95% UV block and column-free spans."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Smart Hydraulic Stack & Puzzle Parking Systems",
+              "description": "2-level and 3-level hydraulic stackers and automated matrix puzzle parking with EV charging."
+            }
+          }
+        ]
+      },
       "knowsAbout": [
+        "Gazebo Builder Dombivli Thane",
+        "Pergola Manufacturer Maharashtra",
         "WPC Wood Composite Decking",
         "High-Pressure Laminate HPL Rainscreen Facades",
         "Aluminium Composite Panels ACP",

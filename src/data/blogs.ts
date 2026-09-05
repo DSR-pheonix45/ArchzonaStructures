@@ -243,4 +243,54 @@ export const blogsData: BlogPost[] = [
       },
     ],
   },
+  {
+    id: 'blog-gazebo-pergola-builder-dombivli-thane',
+    slug: 'gazebo-pergola-builder-dombivli-thane-guide',
+    title: 'Top Gazebo & Pergola Builders in Dombivli & Thane: Architectural Shade Guide',
+    subtitle: 'Looking for a custom gazebo, bioclimatic pergola, or tensile shade builder near Dombivli East and Thane? Discover Archzona Structures.',
+    category: 'OUTDOOR STRUCTURES',
+    author: {
+      name: 'Naresh K',
+      role: 'Co-Founder & Spatial Infrastructure Specialist',
+      avatar: '/images/team/naresh_k.jpg',
+    },
+    date: 'August 02, 2026',
+    readTime: '5 min read',
+    heroImage: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=1200&auto=format&fit=crop',
+    excerpt: 'Located at 105, Prism Industrial Estate in Dombivli East, Archzona Structures provides custom gazebo design, bioclimatic louvered pergolas, and tensile canopy turnkey installations across Thane and Mumbai.',
+    seoKeywords: [
+      'Gazebo builder in Dombivli Thane',
+      'Pergola builder in Dombivli Thane',
+      'Outdoor shade structure contractor Thane',
+      'Archzona Structures Dombivli East',
+    ],
+    relatedStructures: ['gazebo', 'pergola', 'tensile'],
+    relatedMaterials: ['wpc', 'hpl', 'tensile-fabric'],
+    content: [
+      {
+        type: 'paragraph',
+        text: 'If you are searching for a trusted gazebo or pergola builder in Dombivli, Thane, Kalyan, or Navi Mumbai, spatial durability in tropical monsoon conditions is key. At Archzona Structures, our Digital Architectural Experience Centre (located at 105, Prism Industrial Estate, near Pendharkar College, Dombivli East) helps client developers and homeowners engineer turn-key outdoor shade solutions.',
+      },
+      {
+        type: 'heading',
+        text: 'Custom Gazebos & Bioclimatic Pergola Engineering in Thane',
+      },
+      {
+        type: 'paragraph',
+        text: 'Whether you require a poolside gazebo clad in rot-resistant WPC composite timber or a motor-driven bioclimatic louvered pergola for a rooftop terrace, Archzona handles everything from CAD structural calculations to turnkey site installation:',
+      },
+      {
+        type: 'bullet_list',
+        items: [
+          'High-Wind Load Certification: Rated for monsoon wind gusts up to 150 km/h with Grade 316 stainless steel tension rigging.',
+          'Bioclimatic Motorized Louvers: 0° to 135° blade rotation allowing complete daylight control and 100% watertight rain channeling.',
+          'Local Experience Centre & Site Visits: Visit our Dombivli East experience centre or schedule an on-site technical inspection anywhere in Thane, Mumbai, or Navi Mumbai.',
+        ],
+      },
+      {
+        type: 'key_takeaway',
+        text: 'Visit Archzona Structures: Office 105, Prism Industrial Estate, near Pendharkar College, Dombivli East, Thane 421203. Contact Naresh K (+91 98200 48805) or Harish K (+91 97020 51858).',
+      },
+    ],
+  },
 ];
