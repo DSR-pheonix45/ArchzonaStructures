@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { Mail, MessageSquare, MapPin, Send, CheckCircle2, ArrowRight, Paperclip, Upload, X } from 'lucide-react';
-import { ARCHZONA_EMAIL, ARCHZONA_PHONE, generateWhatsAppQuoteUrl } from '../utils/quoteWorkflow';
+import { Mail, MessageSquare, MapPin, Send, CheckCircle2, ArrowRight, Paperclip, Upload, X, ExternalLink } from 'lucide-react';
+import {
+  ARCHZONA_EMAIL,
+  ARCHZONA_PHONE,
+  ARCHZONA_ADDRESS_LINE1,
+  ARCHZONA_ADDRESS_LINE2,
+  ARCHZONA_MAPS_URL,
+  generateWhatsAppQuoteUrl,
+} from '../utils/quoteWorkflow';
 
 interface ContactViewProps {
   initialSubject?: string;
@@ -108,7 +115,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
             </div>
 
             {/* Experience Studio Location */}
-            <div className="p-8 bg-[#141311] rounded-2xl border border-[#D1C7B7]/25 text-[#F7F5F0] space-y-4 shadow-xl">
+            <div className="p-8 bg-[#141311] rounded-2xl border border-[#D1C7B7]/25 text-[#F7F5F0] space-y-5 shadow-xl">
               <span className="text-xs uppercase tracking-[0.2em] text-[#D1C7B7] font-mono font-semibold block">
                 HEADQUARTERS & OFFICE
               </span>
@@ -116,10 +123,22 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                 <MapPin className="w-5 h-5 text-[#D1C7B7] shrink-0 mt-1" />
                 <div className="font-sans-clean text-xs leading-relaxed space-y-1">
                   <p className="font-serif-title text-xl text-[#F7F5F0]">Archzona Structures</p>
-                  <p className="text-[#D1C7B7]">1/19 Ganesh Apt, C.D. Rd, Ram Nagar, Dombivli (E)</p>
-                  <p className="text-[#D1C7B7]">Thane, Maharashtra, India</p>
+                  <p className="text-[#D1C7B7]">{ARCHZONA_ADDRESS_LINE1}</p>
+                  <p className="text-[#D1C7B7]">{ARCHZONA_ADDRESS_LINE2}</p>
                   <p className="text-[10px] text-[#8C8273] pt-1">Field installations across Maharashtra, Goa, Gujarat & Pan-India.</p>
                 </div>
+              </div>
+              <div className="pt-2">
+                <a
+                  href={ARCHZONA_MAPS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-[#F7F5F0] hover:bg-[#D1C7B7] text-[#0D0C0A] text-xs font-sans-clean font-bold tracking-[0.18em] uppercase rounded-xl transition-all shadow-md cursor-pointer"
+                >
+                  <MapPin className="w-4 h-4 text-[#0D0C0A]" />
+                  <span>OPEN IN MAPS</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-[#0D0C0A]" />
+                </a>
               </div>
             </div>
           </div>

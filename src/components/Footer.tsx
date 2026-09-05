@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowUpRight, Mail, Phone, MapPin, Download } from 'lucide-react';
 import { ViewRoute } from '../types';
-import { ARCHZONA_EMAIL, ARCHZONA_PHONE } from '../utils/quoteWorkflow';
+import { ARCHZONA_EMAIL, ARCHZONA_PHONE, ARCHZONA_ADDRESS_LINE1, ARCHZONA_MAPS_URL } from '../utils/quoteWorkflow';
 
 interface FooterProps {
   onNavigate: (route: ViewRoute) => void;
@@ -116,9 +116,22 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 <Mail className="w-4 h-4 text-[#D1C7B7] group-hover:text-[#F7F5F0]" />
                 <span className="font-mono">{ARCHZONA_EMAIL}</span>
               </a>
-              <div className="flex items-start space-x-3 text-[#8C8273] pt-1 px-2">
-                <MapPin className="w-4 h-4 text-[#D1C7B7] shrink-0 mt-0.5" />
-                <span className="text-xs">Thane, Maharashtra, India — Serving projects across India & coastal retreats</span>
+              <div className="flex flex-col space-y-1.5 pt-1 px-2">
+                <div className="flex items-start space-x-3 text-[#8C8273]">
+                  <MapPin className="w-4 h-4 text-[#D1C7B7] shrink-0 mt-0.5" />
+                  <span className="text-xs text-[#D1C7B7]">
+                    {ARCHZONA_ADDRESS_LINE1}, Thane, Maharashtra, India
+                  </span>
+                </div>
+                <a
+                  href={ARCHZONA_MAPS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-[#D1C7B7] hover:text-[#F7F5F0] transition-colors ml-7 pt-0.5"
+                >
+                  <span>Open in Maps</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-[#D1C7B7]" />
+                </a>
               </div>
             </div>
 

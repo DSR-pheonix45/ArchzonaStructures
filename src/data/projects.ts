@@ -87,7 +87,7 @@ export const projectsData: ProjectStory[] = [
     heroImage: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1600&auto=format&fit=crop',
     gallery: [
       'https://images.unsplash.com/photo-1598228723793-52759bba239c?q=80&w=1200&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200&auto=format&fit=crop',
     ],
     application: 'Pitched Roof & Wrap-Around Veranda',
     material: 'Lamit Roofing & Wooden Floors',

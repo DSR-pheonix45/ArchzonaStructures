@@ -184,10 +184,10 @@ export const materialsData: Material[] = [
     category: 'ROOFING',
     positioning: 'Premium interlocking architectural roof shingles and high-spec ceramic composite systems.',
     description: 'Lamit roofing systems provide rich textural relief, deep shadow lines, and superior watertight lap-engineering. Created for luxury residential villas, heritage resorts, and modern pitched roof aesthetics.',
-    heroImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
+    heroImage: 'https://images.unsplash.com/photo-1598228723793-52759bba239c?q=80&w=1200&auto=format&fit=crop',
     spaceImages: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1598228723793-52759bba239c?q=80&w=1200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200&auto=format&fit=crop',
     ],
     materialImage: 'https://images.unsplash.com/photo-1598228723793-52759bba239c?q=80&w=1200&auto=format&fit=crop',
     detailImage: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop',

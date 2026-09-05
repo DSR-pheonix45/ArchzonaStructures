@@ -837,12 +837,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         {/* 6-Step Visual Timeline Preview */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-xs font-sans-clean">
           {[
-            { step: '01', name: 'CONSULT', desc: 'Site climate & exposure audit' },
-            { step: '02', name: 'CURATE', desc: 'Tactile swatch & lab testing' },
-            { step: '03', name: 'ENGINEER', desc: 'Shop drawings & 3D joinery' },
-            { step: '04', name: 'SOURCE', desc: 'Tier-1 authorized factory supply' },
-            { step: '05', name: 'FABRICATE', desc: 'CNC routing & pre-assembly' },
-            { step: '06', name: 'INSTALL', desc: 'Laser-levelled certified execution' },
+            { step: '01', name: 'CONSULT' },
+            { step: '02', name: 'CURATE' },
+            { step: '03', name: 'ENGINEER' },
+            { step: '04', name: 'SOURCE' },
+            { step: '05', name: 'FABRICATE' },
+            { step: '06', name: 'INSTALL' },
           ].map((item) => (
             <div
               key={item.step}
@@ -850,7 +850,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
             >
               <span className="text-xs font-mono font-bold text-[#D1C7B7]">{item.step}</span>
               <h4 className="font-serif-title text-lg text-[#F7F5F0]">{item.name}</h4>
-              <p className="text-[11px] text-[#8C8273] leading-normal font-light">{item.desc}</p>
             </div>
           ))}
         </div>

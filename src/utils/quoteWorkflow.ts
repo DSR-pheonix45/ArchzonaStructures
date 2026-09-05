@@ -4,6 +4,9 @@ export type { QuoteRequest, ContactInquiry };
 export const ARCHZONA_EMAIL = 'info.archzona@gmail.com';
 export const ARCHZONA_PHONE = '+91 98700 48082';
 export const ARCHZONA_WHATSAPP_NUMBER = '919870048082';
+export const ARCHZONA_ADDRESS_LINE1 = '105, Prism Industrial Estate, Near Pendharkar College, Dombivli (E)';
+export const ARCHZONA_ADDRESS_LINE2 = 'Thane, Maharashtra, India';
+export const ARCHZONA_MAPS_URL = 'https://maps.app.goo.gl/2ZGJW9GQhbkKXW6s7';
 
 export interface SubmissionResponse {
   success: boolean;

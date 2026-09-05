@@ -3,7 +3,6 @@ import { ArrowUpRight, ArrowLeft, Layers, Box, CheckCircle2, ChevronRight } from
 import { spacesData } from '../data/spaces';
 import { materialsData } from '../data/materials';
 import { structuresData } from '../data/structures';
-import { productsData } from '../data/products';
 import { projectsData } from '../data/projects';
 import { ViewRoute, Space } from '../types';
 
@@ -31,10 +30,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
 
   const relatedStructures = activeSpace
     ? structuresData.filter((st) => activeSpace.structures.includes(st.slug))
-    : [];
-
-  const relatedProducts = activeSpace
-    ? productsData.filter((p) => p.spaces.includes(activeSpace.slug))
     : [];
 
   const relatedProjectStories = activeSpace
@@ -203,71 +198,11 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               </div>
             </div>
 
-            {/* STEP 4: RELATED PRODUCTS (Section 14) */}
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-[#D1C7B7]/20 pb-3 gap-4">
-                <div>
-                  <span className="text-xs uppercase tracking-[0.25em] text-[#D1C7B7] font-mono font-semibold">
-                    04 — CURATED PRODUCTS & SKUs
-                  </span>
-                  <h3 className="font-serif-title text-3xl text-[#F7F5F0] mt-1">
-                    Products Ready for {activeSpace.name}
-                  </h3>
-                </div>
-                <button
-                  id="view-space-products-in-shop-btn"
-                  onClick={() => onNavigate({ type: 'shop' })}
-                  className="text-xs uppercase tracking-wider font-mono font-semibold text-[#D1C7B7] hover:text-[#F7F5F0] flex items-center gap-1 cursor-pointer"
-                >
-                  <span>Open Filtered Shop</span> <ArrowUpRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {relatedProducts.slice(0, 4).map((p) => (
-                  <div
-                    key={p.id}
-                    id={`product-card-${p.id}`}
-                    onClick={() => onOpenProduct(p.slug)}
-                    className="bg-[#141311] rounded-xl border border-[#D1C7B7]/20 p-4 flex flex-col justify-between group cursor-pointer hover:border-[#D1C7B7]/60 transition-all shadow-md"
-                  >
-                    <div className="space-y-3">
-                      <div className="aspect-[4/3] overflow-hidden rounded-lg bg-black/40 border border-[#D1C7B7]/15">
-                        <img
-                          src={p.images[0]}
-                          alt={p.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                        />
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase tracking-wider text-[#D1C7B7] font-semibold block font-mono">
-                          {p.brand} • {p.material.toUpperCase()}
-                        </span>
-                        <h4 className="font-serif-title text-lg text-[#F7F5F0] leading-snug group-hover:text-[#D1C7B7] transition-colors mt-0.5">
-                          {p.name}
-                        </h4>
-                      </div>
-                      <p className="text-xs font-sans-clean text-[#8C8273] line-clamp-2">
-                        {p.finish}
-                      </p>
-                    </div>
-
-                    <div className="pt-4 mt-4 border-t border-[#D1C7B7]/15 flex items-center justify-between text-xs font-sans-clean">
-                      <span className="text-[#8C8273]">{p.availability}</span>
-                      <span className="font-semibold text-[#D1C7B7] group-hover:underline">
-                        View Spec Sheet →
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* STEP 5: FEATURED REAL PROJECTS (Section 27) */}
+            {/* STEP 4: FEATURED REAL PROJECTS (Section 27) */}
             {relatedProjectStories.length > 0 && (
               <div className="space-y-6 pt-6 border-t border-[#D1C7B7]/20">
                 <span className="text-xs uppercase tracking-[0.25em] text-[#D1C7B7] font-mono font-semibold block">
-                  05 — CASE STUDIES IN THIS SPACE
+                  04 — CASE STUDIES IN THIS SPACE
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {relatedProjectStories.map((proj) => (
