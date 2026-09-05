@@ -1,0 +1,35 @@
+# Archzona Structures Robots.txt - SEO & AEO (Answer Engine Optimization)
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /private
+
+# Explicitly Allow AI & Generative Answer Engine Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+Sitemap: https://archzonastructures.com/sitemap.xml

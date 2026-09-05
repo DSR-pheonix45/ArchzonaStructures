@@ -211,5 +211,6 @@ export type ViewRoute =
   | { type: 'materials'; category?: string; materialSlug?: string }
   | { type: 'structures'; structureSlug?: string }
   | { type: 'services' }
+  | { type: 'blogs'; articleSlug?: string }
   | { type: 'shop'; productSlug?: string }
   | { type: 'contact' };

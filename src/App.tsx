@@ -22,6 +22,9 @@ import { ServicesView } from './views/ServicesView';
 import { AboutView } from './views/AboutView';
 import { ContactView } from './views/ContactView';
 import { ProjectStoryView } from './views/ProjectStoryView';
+import { BlogsView } from './views/BlogsView';
+
+import { updatePageSEO } from './utils/seo';
 
 export default function App() {
   const [currentRoute, setCurrentRoute] = useState<ViewRoute>({ type: 'home' });
@@ -31,9 +34,10 @@ export default function App() {
   const [activeStructureConfig, setActiveStructureConfig] = useState<any | null>(null);
   const [contactSubject, setContactSubject] = useState<string | undefined>(undefined);
 
-  // Scroll to top on route change
+  // Scroll to top and update dynamic SEO meta tags on route change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    updatePageSEO(currentRoute);
   }, [currentRoute]);
 
   const handleNavigate = (route: ViewRoute) => {
@@ -141,6 +145,14 @@ export default function App() {
               projectSlug={currentRoute.projectSlug}
               onNavigate={handleNavigate}
               onOpenProduct={handleOpenProduct}
+            />
+          )}
+
+          {currentRoute.type === 'blogs' && (
+            <BlogsView
+              initialArticleSlug={currentRoute.articleSlug}
+              onNavigate={handleNavigate}
+              onOpenQuote={handleOpenGeneralQuote}
             />
           )}
         </main>

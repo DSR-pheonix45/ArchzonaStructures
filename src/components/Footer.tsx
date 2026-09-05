@@ -80,6 +80,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </button>
               </li>
               <li>
+                <button
+                  id="footer-nav-blogs"
+                  onClick={() => onNavigate({ type: 'blogs' })}
+                  className="text-[#D1C7B7]/80 hover:text-[#F7F5F0] transition-colors cursor-pointer text-left"
+                >
+                  BLOGS & ARCHITECTURAL INSIGHTS
+                </button>
+              </li>
+              <li>
                 <a
                   id="footer-nav-catalogue-deck"
                   href="/Archzona_Product_Catalogue_Deck.pdf"
