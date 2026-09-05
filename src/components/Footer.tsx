@@ -1,7 +1,13 @@
 import React from 'react';
 import { ArrowUpRight, Mail, Phone, MapPin, Download } from 'lucide-react';
 import { ViewRoute } from '../types';
-import { ARCHZONA_EMAIL, ARCHZONA_PHONE, ARCHZONA_ADDRESS_LINE1, ARCHZONA_MAPS_URL } from '../utils/quoteWorkflow';
+import {
+  ARCHZONA_EMAIL,
+  ARCHZONA_PHONE_NARESH,
+  ARCHZONA_PHONE_HARISH,
+  ARCHZONA_ADDRESS_LINE1,
+  ARCHZONA_MAPS_URL,
+} from '../utils/quoteWorkflow';
 
 interface FooterProps {
   onNavigate: (route: ViewRoute) => void;
