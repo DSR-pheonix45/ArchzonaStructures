@@ -107,8 +107,8 @@ export const structuresData: Structure[] = [
       'https://images.unsplash.com/photo-1567496898669-ee935f5f647a?q=80&w=1200&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop',
     ],
-    applications: ['Outdoor Shade', 'Outdoor Dining Canopies', 'Playgrounds & Sports Arenas', 'Car Parking Shade Structures'],
-    spaces: ['resorts', 'terraces', 'hospitality', 'poolside', 'commercial', 'gardens'],
+    applications: ['Outdoor Shade', 'Outdoor Dining Canopies', 'Car Parking Shade Structures', 'Playgrounds & Sports Arenas'],
+    spaces: ['smart-parking', 'resorts', 'terraces', 'hospitality', 'poolside', 'commercial', 'gardens'],
     materials: ['tensile-fabric'],
     configuratorOptions: {
       sizes: ['Single Bay 5×5m (16×16ft)', 'Double Bay 6×10m (20×33ft)', 'Conical Span 8×8m (26×26ft)', 'Multi-Bay Engineered Span'],

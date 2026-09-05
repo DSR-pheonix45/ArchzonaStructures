@@ -114,11 +114,12 @@ export const spacesData: Space[] = [
     applications: [
       'Stack Parking (2 & 3 Level Hydraulic)',
       'Puzzle Parking (Multi-Tier Automated Matrix)',
+      'Tensile Fabric Canopies (Primary Shade)',
       'EV Charging Services (Third-Party Integration)',
-      'Perimeter Steel Framing & Shade Canopies',
+      'Perimeter Steel Framing & Enclosures',
     ],
-    materials: [],
-    structures: ['custom-structures', 'tensile-structures', 'pergola'],
+    materials: ['tensile-fabric'],
+    structures: ['tensile-structures', 'custom-structures', 'pergola'],
     featuredProjects: ['horizon-sky-terrace'],
   },
   {
