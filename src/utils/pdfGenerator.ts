@@ -9,9 +9,37 @@ function formatCurrency(amount: number): string {
 }
 
 /**
+ * Helper to asynchronously load the site's logo from /logo.png as a Base64 string for jsPDF
+ */
+async function getLogoBase64(): Promise<string | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.src = '/logo.png';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL('image/png'));
+          return;
+        }
+      } catch (e) {
+        console.warn('Canvas conversion failed for logo', e);
+      }
+      resolve(null);
+    };
+    img.onerror = () => resolve(null);
+  });
+}
+
+/**
  * Download a crisp, professional, branded pre-tax Quotation PDF
  */
-export function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): void {
+export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): Promise<void> {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -25,23 +53,35 @@ export function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): void {
   doc.setFillColor(13, 12, 10); // #0D0C0A Obsidian
   doc.rect(0, 0, pageWidth, 28, 'F');
 
+  // Load Logo Icon from /logo.png
+  const logoBase64 = await getLogoBase64();
+  if (logoBase64) {
+    try {
+      doc.addImage(logoBase64, 'PNG', 12, 3, 22, 22);
+    } catch (err) {
+      console.warn('jsPDF addImage logo failed:', err);
+    }
+  }
+
+  const titleX = logoBase64 ? 38 : 15;
+
   doc.setTextColor(247, 245, 240); // #F7F5F0 Chalk
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.text('ARCHZONA STRUCTURES', 15, 14);
+  doc.setFontSize(17);
+  doc.text('ARCHZONA STRUCTURES', titleX, 13);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(209, 199, 183); // #D1C7B7 Stone
-  doc.text('Architectural Pergolas, Gazebos, Timber Cladding & Custom Structures', 15, 20);
+  doc.text('Architectural Pergolas, Gazebos, Timber Cladding & Custom Structures', titleX, 19);
 
-  doc.setFontSize(14);
+  doc.setFontSize(13);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(247, 245, 240);
-  doc.text('COMMERCIAL QUOTATION', pageWidth - 15, 16, { align: 'right' });
-  doc.setFontSize(10);
+  doc.text('COMMERCIAL QUOTATION', pageWidth - 15, 15, { align: 'right' });
+  doc.setFontSize(9.5);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Ref: ${quote.id}`, pageWidth - 15, 22, { align: 'right' });
+  doc.text(`Ref: ${quote.id}`, pageWidth - 15, 21, { align: 'right' });
 
   y = 35;
 
@@ -110,16 +150,14 @@ export function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): void {
 
   quote.items.forEach((item, index) => {
     // Check if new page is needed
-    if (y > 250) {
+    if (y > 245) {
       doc.addPage();
       y = 20;
     }
 
-    const startY = y;
     doc.text(`${index + 1}`, 18, y + 5);
 
     // Multiline item description
-    const descText = `${item.name}\n${item.description}`;
     doc.setFont('helvetica', 'bold');
     doc.text(item.name, 28, y + 5);
     doc.setFont('helvetica', 'normal');
@@ -145,34 +183,43 @@ export function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): void {
 
   y += 4;
 
-  // Totals Box
-  if (y > 230) {
+  // Totals Box (Wider box starting at X=95 to prevent ANY text overlap)
+  if (y > 220) {
     doc.addPage();
     y = 20;
   }
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.text('Subtotal (Pre-Tax):', 125, y + 5);
+  doc.setFontSize(8.5);
+  doc.setTextColor(60, 60, 60);
+  doc.text('Subtotal (Pre-Tax):', 100, y + 5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(13, 12, 10);
   doc.text(formatCurrency(quote.subtotal), pageWidth - 18, y + 5, { align: 'right' });
 
   if (quote.overallDiscountAmount > 0) {
     y += 5;
     doc.setFont('helvetica', 'normal');
-    doc.text(`Overall Discount (${quote.overallDiscountPercent}%):`, 125, y + 5);
+    doc.setTextColor(60, 60, 60);
+    doc.text(`Overall Discount (${quote.overallDiscountPercent}%):`, 100, y + 5);
     doc.text(`- ${formatCurrency(quote.overallDiscountAmount)}`, pageWidth - 18, y + 5, { align: 'right' });
   }
 
-  y += 6;
+  y += 7;
+  // Box starts at X=95, width=100 (from 95mm to 195mm)
   doc.setFillColor(239, 234, 226);
-  doc.rect(120, y, pageWidth - 135, 9, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(13, 12, 10);
-  doc.text('NET ESTIMATED TOTAL:', 125, y + 6);
-  doc.text(formatCurrency(quote.netPreTaxTotal), pageWidth - 18, y + 6, { align: 'right' });
+  doc.rect(95, y, 100, 10, 'F');
+  doc.setDrawColor(209, 199, 183);
+  doc.rect(95, y, 100, 10, 'S');
 
-  y += 14;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(13, 12, 10);
+  doc.text('NET ESTIMATED TOTAL:', 99, y + 6.5);
+  doc.setFontSize(9.5);
+  doc.text(formatCurrency(quote.netPreTaxTotal), pageWidth - 18, y + 6.5, { align: 'right' });
+
+  y += 15;
 
   // Note on Pre-Tax nature
   doc.setFont('helvetica', 'italic');
@@ -184,7 +231,7 @@ export function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): void {
 
   // Terms & Payment Milestones
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
   doc.text('TERMS & CONDITIONS:', 15, y);
   doc.setFont('helvetica', 'normal');
@@ -195,7 +242,7 @@ export function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): void {
 
   y += 12;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
   doc.text('PAYMENT TERMS:', 15, y);
   doc.setFont('helvetica', 'normal');
@@ -224,7 +271,7 @@ export function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): void {
 /**
  * Download a crisp, legal, GST Tax Invoice PDF
  */
-export function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): void {
+export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Promise<void> {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -238,23 +285,35 @@ export function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): void {
   doc.setFillColor(13, 12, 10); // #0D0C0A Obsidian
   doc.rect(0, 0, pageWidth, 28, 'F');
 
+  // Load Logo Icon from /logo.png
+  const logoBase64 = await getLogoBase64();
+  if (logoBase64) {
+    try {
+      doc.addImage(logoBase64, 'PNG', 12, 3, 22, 22);
+    } catch (err) {
+      console.warn('jsPDF addImage logo failed:', err);
+    }
+  }
+
+  const titleX = logoBase64 ? 38 : 15;
+
   doc.setTextColor(247, 245, 240); // #F7F5F0 Chalk
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.text('ARCHZONA STRUCTURES', 15, 14);
+  doc.setFontSize(17);
+  doc.text('ARCHZONA STRUCTURES', titleX, 13);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(209, 199, 183); // #D1C7B7 Stone
-  doc.text('Architectural Pergolas, Gazebos, Timber Cladding & Custom Structures', 15, 20);
+  doc.text('Architectural Pergolas, Gazebos, Timber Cladding & Custom Structures', titleX, 19);
 
-  doc.setFontSize(14);
+  doc.setFontSize(13);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(247, 245, 240);
-  doc.text('TAX INVOICE', pageWidth - 15, 16, { align: 'right' });
-  doc.setFontSize(10);
+  doc.text('TAX INVOICE', pageWidth - 15, 15, { align: 'right' });
+  doc.setFontSize(9.5);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Invoice #: ${invoice.id}`, pageWidth - 15, 22, { align: 'right' });
+  doc.text(`Invoice #: ${invoice.id}`, pageWidth - 15, 21, { align: 'right' });
 
   y = 35;
 
@@ -353,54 +412,67 @@ export function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): void {
 
   y += 4;
 
-  // Tax & Totals Breakdown
-  if (y > 220) {
+  // Tax & Totals Breakdown (Box starts at X=95, width=100mm to prevent text overlap)
+  if (y > 215) {
     doc.addPage();
     y = 20;
   }
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
-  doc.text('Taxable Subtotal:', 125, y + 5);
+  doc.setTextColor(60, 60, 60);
+  doc.text('Taxable Subtotal:', 100, y + 5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(13, 12, 10);
   doc.text(formatCurrency(invoice.subtotal), pageWidth - 18, y + 5, { align: 'right' });
 
   if (invoice.taxType === 'CGST_SGST') {
     y += 5;
-    doc.text(`CGST @ ${invoice.cgstPercent}%:`, 125, y + 5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(60, 60, 60);
+    doc.text(`CGST @ ${invoice.cgstPercent}%:`, 100, y + 5);
     doc.text(formatCurrency(invoice.cgstAmount), pageWidth - 18, y + 5, { align: 'right' });
     y += 5;
-    doc.text(`SGST @ ${invoice.sgstPercent}%:`, 125, y + 5);
+    doc.text(`SGST @ ${invoice.sgstPercent}%:`, 100, y + 5);
     doc.text(formatCurrency(invoice.sgstAmount), pageWidth - 18, y + 5, { align: 'right' });
   } else {
     y += 5;
-    doc.text(`IGST @ ${invoice.igstPercent}%:`, 125, y + 5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(60, 60, 60);
+    doc.text(`IGST @ ${invoice.igstPercent}%:`, 100, y + 5);
     doc.text(formatCurrency(invoice.igstAmount), pageWidth - 18, y + 5, { align: 'right' });
   }
 
-  y += 6;
+  y += 7;
   doc.setFillColor(20, 19, 17);
-  doc.rect(120, y, pageWidth - 135, 9, 'F');
+  doc.rect(95, y, 100, 10, 'F');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setTextColor(247, 245, 240);
-  doc.text('GRAND TOTAL:', 125, y + 6);
-  doc.text(formatCurrency(invoice.grandTotal), pageWidth - 18, y + 6, { align: 'right' });
+  doc.text('GRAND TOTAL (INC. GST):', 99, y + 6.5);
+  doc.setFontSize(9.5);
+  doc.text(formatCurrency(invoice.grandTotal), pageWidth - 18, y + 6.5, { align: 'right' });
 
-  y += 11;
+  y += 12;
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
-  doc.text('AMOUNT PAID:', 125, y + 4);
+  doc.text('AMOUNT PAID:', 100, y + 4);
   doc.text(formatCurrency(invoice.amountPaid), pageWidth - 18, y + 4, { align: 'right' });
 
   y += 5;
   doc.setFillColor(239, 234, 226);
-  doc.rect(120, y, pageWidth - 135, 8, 'F');
+  doc.rect(95, y, 100, 9, 'F');
+  doc.setDrawColor(209, 199, 183);
+  doc.rect(95, y, 100, 9, 'S');
+
   doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
   doc.setTextColor(invoice.balanceDue > 0 ? 180 : 0, invoice.balanceDue > 0 ? 0 : 120, 0);
-  doc.text('BALANCE DUE:', 125, y + 5.5);
-  doc.text(formatCurrency(invoice.balanceDue), pageWidth - 18, y + 5.5, { align: 'right' });
+  doc.text('BALANCE DUE:', 99, y + 6);
+  doc.setFontSize(9.5);
+  doc.text(formatCurrency(invoice.balanceDue), pageWidth - 18, y + 6, { align: 'right' });
 
   // Left Column: Bank Details for Payment
   const leftY = y - 27;
