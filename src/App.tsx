@@ -12,6 +12,11 @@ import { QuoteModal } from './components/QuoteModal';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
 
+// Admin Components
+import { AdminLayout } from './components/admin/AdminLayout';
+import { AdminLogin } from './components/admin/AdminLogin';
+import { checkIsLoggedIn } from './utils/adminStorage';
+
 // Views
 import { HomeView } from './views/HomeView';
 import { ExploreView } from './views/ExploreView';
@@ -34,11 +39,38 @@ export default function App() {
   const [activeStructureConfig, setActiveStructureConfig] = useState<any | null>(null);
   const [contactSubject, setContactSubject] = useState<string | undefined>(undefined);
 
+  // Subdomain & Admin Route Detection
+  const [isAdminMode, setIsAdminMode] = useState<boolean>(() => {
+    const hostname = window.location.hostname;
+    const hash = window.location.hash;
+    const search = window.location.search;
+    const pathname = window.location.pathname;
+
+    const isSubdomain = hostname.startsWith('admin') || hostname.includes('admin.');
+    const isExplicitRoute = hash === '#admin' || search.includes('admin=true') || pathname.startsWith('/admin');
+    return isSubdomain || isExplicitRoute;
+  });
+
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(checkIsLoggedIn());
+
+  // Listen for hash change for #admin shortcut
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#admin') {
+        setIsAdminMode(true);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   // Scroll to top and update dynamic SEO meta tags on route change
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    updatePageSEO(currentRoute);
-  }, [currentRoute]);
+    if (!isAdminMode) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      updatePageSEO(currentRoute);
+    }
+  }, [currentRoute, isAdminMode]);
 
   const handleNavigate = (route: ViewRoute) => {
     setCurrentRoute(route);
@@ -71,6 +103,30 @@ export default function App() {
     setIsQuoteOpen(true);
   };
 
+  // IF ADMIN MODE IS ACTIVE (admin.archzonestructures.com or #admin / /admin)
+  if (isAdminMode) {
+    if (!isLoggedIn) {
+      return (
+        <AdminLogin
+          onLoginSuccess={() => setIsLoggedIn(true)}
+          onClosePublic={() => {
+            setIsAdminMode(false);
+            if (window.location.hash === '#admin') window.location.hash = '';
+          }}
+        />
+      );
+    }
+
+    return (
+      <AdminLayout
+        onLogout={() => {
+          setIsLoggedIn(false);
+        }}
+      />
+    );
+  }
+
+  // STANDARD PUBLIC MARKETING APP
   return (
     <ProjectCartProvider>
       <div id="archzona-app-root" className="relative min-h-screen bg-[#0D0C0A] text-[#F7F5F0] font-sans-clean selection:bg-[#D1C7B7] selection:text-[#0D0C0A] flex flex-col overflow-x-hidden">
@@ -158,7 +214,10 @@ export default function App() {
         </main>
 
         {/* Global Footer */}
-        <Footer onNavigate={handleNavigate} />
+        <Footer
+          onNavigate={handleNavigate}
+          onOpenAdmin={() => setIsAdminMode(true)}
+        />
 
         {/* Global Modals & Drawers */}
         <ProjectCartDrawer onRequestQuote={handleOpenGeneralQuote} />

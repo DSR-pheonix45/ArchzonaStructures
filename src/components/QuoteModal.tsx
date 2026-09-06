@@ -69,6 +69,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, customS
         notes: finalNotes,
         items: cart.items,
         customStructureConfig,
+        attachment: attachedFile || undefined,
       };
 
       const res = await submitQuoteRequest(quotePayload);

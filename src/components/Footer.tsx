@@ -11,9 +11,10 @@ import {
 
 interface FooterProps {
   onNavigate: (route: ViewRoute) => void;
+  onOpenAdmin?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
   return (
     <footer id="main-footer" className="relative z-10 bg-[#0D0C0A] text-[#F7F5F0] border-t border-[#D1C7B7]/20 pt-20 pb-12 mt-20">
       <div className="max-w-7xl mx-auto px-6 md:px-10">
@@ -178,9 +179,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           <div className="flex items-center space-x-3 text-[10px] tracking-widest uppercase">
             <span className="px-2.5 py-0.5 rounded-full border border-[#D1C7B7]/20 bg-[#141311] text-[#D1C7B7]">RESORTS</span>
             <span className="px-2.5 py-0.5 rounded-full border border-[#D1C7B7]/20 bg-[#141311] text-[#D1C7B7]">VILLAS</span>
-            <span className="px-2.5 py-0.5 rounded-full border border-[#D1C7B7]/20 bg-[#141311] text-[#D1C7B7]">BUNGALOWS</span>
-            <span className="px-2.5 py-0.5 rounded-full border border-[#D1C7B7]/20 bg-[#141311] text-[#D1C7B7]">POOLSIDE</span>
             <span className="px-2.5 py-0.5 rounded-full border border-[#D1C7B7]/20 bg-[#141311] text-[#D1C7B7]">TERRACES</span>
+            {onOpenAdmin && (
+              <button
+                onClick={onOpenAdmin}
+                className="px-2.5 py-0.5 rounded-full border border-[#D1C7B7]/40 bg-[#141311] text-[#D1C7B7] hover:text-[#F7F5F0] hover:border-[#D1C7B7] transition-colors cursor-pointer"
+              >
+                OWNER PORTAL
+              </button>
+            )}
           </div>
         </div>
       </div>

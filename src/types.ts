@@ -190,18 +190,20 @@ export interface QuoteRequest {
   notes: string;
   items: ProjectCartItem[];
   customStructureConfig?: GazeboConfig | PergolaConfig;
+  attachment?: File;
 }
 
 export interface ContactInquiry {
   name: string;
-  company: string;
+  company?: string;
   email: string;
   phone: string;
   projectType: string;
-  projectLocation: string;
-  approximateSize: string;
-  requirements: string;
-  message: string;
+  projectLocation?: string;
+  approximateSize?: string;
+  requirements?: string;
+  message?: string;
+  attachment?: File;
 }
 
 export type ViewRoute = 

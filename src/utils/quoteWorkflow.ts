@@ -34,28 +34,32 @@ export async function submitQuoteRequest(quote: QuoteRequest): Promise<Submissio
     : 'No items selected';
 
   try {
+    const formDataToSend = new FormData();
+    formDataToSend.append('_subject', `[Archzona Quote Request] ${quote.clientName} - ${quote.projectName || 'Project'}`);
+    formDataToSend.append('_replyto', quote.email);
+    formDataToSend.append('_captcha', 'false');
+    formDataToSend.append('Reference ID', referenceId);
+    formDataToSend.append('Client Name', quote.clientName);
+    formDataToSend.append('Email Address', quote.email);
+    formDataToSend.append('Phone / WhatsApp', quote.phone);
+    formDataToSend.append('Company / Firm', quote.company || 'Not specified');
+    formDataToSend.append('Project Name', quote.projectName || 'Architectural Project');
+    formDataToSend.append('Project Location', quote.projectLocation || 'Not specified');
+    formDataToSend.append('Project Type', quote.projectType || 'Custom Space');
+    formDataToSend.append('Approximate Area', quote.approximateArea || 'Not specified');
+    formDataToSend.append('Selected Products', formattedItems);
+    formDataToSend.append('Project Notes', quote.notes || 'None');
+
+    if (quote.attachment) {
+      formDataToSend.append('attachment', quote.attachment, quote.attachment.name);
+    }
+
     await fetch(`https://formsubmit.co/ajax/${ARCHZONA_EMAIL}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify({
-        _subject: `[Archzona Quote Request] ${quote.clientName} - ${quote.projectName || 'Project'}`,
-        _replyto: quote.email,
-        _captcha: 'false',
-        'Reference ID': referenceId,
-        'Client Name': quote.clientName,
-        'Email Address': quote.email,
-        'Phone / WhatsApp': quote.phone,
-        'Company / Firm': quote.company || 'Not specified',
-        'Project Name': quote.projectName || 'Architectural Project',
-        'Project Location': quote.projectLocation || 'Not specified',
-        'Project Type': quote.projectType || 'Custom Space',
-        'Approximate Area': quote.approximateArea || 'Not specified',
-        'Selected Products': formattedItems,
-        'Project Notes': quote.notes || 'None',
-      }),
+      body: formDataToSend,
     });
   } catch (err) {
     console.warn('[Archzona] FormSubmit quote email attempt exception:', err);
@@ -78,26 +82,30 @@ export async function submitProjectInquiry(inquiry: ContactInquiry): Promise<Sub
   const timestamp = new Date().toISOString();
 
   try {
+    const formDataToSend = new FormData();
+    formDataToSend.append('_subject', `[Archzona Inquiry] ${inquiry.name} (${inquiry.projectType})`);
+    formDataToSend.append('_replyto', inquiry.email);
+    formDataToSend.append('_captcha', 'false');
+    formDataToSend.append('Reference ID', referenceId);
+    formDataToSend.append('Client Name', inquiry.name);
+    formDataToSend.append('Email Address', inquiry.email);
+    formDataToSend.append('Phone / WhatsApp', inquiry.phone);
+    formDataToSend.append('Company / Firm', inquiry.company || 'Not specified');
+    formDataToSend.append('Project Type', inquiry.projectType);
+    formDataToSend.append('Project Location', inquiry.projectLocation || 'Not specified');
+    formDataToSend.append('Approximate Size', inquiry.approximateSize || 'Not specified');
+    formDataToSend.append('Message & Requirements', inquiry.message || inquiry.requirements || 'General inquiry');
+
+    if (inquiry.attachment) {
+      formDataToSend.append('attachment', inquiry.attachment, inquiry.attachment.name);
+    }
+
     await fetch(`https://formsubmit.co/ajax/${ARCHZONA_EMAIL}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify({
-        _subject: `[Archzona Inquiry] ${inquiry.name} (${inquiry.projectType})`,
-        _replyto: inquiry.email,
-        _captcha: 'false',
-        'Reference ID': referenceId,
-        'Client Name': inquiry.name,
-        'Email Address': inquiry.email,
-        'Phone / WhatsApp': inquiry.phone,
-        'Company / Firm': inquiry.company || 'Not specified',
-        'Project Type': inquiry.projectType,
-        'Project Location': inquiry.projectLocation || 'Not specified',
-        'Approximate Size': inquiry.approximateSize || 'Not specified',
-        'Message & Requirements': inquiry.message || inquiry.requirements || 'General inquiry',
-      }),
+      body: formDataToSend,
     });
   } catch (err) {
     console.warn('[Archzona] FormSubmit inquiry email attempt exception:', err);

@@ -55,6 +55,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
       projectLocation: formData.location,
       message: messageWithFile,
       requirements: messageWithFile,
+      attachment: attachedFile || undefined,
     });
 
     setIsSubmitting(false);
