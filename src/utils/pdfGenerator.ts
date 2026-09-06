@@ -85,35 +85,64 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
 
   y = 35;
 
-  // Archzona Sender Info
+  // --- DYNAMIC HEADER SECTION (ISSUED BY vs QUOTATION FOR) ---
   doc.setTextColor(13, 12, 10);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.text('ISSUED BY:', 15, y);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(60, 60, 60);
-  doc.text(owner.companyName, 15, y + 5);
-  doc.text(owner.address, 15, y + 10, { maxWidth: 85 });
-  doc.text(`Phone: ${owner.phone} | Email: ${owner.email}`, 15, y + 18);
-  doc.text(`GSTIN: ${owner.gstin}`, 15, y + 23);
-
-  // Client Info Box
-  doc.setTextColor(13, 12, 10);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
   doc.text('QUOTATION FOR:', 110, y);
+
+  // Left Column (Sender - Archzona)
+  let leftY = y + 5;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(60, 60, 60);
-  doc.text(quote.client.name, 110, y + 5);
-  if (quote.client.companyName) doc.text(quote.client.companyName, 110, y + 10);
-  doc.text(quote.client.billingAddress, 110, y + (quote.client.companyName ? 15 : 10), { maxWidth: 85 });
-  doc.text(`Phone: ${quote.client.phone}`, 110, y + 24);
-  doc.text(`Email: ${quote.client.email}`, 110, y + 29);
-  if (quote.client.gstin) doc.text(`Client GSTIN: ${quote.client.gstin}`, 110, y + 34);
 
-  y += 42;
+  doc.text(owner.companyName, 15, leftY);
+  leftY += 4.5;
+
+  const ownerAddressLines = doc.splitTextToSize(owner.address, 85);
+  doc.text(ownerAddressLines, 15, leftY);
+  leftY += (ownerAddressLines.length * 4.2);
+
+  doc.text(`Phone: ${owner.phone} | Email: ${owner.email}`, 15, leftY);
+  leftY += 4.5;
+  doc.text(`GSTIN: ${owner.gstin}`, 15, leftY);
+  leftY += 4.5;
+
+  // Right Column (Recipient - Client)
+  let rightY = y + 5;
+  doc.text(quote.client.name, 110, rightY);
+  rightY += 4.5;
+
+  if (quote.client.companyName) {
+    doc.text(quote.client.companyName, 110, rightY);
+    rightY += 4.5;
+  }
+
+  if (quote.client.billingAddress) {
+    const clientAddressLines = doc.splitTextToSize(quote.client.billingAddress, 85);
+    doc.text(clientAddressLines, 110, rightY);
+    rightY += (clientAddressLines.length * 4.2);
+  }
+
+  if (quote.client.phone) {
+    doc.text(`Phone: ${quote.client.phone}`, 110, rightY);
+    rightY += 4.5;
+  }
+
+  if (quote.client.email) {
+    doc.text(`Email: ${quote.client.email}`, 110, rightY);
+    rightY += 4.5;
+  }
+
+  if (quote.client.gstin) {
+    doc.text(`Client GSTIN: ${quote.client.gstin}`, 110, rightY);
+    rightY += 4.5;
+  }
+
+  // Advance y past both header blocks
+  y = Math.max(leftY, rightY) + 5;
 
   // Metadata Row
   doc.setFillColor(239, 234, 226); // #EFEAE2
@@ -317,38 +346,67 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
 
   y = 35;
 
-  // Archzona Sender Info
+  // --- DYNAMIC HEADER SECTION (ISSUED BY vs BILLED TO) ---
   doc.setTextColor(13, 12, 10);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.text('ISSUED BY:', 15, y);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(60, 60, 60);
-  doc.text(owner.companyName, 15, y + 5);
-  doc.text(owner.address, 15, y + 10, { maxWidth: 85 });
-  doc.text(`Phone: ${owner.phone} | Email: ${owner.email}`, 15, y + 18);
-  doc.setFont('helvetica', 'bold');
-  doc.text(`GSTIN: ${owner.gstin}`, 15, y + 23);
-
-  // Client Info Box
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
   doc.text('BILLED TO:', 110, y);
+
+  // Left Column (Sender - Archzona)
+  let leftY = y + 5;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(60, 60, 60);
-  doc.text(invoice.client.name, 110, y + 5);
-  if (invoice.client.companyName) doc.text(invoice.client.companyName, 110, y + 10);
-  doc.text(invoice.client.billingAddress, 110, y + (invoice.client.companyName ? 15 : 10), { maxWidth: 85 });
-  doc.text(`Phone: ${invoice.client.phone}`, 110, y + 24);
-  doc.text(`Email: ${invoice.client.email}`, 110, y + 29);
-  if (invoice.client.gstin) {
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Client GSTIN: ${invoice.client.gstin}`, 110, y + 34);
+
+  doc.text(owner.companyName, 15, leftY);
+  leftY += 4.5;
+
+  const ownerAddressLines = doc.splitTextToSize(owner.address, 85);
+  doc.text(ownerAddressLines, 15, leftY);
+  leftY += (ownerAddressLines.length * 4.2);
+
+  doc.text(`Phone: ${owner.phone} | Email: ${owner.email}`, 15, leftY);
+  leftY += 4.5;
+  doc.setFont('helvetica', 'bold');
+  doc.text(`GSTIN: ${owner.gstin}`, 15, leftY);
+  leftY += 4.5;
+
+  // Right Column (Recipient - Client)
+  let rightY = y + 5;
+  doc.setFont('helvetica', 'normal');
+  doc.text(invoice.client.name, 110, rightY);
+  rightY += 4.5;
+
+  if (invoice.client.companyName) {
+    doc.text(invoice.client.companyName, 110, rightY);
+    rightY += 4.5;
   }
 
-  y += 42;
+  if (invoice.client.billingAddress) {
+    const clientAddressLines = doc.splitTextToSize(invoice.client.billingAddress, 85);
+    doc.text(clientAddressLines, 110, rightY);
+    rightY += (clientAddressLines.length * 4.2);
+  }
+
+  if (invoice.client.phone) {
+    doc.text(`Phone: ${invoice.client.phone}`, 110, rightY);
+    rightY += 4.5;
+  }
+
+  if (invoice.client.email) {
+    doc.text(`Email: ${invoice.client.email}`, 110, rightY);
+    rightY += 4.5;
+  }
+
+  if (invoice.client.gstin) {
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Client GSTIN: ${invoice.client.gstin}`, 110, rightY);
+    rightY += 4.5;
+  }
+
+  // Advance y past both header blocks
+  y = Math.max(leftY, rightY) + 5;
 
   // Invoice Metadata Row
   doc.setFillColor(239, 234, 226);
@@ -475,19 +533,19 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
   doc.text(formatCurrency(invoice.balanceDue), pageWidth - 18, y + 6, { align: 'right' });
 
   // Left Column: Bank Details for Payment
-  const leftY = y - 27;
+  const leftYBank = y - 27;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
-  doc.text('BANK PAYMENT DETAILS (NEFT/RTGS):', 15, leftY);
+  doc.text('BANK PAYMENT DETAILS (NEFT/RTGS):', 15, leftYBank);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(60, 60, 60);
-  doc.text(`Bank: ${owner.bankDetails.bankName}`, 15, leftY + 4);
-  doc.text(`Account Name: ${owner.bankDetails.accountName}`, 15, leftY + 8);
-  doc.text(`Account #: ${owner.bankDetails.accountNumber}`, 15, leftY + 12);
-  doc.text(`IFSC Code: ${owner.bankDetails.ifscCode}`, 15, leftY + 16);
-  doc.text(`Branch: ${owner.bankDetails.branch}`, 15, leftY + 20);
+  doc.text(`Bank: ${owner.bankDetails.bankName}`, 15, leftYBank + 4);
+  doc.text(`Account Name: ${owner.bankDetails.accountName}`, 15, leftYBank + 8);
+  doc.text(`Account #: ${owner.bankDetails.accountNumber}`, 15, leftYBank + 12);
+  doc.text(`IFSC Code: ${owner.bankDetails.ifscCode}`, 15, leftYBank + 16);
+  doc.text(`Branch: ${owner.bankDetails.branch}`, 15, leftYBank + 20);
 
   y += 16;
 
