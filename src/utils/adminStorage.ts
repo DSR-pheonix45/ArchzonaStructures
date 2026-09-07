@@ -1,4 +1,5 @@
 import { Quotation, Invoice, OwnerUser, PaymentRecord, AdminDashboardMetrics } from '../types/adminTypes';
+import { syncQuoteToGSheet, syncInvoiceToGSheet } from './googleSheetsSync';
 
 const STORAGE_KEYS = {
   SESSION: 'archzona_admin_session',
@@ -251,12 +252,19 @@ export function getQuotations(): Quotation[] {
 export function saveQuotation(quote: Quotation): void {
   const quotes = getQuotations();
   const index = quotes.findIndex((q) => q.id === quote.id);
+  const updatedQuote = index >= 0
+    ? { ...quote, updatedAt: new Date().toISOString() }
+    : { ...quote, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+
   if (index >= 0) {
-    quotes[index] = { ...quote, updatedAt: new Date().toISOString() };
+    quotes[index] = updatedQuote;
   } else {
-    quotes.unshift({ ...quote, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    quotes.unshift(updatedQuote);
   }
   localStorage.setItem(STORAGE_KEYS.QUOTES, JSON.stringify(quotes));
+
+  // Trigger Google Sheet sync in background
+  syncQuoteToGSheet(updatedQuote).catch(() => {});
 }
 
 export function deleteQuotation(quoteId: string): void {
@@ -279,12 +287,19 @@ export function getInvoices(): Invoice[] {
 export function saveInvoice(invoice: Invoice): void {
   const invoices = getInvoices();
   const index = invoices.findIndex((i) => i.id === invoice.id);
+  const updatedInvoice = index >= 0
+    ? { ...invoice, updatedAt: new Date().toISOString() }
+    : { ...invoice, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+
   if (index >= 0) {
-    invoices[index] = { ...invoice, updatedAt: new Date().toISOString() };
+    invoices[index] = updatedInvoice;
   } else {
-    invoices.unshift({ ...invoice, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    invoices.unshift(updatedInvoice);
   }
   localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(invoices));
+
+  // Trigger Google Sheet sync in background
+  syncInvoiceToGSheet(updatedInvoice).catch(() => {});
 }
 
 export function convertQuoteToInvoice(quoteId: string, taxType: 'CGST_SGST' | 'IGST' = 'CGST_SGST'): Invoice | null {

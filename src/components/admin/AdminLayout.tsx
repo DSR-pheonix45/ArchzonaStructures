@@ -161,7 +161,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
             className="px-4 py-2 rounded-xl bg-[#D1C7B7] hover:bg-[#F7F5F0] text-[#0D0C0A] font-bold text-xs flex items-center space-x-1.5 transition-all cursor-pointer shadow-md"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>+ Create Quote</span>
+            <span>Create Quote</span>
           </button>
 
           <div className="h-5 w-[1px] bg-[#D1C7B7]/20" />
