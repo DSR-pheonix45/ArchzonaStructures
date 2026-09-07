@@ -12,9 +12,26 @@ function formatCurrency(amount: number): string {
  * Helper to asynchronously load the site's logo from /logo.png as a Base64 string for jsPDF
  */
 async function getLogoBase64(): Promise<string | null> {
+  // 1. Try fetch + FileReader blob to data URL (most reliable in browser SPA)
+  try {
+    const res = await fetch('/logo.png');
+    if (res.ok) {
+      const blob = await res.blob();
+      const dataUrl = await new Promise<string | null>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      });
+      if (dataUrl) return dataUrl;
+    }
+  } catch (err) {
+    console.warn('Fetch logo failed, attempting Image load fallback', err);
+  }
+
+  // 2. Fallback using Image loading without crossOrigin restriction
   return new Promise((resolve) => {
     const img = new Image();
-    img.crossOrigin = 'Anonymous';
     img.src = '/logo.png';
     img.onload = () => {
       try {
@@ -57,7 +74,10 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
   const logoBase64 = await getLogoBase64();
   if (logoBase64) {
     try {
-      doc.addImage(logoBase64, 'PNG', 12, 3, 22, 22);
+      // Draw white rounded background badge for logo to pop on dark obsidian banner
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(11, 2.5, 23, 23, 3, 3, 'F');
+      doc.addImage(logoBase64, 'PNG', 12, 3.5, 21, 21);
     } catch (err) {
       console.warn('jsPDF addImage logo failed:', err);
     }
@@ -73,7 +93,7 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(209, 199, 183); // #D1C7B7 Stone
-  doc.text('Architectural Pergolas, Gazebos, Timber Cladding & Custom Structures', titleX, 19);
+  doc.text('Architectural Pergolas, Gazebos, Exterior Cladding & Custom Structures', titleX, 19);
 
   doc.setFontSize(13);
   doc.setFont('helvetica', 'bold');
@@ -318,7 +338,10 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
   const logoBase64 = await getLogoBase64();
   if (logoBase64) {
     try {
-      doc.addImage(logoBase64, 'PNG', 12, 3, 22, 22);
+      // Draw white rounded background badge for logo to pop on dark obsidian banner
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(11, 2.5, 23, 23, 3, 3, 'F');
+      doc.addImage(logoBase64, 'PNG', 12, 3.5, 21, 21);
     } catch (err) {
       console.warn('jsPDF addImage logo failed:', err);
     }
@@ -334,7 +357,7 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(209, 199, 183); // #D1C7B7 Stone
-  doc.text('Architectural Pergolas, Gazebos, Timber Cladding & Custom Structures', titleX, 19);
+  doc.text('Architectural Pergolas, Gazebos, Exterior Cladding & Custom Structures', titleX, 19);
 
   doc.setFontSize(13);
   doc.setFont('helvetica', 'bold');

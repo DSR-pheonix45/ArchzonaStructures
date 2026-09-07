@@ -735,7 +735,7 @@ const deckCats = [
   },
   {
     title: 'WALLS',
-    desc: 'Vertical structural enclosures designed to provide acoustic control, thermal insulation, and architectural timber cladding.',
+    desc: 'Vertical structural enclosures designed to provide acoustic control, thermal insulation, and architectural exterior cladding.',
   },
   {
     title: 'PARTITIONS',

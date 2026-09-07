@@ -22,10 +22,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
           {/* Main Brand Column (5 cols) */}
           <div className="md:col-span-5 space-y-6">
             <div className="flex flex-col">
-              <span className="font-serif-title text-4xl md:text-5xl font-light tracking-[0.25em] text-[#F7F5F0]">
-                ARCHZONA
-              </span>
-              <span className="font-mono text-[10px] tracking-[0.38em] text-[#C5A880] uppercase mt-1 font-semibold">
+              <div className="flex items-center gap-3 mb-2">
+                <img src="/logo.png" alt="Archzona Logo" className="w-8 h-8 object-contain" />
+                <span className="font-serif-title text-4xl md:text-5xl font-light tracking-[0.25em] text-[#F7F5F0]">
+                  ARCHZONA
+                </span>
+              </div>
+              <span className="font-mono text-[10px] tracking-[0.38em] text-[#C5A880] uppercase -mt-1 font-semibold">
                 STRUCTURES
               </span>
             </div>

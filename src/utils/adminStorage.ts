@@ -96,7 +96,7 @@ const INITIAL_SEED_QUOTES: Quotation[] = [
       phone: '+91 97699 44332',
       gstin: '27AABCS5544M1Z2',
       billingAddress: 'Suite 302, One BKC, Bandra Kurla Complex, Mumbai 400051',
-      projectName: 'Bandra Penthouse Terrace Timber Cladding',
+      projectName: 'Bandra Penthouse Terrace Exterior Cladding',
       projectLocation: 'Pali Hill, Bandra West, Mumbai',
     },
     date: '2026-09-02',
