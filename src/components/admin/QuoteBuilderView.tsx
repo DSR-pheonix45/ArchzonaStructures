@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Save, Download, FileText, CheckCircle2, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, Save, Download, FileText, CheckCircle2, ArrowLeft, RefreshCw, Loader2 } from 'lucide-react';
 import { Quotation, QuoteItem, ClientDetails } from '../../types/adminTypes';
 import { productsData } from '../../data/products';
 import { saveQuotation, generateNextQuoteId, getOwnerProfile } from '../../utils/adminStorage';
 import { downloadQuotationPDF } from '../../utils/pdfGenerator';
+import { syncQuoteToGSheet } from '../../utils/googleSheetsSync';
 
 interface QuoteBuilderViewProps {
   initialQuote?: Quotation | null;
@@ -22,6 +23,9 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
     d.setDate(d.getDate() + 30);
     return d.toISOString().split('T')[0];
   });
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [syncStatusMsg, setSyncStatusMsg] = useState('');
 
   // Client Details State
   const [client, setClient] = useState<ClientDetails>(initialQuote?.client || {
@@ -127,12 +131,13 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
   const overallDiscountAmount = Math.round(subtotal * (overallDiscountPercent / 100) * 100) / 100;
   const netPreTaxTotal = Math.round((subtotal - overallDiscountAmount) * 100) / 100;
 
-  const handleSave = (saveStatus?: Quotation['status']) => {
+  const handleSave = async (saveStatus?: Quotation['status']) => {
     if (!client.name || !client.email) {
       alert('Please fill in Client Name and Email before saving.');
       return;
     }
 
+    setIsSaving(true);
     const finalStatus = saveStatus || status;
 
     const newQuote: Quotation = {
@@ -154,7 +159,16 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
     };
 
     saveQuotation(newQuote);
-    onSaved();
+
+    try {
+      setSyncStatusMsg(finalStatus === 'issued' ? 'Updating in Google Sheet...' : 'Syncing...');
+      await syncQuoteToGSheet(newQuote);
+    } catch (err) {
+      console.warn('Google Sheet sync error:', err);
+    } finally {
+      setIsSaving(false);
+      onSaved();
+    }
   };
 
   const handleDownloadPDF = () => {
@@ -208,17 +222,28 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
           </button>
           <button
             onClick={() => handleSave('draft')}
-            className="px-4 py-2 rounded-xl bg-[#141311] border border-[#D1C7B7]/30 text-[#D1C7B7] hover:text-[#F7F5F0] text-xs font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer"
+            disabled={isSaving}
+            className="px-4 py-2 rounded-xl bg-[#141311] border border-[#D1C7B7]/30 text-[#D1C7B7] hover:text-[#F7F5F0] text-xs font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             <span>Save Draft</span>
           </button>
           <button
             onClick={() => handleSave('issued')}
-            className="px-5 py-2 rounded-xl bg-[#D1C7B7] hover:bg-[#F7F5F0] text-[#0D0C0A] text-xs font-bold flex items-center space-x-1.5 transition-all shadow-md cursor-pointer"
+            disabled={isSaving}
+            className="px-5 py-2 rounded-xl bg-[#D1C7B7] hover:bg-[#F7F5F0] text-[#0D0C0A] text-xs font-bold flex items-center space-x-1.5 transition-all shadow-md cursor-pointer disabled:opacity-50"
           >
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Issue Commercial Quote</span>
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-[#0D0C0A]" />
+                <span>Updating GSheet...</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Issue Commercial Quote</span>
+              </>
+            )}
           </button>
         </div>
       </div>
