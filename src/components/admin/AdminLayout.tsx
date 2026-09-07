@@ -30,7 +30,8 @@ import {
   convertQuoteToInvoice,
   deleteQuotation,
   exportDataJSON,
-  importDataJSON
+  importDataJSON,
+  clearAllDemoData
 } from '../../utils/adminStorage';
 import { downloadQuotationPDF, downloadInvoicePDF } from '../../utils/pdfGenerator';
 import { QuoteBuilderView } from './QuoteBuilderView';
@@ -738,10 +739,19 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
                     Export JSON Backup
                   </button>
 
-                  <label className="px-3 py-1.5 rounded-lg bg-[#0D0C0A] border border-[#D1C7B7]/20 text-[#D1C7B7] hover:text-[#F7F5F0] cursor-pointer">
-                    <span>Import JSON Backup</span>
-                    <input type="file" accept=".json" onChange={handleImportBackup} className="hidden" />
-                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm('Are you sure you want to clear all local quotes and invoices? This will reset all dashboard metrics to 0.')) {
+                        clearAllDemoData();
+                        reloadData();
+                        setSettingsMsg('All data reset to zero successfully.');
+                      }
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-[#0D0C0A] border border-red-500/30 text-red-400 hover:bg-red-500/10 cursor-pointer"
+                  >
+                    Reset / Clear All Data
+                  </button>
                 </div>
 
                 <button
