@@ -6,6 +6,7 @@ import { Quotation, Invoice } from '../types/adminTypes';
  */
 
 export const GSHEET_SPREADSHEET_ID = '1UgAsXRQu2aQXRU3IMnGmhh8r6ZcLQA6dS478_zLPv0E';
+export const DEFAULT_GSHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_FSxcB6fgZI2QSTFqqqEADB4whFld6soDOlqdeqiI-Rzu5iN1mL2rj22CCSFyvcnEAw/exec';
 
 // Storage key for configured Apps Script Web App Deployment URL
 const GSHEET_WEB_APP_URL_KEY = 'archzona_gsheet_web_app_url';
@@ -14,7 +15,7 @@ const GSHEET_WEB_APP_URL_KEY = 'archzona_gsheet_web_app_url';
  * Get or set Google Apps Script Web App URL
  */
 export function getGSheetWebAppUrl(): string {
-  return localStorage.getItem(GSHEET_WEB_APP_URL_KEY) || '';
+  return localStorage.getItem(GSHEET_WEB_APP_URL_KEY) || DEFAULT_GSHEET_WEB_APP_URL;
 }
 
 export function setGSheetWebAppUrl(url: string): void {
