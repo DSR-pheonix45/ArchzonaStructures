@@ -9,6 +9,21 @@ function formatCurrency(amount: number): string {
 }
 
 /**
+ * Helper to clean and normalize text (strips \r, converts HTML breaks, normalizes line endings)
+ */
+function cleanText(input: string | undefined | null): string {
+  if (!input) return '';
+  return String(input)
+    .replace(/\r\n/g, '\n')          // convert Windows CRLF to LF
+    .replace(/\r/g, '\n')            // convert standalone CR to LF
+    .replace(/<br\s*\/?>/gi, '\n')   // convert HTML <br> tags to LF
+    .replace(/<\/p>/gi, '\n')        // convert </p> tags to LF
+    .replace(/<[^>]+>/g, '')         // strip any HTML tags
+    .replace(/\u2028|\u2029/g, '\n') // convert unicode line separators to LF
+    .trim();
+}
+
+/**
  * Helper to asynchronously load the site's logo from /logo.png as a Base64 string for jsPDF
  */
 async function getLogoBase64(): Promise<string | null> {
@@ -127,19 +142,19 @@ function renderTableHeader(doc: jsPDF, y: number, isInvoice: boolean): number {
 function renderMultiLineSection(
   doc: jsPDF,
   title: string,
-  text: string,
+  rawText: string,
   startY: number,
   logoBase64: string | null,
   headerTitle: string,
-  refText: string,
-  isInvoice: boolean
+  refText: string
 ): number {
   const pageWidth = doc.internal.pageSize.getWidth();
   let y = startY;
 
-  if (!text || text.trim().length === 0) return y;
+  const text = cleanText(rawText);
+  if (!text) return y;
 
-  // Check if title fits
+  // Check if title fits on current page
   if (y > 245) {
     doc.addPage();
     renderHeaderBanner(doc, headerTitle, refText, logoBase64);
@@ -151,25 +166,32 @@ function renderMultiLineSection(
   doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
   doc.text(title, 15, y);
-  y += 5;
+  y += 5.5;
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(60, 60, 60);
 
-  // Split text by newlines first to preserve paragraph breaks
+  // Split text by newlines first to preserve paragraph structure
   const paragraphs = text.split('\n');
 
   for (const para of paragraphs) {
     const trimmed = para.trim();
     if (!trimmed) {
-      y += 2.5; // empty line gap
+      y += 2.5; // empty line spacing between paragraphs
       continue;
     }
 
-    const lines = doc.splitTextToSize(trimmed, pageWidth - 30);
-    for (const line of lines) {
-      if (y > 255) {
+    // Split long paragraph into wrapped lines
+    const wrappedLines = doc.splitTextToSize(trimmed, pageWidth - 30);
+
+    for (const rawLine of wrappedLines) {
+      // Strip any residual carriage return characters
+      const line = String(rawLine).replace(/[\r\n]/g, '').trim();
+      if (!line) continue;
+
+      // Page break check before drawing each line
+      if (y > 252) {
         doc.addPage();
         renderHeaderBanner(doc, headerTitle, refText, logoBase64);
         y = 35;
@@ -177,12 +199,23 @@ function renderMultiLineSection(
         doc.setFontSize(8);
         doc.setTextColor(60, 60, 60);
       }
+
+      // Check if line looks like a sub-heading (all caps or ends with colon)
+      const isSubHeader = line === line.toUpperCase() && line.length < 50 && !line.startsWith('•') && !/^\d+\./.test(line);
+      if (isSubHeader) {
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(30, 30, 30);
+      } else {
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(60, 60, 60);
+      }
+
       doc.text(line, 15, y);
-      y += 4.2; // 4.2mm line height for 8pt text
+      y += 4.2; // Advance Y position vertically for EVERY line!
     }
   }
 
-  y += 4; // Section bottom margin
+  y += 4; // Section bottom spacing
   return y;
 }
 
@@ -240,32 +273,34 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
   doc.text('ISSUED BY:', 15, y);
   doc.text('QUOTATION FOR:', 110, y);
 
-  // Left Column (Sender)
+  // Left Column (Sender - Archzona)
   let leftY = y + 5;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(30, 30, 30);
-  doc.text(owner.companyName, 15, leftY);
+  doc.text(cleanText(owner.companyName), 15, leftY);
   leftY += 4.5;
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(60, 60, 60);
-  const ownerAddressLines = doc.splitTextToSize(owner.address, 85);
-  doc.text(ownerAddressLines, 15, leftY);
-  leftY += (ownerAddressLines.length * 4.2);
+  const ownerAddressLines = doc.splitTextToSize(cleanText(owner.address), 85);
+  for (const line of ownerAddressLines) {
+    doc.text(String(line).replace(/[\r\n]/g, ''), 15, leftY);
+    leftY += 4.2;
+  }
 
-  doc.text(`Phone: ${owner.phone} | Email: ${owner.email}`, 15, leftY);
+  doc.text(`Phone: ${cleanText(owner.phone)} | Email: ${cleanText(owner.email)}`, 15, leftY);
   leftY += 4.5;
-  doc.text(`GSTIN: ${owner.gstin}`, 15, leftY);
+  doc.text(`GSTIN: ${cleanText(owner.gstin)}`, 15, leftY);
   leftY += 4.5;
 
-  // Right Column (Recipient)
+  // Right Column (Recipient - Client)
   let rightY = y + 5;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(30, 30, 30);
-  doc.text(quote.client.name, 110, rightY);
+  doc.text(cleanText(quote.client.name), 110, rightY);
   rightY += 4.5;
 
   doc.setFont('helvetica', 'normal');
@@ -273,28 +308,30 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
   doc.setTextColor(60, 60, 60);
 
   if (quote.client.companyName) {
-    doc.text(quote.client.companyName, 110, rightY);
+    doc.text(cleanText(quote.client.companyName), 110, rightY);
     rightY += 4.5;
   }
 
   if (quote.client.billingAddress) {
-    const clientAddressLines = doc.splitTextToSize(quote.client.billingAddress, 85);
-    doc.text(clientAddressLines, 110, rightY);
-    rightY += (clientAddressLines.length * 4.2);
+    const clientAddressLines = doc.splitTextToSize(cleanText(quote.client.billingAddress), 85);
+    for (const line of clientAddressLines) {
+      doc.text(String(line).replace(/[\r\n]/g, ''), 110, rightY);
+      rightY += 4.2;
+    }
   }
 
   if (quote.client.phone) {
-    doc.text(`Phone: ${quote.client.phone}`, 110, rightY);
+    doc.text(`Phone: ${cleanText(quote.client.phone)}`, 110, rightY);
     rightY += 4.5;
   }
 
   if (quote.client.email) {
-    doc.text(`Email: ${quote.client.email}`, 110, rightY);
+    doc.text(`Email: ${cleanText(quote.client.email)}`, 110, rightY);
     rightY += 4.5;
   }
 
   if (quote.client.gstin) {
-    doc.text(`Client GSTIN: ${quote.client.gstin}`, 110, rightY);
+    doc.text(`Client GSTIN: ${cleanText(quote.client.gstin)}`, 110, rightY);
     rightY += 4.5;
   }
 
@@ -309,7 +346,7 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
   doc.text(`Quote Date: ${quote.date}`, 20, y + 5.5);
   doc.text(`Valid Until: ${quote.validUntil}`, 80, y + 5.5);
   if (quote.client.projectName) {
-    doc.text(`Project: ${quote.client.projectName}`, 140, y + 5.5, { maxWidth: 55 });
+    doc.text(`Project: ${cleanText(quote.client.projectName)}`, 140, y + 5.5, { maxWidth: 55 });
   }
 
   y += 14;
@@ -318,13 +355,10 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
   y = renderTableHeader(doc, y, false);
 
   // 5. Line Items Body Rows
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
-
   quote.items.forEach((item, index) => {
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    const splitDesc = doc.splitTextToSize(item.description, 80);
+    const cleanedItemName = cleanText(item.name);
+    const cleanedItemDesc = cleanText(item.description);
+    const splitDesc = doc.splitTextToSize(cleanedItemDesc, 80);
     const rowHeight = Math.max(6 + (splitDesc.length * 3.8), 10);
 
     // Check pagination
@@ -335,16 +369,23 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
     }
 
     doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
     doc.text(`${index + 1}`, 18, y + 5);
 
-    // Multiline item description
+    // Item Title
     doc.setFont('helvetica', 'bold');
-    doc.text(item.name, 28, y + 5);
+    doc.text(cleanedItemName, 28, y + 5);
+
+    // Multiline item description
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(80, 80, 80);
-    doc.text(splitDesc, 28, y + 9);
+    let descY = y + 9;
+    for (const dLine of splitDesc) {
+      doc.text(String(dLine).replace(/[\r\n]/g, ''), 28, descY);
+      descY += 3.8;
+    }
 
     doc.setFontSize(8.5);
     doc.setTextColor(30, 30, 30);
@@ -422,8 +463,7 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
     y,
     logoBase64,
     headerTitle,
-    refText,
-    false
+    refText
   );
 
   // 9. Payment Terms Section (Dynamic multi-line rendering)
@@ -435,8 +475,7 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
     y,
     logoBase64,
     headerTitle,
-    refText,
-    false
+    refText
   );
 
   // 10. Signature Block
@@ -496,20 +535,22 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(30, 30, 30);
-  doc.text(owner.companyName, 15, leftY);
+  doc.text(cleanText(owner.companyName), 15, leftY);
   leftY += 4.5;
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(60, 60, 60);
-  const ownerAddressLines = doc.splitTextToSize(owner.address, 85);
-  doc.text(ownerAddressLines, 15, leftY);
-  leftY += (ownerAddressLines.length * 4.2);
+  const ownerAddressLines = doc.splitTextToSize(cleanText(owner.address), 85);
+  for (const line of ownerAddressLines) {
+    doc.text(String(line).replace(/[\r\n]/g, ''), 15, leftY);
+    leftY += 4.2;
+  }
 
-  doc.text(`Phone: ${owner.phone} | Email: ${owner.email}`, 15, leftY);
+  doc.text(`Phone: ${cleanText(owner.phone)} | Email: ${cleanText(owner.email)}`, 15, leftY);
   leftY += 4.5;
   doc.setFont('helvetica', 'bold');
-  doc.text(`GSTIN: ${owner.gstin}`, 15, leftY);
+  doc.text(`GSTIN: ${cleanText(owner.gstin)}`, 15, leftY);
   leftY += 4.5;
 
   // Right Column (Recipient)
@@ -517,7 +558,7 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(30, 30, 30);
-  doc.text(invoice.client.name, 110, rightY);
+  doc.text(cleanText(invoice.client.name), 110, rightY);
   rightY += 4.5;
 
   doc.setFont('helvetica', 'normal');
@@ -525,29 +566,31 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
   doc.setTextColor(60, 60, 60);
 
   if (invoice.client.companyName) {
-    doc.text(invoice.client.companyName, 110, rightY);
+    doc.text(cleanText(invoice.client.companyName), 110, rightY);
     rightY += 4.5;
   }
 
   if (invoice.client.billingAddress) {
-    const clientAddressLines = doc.splitTextToSize(invoice.client.billingAddress, 85);
-    doc.text(clientAddressLines, 110, rightY);
-    rightY += (clientAddressLines.length * 4.2);
+    const clientAddressLines = doc.splitTextToSize(cleanText(invoice.client.billingAddress), 85);
+    for (const line of clientAddressLines) {
+      doc.text(String(line).replace(/[\r\n]/g, ''), 110, rightY);
+      rightY += 4.2;
+    }
   }
 
   if (invoice.client.phone) {
-    doc.text(`Phone: ${invoice.client.phone}`, 110, rightY);
+    doc.text(`Phone: ${cleanText(invoice.client.phone)}`, 110, rightY);
     rightY += 4.5;
   }
 
   if (invoice.client.email) {
-    doc.text(`Email: ${invoice.client.email}`, 110, rightY);
+    doc.text(`Email: ${cleanText(invoice.client.email)}`, 110, rightY);
     rightY += 4.5;
   }
 
   if (invoice.client.gstin) {
     doc.setFont('helvetica', 'bold');
-    doc.text(`Client GSTIN: ${invoice.client.gstin}`, 110, rightY);
+    doc.text(`Client GSTIN: ${cleanText(invoice.client.gstin)}`, 110, rightY);
     rightY += 4.5;
   }
 
@@ -569,13 +612,10 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
   y = renderTableHeader(doc, y, true);
 
   // 5. Line Items Body Rows
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
-
   invoice.items.forEach((item, index) => {
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    const splitDesc = doc.splitTextToSize(item.description, 80);
+    const cleanedItemName = cleanText(item.name);
+    const cleanedItemDesc = cleanText(item.description);
+    const splitDesc = doc.splitTextToSize(cleanedItemDesc, 80);
     const rowHeight = Math.max(6 + (splitDesc.length * 3.8), 10);
 
     if (y + rowHeight > 250) {
@@ -585,15 +625,21 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
     }
 
     doc.setTextColor(30, 30, 30);
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
     doc.text(`${index + 1}`, 18, y + 5);
 
     doc.setFont('helvetica', 'bold');
-    doc.text(item.name, 28, y + 5);
+    doc.text(cleanedItemName, 28, y + 5);
+
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(80, 80, 80);
-    doc.text(splitDesc, 28, y + 9);
+    let descY = y + 9;
+    for (const dLine of splitDesc) {
+      doc.text(String(dLine).replace(/[\r\n]/g, ''), 28, descY);
+      descY += 3.8;
+    }
 
     doc.setFontSize(8.5);
     doc.setTextColor(30, 30, 30);
@@ -627,11 +673,11 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(60, 60, 60);
-  doc.text(`Bank: ${owner.bankDetails.bankName}`, 15, startTotalsY + 8.5);
-  doc.text(`Account Name: ${owner.bankDetails.accountName}`, 15, startTotalsY + 12.5);
-  doc.text(`Account #: ${owner.bankDetails.accountNumber}`, 15, startTotalsY + 16.5);
-  doc.text(`IFSC Code: ${owner.bankDetails.ifscCode}`, 15, startTotalsY + 20.5);
-  doc.text(`Branch: ${owner.bankDetails.branch}`, 15, startTotalsY + 24.5);
+  doc.text(`Bank: ${cleanText(owner.bankDetails.bankName)}`, 15, startTotalsY + 8.5);
+  doc.text(`Account Name: ${cleanText(owner.bankDetails.accountName)}`, 15, startTotalsY + 12.5);
+  doc.text(`Account #: ${cleanText(owner.bankDetails.accountNumber)}`, 15, startTotalsY + 16.5);
+  doc.text(`IFSC Code: ${cleanText(owner.bankDetails.ifscCode)}`, 15, startTotalsY + 20.5);
+  doc.text(`Branch: ${cleanText(owner.bankDetails.branch)}`, 15, startTotalsY + 24.5);
 
   // Totals Breakdown on Right (X = 95 to X = 195)
   let rightTotalsY = startTotalsY;
@@ -704,8 +750,7 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
       y,
       logoBase64,
       headerTitle,
-      refText,
-      true
+      refText
     );
   }
 
@@ -717,8 +762,7 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
       y,
       logoBase64,
       headerTitle,
-      refText,
-      true
+      refText
     );
   }
 
