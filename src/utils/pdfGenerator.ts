@@ -478,13 +478,16 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
     refText
   );
 
-  // 10. Signature Block
-  if (y + 25 > 255) {
+  // 10. Signature Block Placement
+  // Signature block requires ~20mm of vertical space.
+  // Footer divider line is at 282mm, printable area limit is 265mm.
+  if (y + 20 > 265) {
     doc.addPage();
     renderHeaderBanner(doc, headerTitle, refText, logoBase64);
-    y = 35;
+    y = 40;
   } else {
-    y = Math.max(y + 8, 245);
+    // Keep at least 8mm gap after terms, or place nicely near bottom if space allows
+    y = Math.min(Math.max(y + 8, 230), 252);
   }
 
   doc.setFont('helvetica', 'bold');
@@ -766,13 +769,16 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
     );
   }
 
-  // 8. Signature Block
-  if (y + 25 > 255) {
+  // 8. Signature Block Placement
+  // Signature block requires ~20mm of vertical space.
+  // Footer divider line is at 282mm, printable area limit is 265mm.
+  if (y + 20 > 265) {
     doc.addPage();
     renderHeaderBanner(doc, headerTitle, refText, logoBase64);
-    y = 35;
+    y = 40;
   } else {
-    y = Math.max(y + 8, 245);
+    // Keep at least 8mm gap after terms, or place nicely near bottom if space allows
+    y = Math.min(Math.max(y + 8, 230), 252);
   }
 
   doc.setFont('helvetica', 'bold');
