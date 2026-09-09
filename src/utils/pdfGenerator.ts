@@ -12,7 +12,6 @@ function formatCurrency(amount: number): string {
  * Helper to asynchronously load the site's logo from /logo.png as a Base64 string for jsPDF
  */
 async function getLogoBase64(): Promise<string | null> {
-  // 1. Try fetch + FileReader blob to data URL (most reliable in browser SPA)
   try {
     const res = await fetch('/logo.png');
     if (res.ok) {
@@ -29,7 +28,6 @@ async function getLogoBase64(): Promise<string | null> {
     console.warn('Fetch logo failed, attempting Image load fallback', err);
   }
 
-  // 2. Fallback using Image loading without crossOrigin restriction
   return new Promise((resolve) => {
     const img = new Image();
     img.src = '/logo.png';
@@ -54,27 +52,23 @@ async function getLogoBase64(): Promise<string | null> {
 }
 
 /**
- * Download a crisp, professional, branded pre-tax Quotation PDF
+ * Helper to render Top Branded Banner
  */
-export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): Promise<void> {
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
-  });
-
+function renderHeaderBanner(doc: jsPDF, title: string, refText: string, logoBase64: string | null): void {
   const pageWidth = doc.internal.pageSize.getWidth();
-  let y = 15;
 
-  // Header Banner / Brand Title
-  doc.setFillColor(13, 12, 10); // #0D0C0A Obsidian
+  // Dark obsidian header rectangle
+  doc.setFillColor(13, 12, 10); // #0D0C0A
   doc.rect(0, 0, pageWidth, 28, 'F');
 
-  // Load Logo Icon from /logo.png
-  const logoBase64 = await getLogoBase64();
+  // Accent bottom border line
+  doc.setDrawColor(209, 199, 183); // #D1C7B7
+  doc.setLineWidth(0.5);
+  doc.line(0, 28, pageWidth, 28);
+
+  // Logo Icon Badge
   if (logoBase64) {
     try {
-      // Draw white rounded background badge for logo to pop on dark obsidian banner
       doc.setFillColor(255, 255, 255);
       doc.roundedRect(11, 2.5, 23, 23, 3, 3, 'F');
       doc.addImage(logoBase64, 'PNG', 12, 3.5, 21, 21);
@@ -87,40 +81,176 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
 
   doc.setTextColor(247, 245, 240); // #F7F5F0 Chalk
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(17);
-  doc.text('ARCHZONA STRUCTURES', titleX, 13);
+  doc.setFontSize(16);
+  doc.text('ARCHZONA STRUCTURES', titleX, 12.5);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
+  doc.setFontSize(8);
   doc.setTextColor(209, 199, 183); // #D1C7B7 Stone
-  doc.text('Architectural Pergolas, Gazebos, Exterior Cladding & Custom Structures', titleX, 19);
+  doc.text('Architectural Pergolas, Gazebos, Exterior Cladding & Custom Structures', titleX, 18.5);
 
-  doc.setFontSize(13);
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(247, 245, 240);
-  doc.text('COMMERCIAL QUOTATION', pageWidth - 15, 15, { align: 'right' });
-  doc.setFontSize(9.5);
+  doc.text(title, pageWidth - 15, 13, { align: 'right' });
+
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Ref: ${quote.id}`, pageWidth - 15, 21, { align: 'right' });
+  doc.setTextColor(209, 199, 183);
+  doc.text(refText, pageWidth - 15, 19, { align: 'right' });
+}
 
-  y = 35;
+/**
+ * Helper to render Table Header
+ */
+function renderTableHeader(doc: jsPDF, y: number, isInvoice: boolean): number {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  doc.setFillColor(20, 19, 17);
+  doc.rect(15, y, pageWidth - 30, 8, 'F');
 
-  // --- DYNAMIC HEADER SECTION (ISSUED BY vs QUOTATION FOR) ---
+  doc.setTextColor(247, 245, 240);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+
+  doc.text('#', 18, y + 5.5);
+  doc.text(isInvoice ? 'DESCRIPTION & SPECIFICATIONS' : 'ITEM DESCRIPTION', 28, y + 5.5);
+  doc.text('QTY / UNIT', 115, y + 5.5, { align: 'center' });
+  doc.text('UNIT RATE', 145, y + 5.5, { align: 'right' });
+  doc.text(isInvoice ? 'TAXABLE VALUE' : 'AMOUNT (PRE-TAX)', pageWidth - 18, y + 5.5, { align: 'right' });
+
+  return y + 8;
+}
+
+/**
+ * Helper to render dynamic multi-line text safely across page boundaries with clean line heights
+ */
+function renderMultiLineSection(
+  doc: jsPDF,
+  title: string,
+  text: string,
+  startY: number,
+  logoBase64: string | null,
+  headerTitle: string,
+  refText: string,
+  isInvoice: boolean
+): number {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  let y = startY;
+
+  if (!text || text.trim().length === 0) return y;
+
+  // Check if title fits
+  if (y > 245) {
+    doc.addPage();
+    renderHeaderBanner(doc, headerTitle, refText, logoBase64);
+    y = 35;
+  }
+
+  // Section Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(13, 12, 10);
+  doc.text(title, 15, y);
+  y += 5;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(60, 60, 60);
+
+  // Split text by newlines first to preserve paragraph breaks
+  const paragraphs = text.split('\n');
+
+  for (const para of paragraphs) {
+    const trimmed = para.trim();
+    if (!trimmed) {
+      y += 2.5; // empty line gap
+      continue;
+    }
+
+    const lines = doc.splitTextToSize(trimmed, pageWidth - 30);
+    for (const line of lines) {
+      if (y > 255) {
+        doc.addPage();
+        renderHeaderBanner(doc, headerTitle, refText, logoBase64);
+        y = 35;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(60, 60, 60);
+      }
+      doc.text(line, 15, y);
+      y += 4.2; // 4.2mm line height for 8pt text
+    }
+  }
+
+  y += 4; // Section bottom margin
+  return y;
+}
+
+/**
+ * Apply page numbers & footers across all generated pages
+ */
+function applyFootersToAllPages(doc: jsPDF): void {
+  const totalPages = doc.getNumberOfPages();
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+
+    // Footer divider line
+    doc.setDrawColor(220, 215, 205);
+    doc.setLineWidth(0.3);
+    doc.line(15, 282, pageWidth - 15, 282);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(140, 130, 115);
+
+    // Left/Center company details
+    doc.text('Archzona Structures LLP | www.archzonestructures.com | info.archzona@gmail.com', 15, 287);
+
+    // Right page number
+    doc.text(`Page ${i} of ${totalPages}`, pageWidth - 15, 287, { align: 'right' });
+  }
+}
+
+/**
+ * Download a crisp, professional, branded pre-tax Quotation PDF
+ */
+export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): Promise<void> {
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+  });
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const logoBase64 = await getLogoBase64();
+  const headerTitle = 'COMMERCIAL QUOTATION';
+  const refText = `Ref: ${quote.id}`;
+
+  // 1. Initial Page Banner
+  renderHeaderBanner(doc, headerTitle, refText, logoBase64);
+
+  let y = 35;
+
+  // 2. Sender / Recipient Header Info
   doc.setTextColor(13, 12, 10);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
+  doc.setFontSize(9.5);
   doc.text('ISSUED BY:', 15, y);
   doc.text('QUOTATION FOR:', 110, y);
 
-  // Left Column (Sender - Archzona)
+  // Left Column (Sender)
   let leftY = y + 5;
-  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.setTextColor(60, 60, 60);
-
+  doc.setTextColor(30, 30, 30);
   doc.text(owner.companyName, 15, leftY);
   leftY += 4.5;
 
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(60, 60, 60);
   const ownerAddressLines = doc.splitTextToSize(owner.address, 85);
   doc.text(ownerAddressLines, 15, leftY);
   leftY += (ownerAddressLines.length * 4.2);
@@ -130,10 +260,17 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
   doc.text(`GSTIN: ${owner.gstin}`, 15, leftY);
   leftY += 4.5;
 
-  // Right Column (Recipient - Client)
+  // Right Column (Recipient)
   let rightY = y + 5;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(30, 30, 30);
   doc.text(quote.client.name, 110, rightY);
   rightY += 4.5;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(60, 60, 60);
 
   if (quote.client.companyName) {
     doc.text(quote.client.companyName, 110, rightY);
@@ -161,14 +298,13 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
     rightY += 4.5;
   }
 
-  // Advance y past both header blocks
-  y = Math.max(leftY, rightY) + 5;
+  y = Math.max(leftY, rightY) + 4;
 
-  // Metadata Row
+  // 3. Metadata Banner Bar
   doc.setFillColor(239, 234, 226); // #EFEAE2
-  doc.rect(15, y, pageWidth - 30, 8, 'F');
+  doc.roundedRect(15, y, pageWidth - 30, 8, 1.5, 1.5, 'F');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
   doc.text(`Quote Date: ${quote.date}`, 20, y + 5.5);
   doc.text(`Valid Until: ${quote.validUntil}`, 80, y + 5.5);
@@ -178,32 +314,28 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
 
   y += 14;
 
-  // Table Header
-  doc.setFillColor(20, 19, 17);
-  doc.rect(15, y, pageWidth - 30, 8, 'F');
-  doc.setTextColor(247, 245, 240);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.text('#', 18, y + 5.5);
-  doc.text('ITEM DESCRIPTION', 28, y + 5.5);
-  doc.text('QTY / UNIT', 115, y + 5.5, { align: 'center' });
-  doc.text('UNIT RATE', 145, y + 5.5, { align: 'right' });
-  doc.text('AMOUNT (PRE-TAX)', pageWidth - 18, y + 5.5, { align: 'right' });
+  // 4. Line Items Table Header
+  y = renderTableHeader(doc, y, false);
 
-  y += 8;
-
-  // Table Body Rows
+  // 5. Line Items Body Rows
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
-  doc.setTextColor(30, 30, 30);
 
   quote.items.forEach((item, index) => {
-    // Check if new page is needed
-    if (y > 245) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    const splitDesc = doc.splitTextToSize(item.description, 80);
+    const rowHeight = Math.max(6 + (splitDesc.length * 3.8), 10);
+
+    // Check pagination
+    if (y + rowHeight > 250) {
       doc.addPage();
-      y = 20;
+      renderHeaderBanner(doc, headerTitle, refText, logoBase64);
+      y = renderTableHeader(doc, 33, false);
     }
 
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(8.5);
     doc.text(`${index + 1}`, 18, y + 5);
 
     // Multiline item description
@@ -212,10 +344,7 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(80, 80, 80);
-    const splitDesc = doc.splitTextToSize(item.description, 80);
     doc.text(splitDesc, 28, y + 9);
-
-    const descHeight = 5 + (splitDesc.length * 3.8);
 
     doc.setFontSize(8.5);
     doc.setTextColor(30, 30, 30);
@@ -223,22 +352,23 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
     doc.text(formatCurrency(item.unitRate), 145, y + 5, { align: 'right' });
     doc.text(formatCurrency(item.netAmount), pageWidth - 18, y + 5, { align: 'right' });
 
-    y += Math.max(descHeight, 10);
+    y += rowHeight;
 
-    // Thin separator line
-    doc.setDrawColor(220, 220, 220);
+    // Line separator
+    doc.setDrawColor(230, 225, 215);
     doc.line(15, y, pageWidth - 15, y);
   });
 
-  y += 4;
+  y += 6;
 
-  // Totals Box (Wider box starting at X=95 to prevent ANY text overlap)
-  if (y > 220) {
+  // 6. Pre-Tax Totals Summary Box
+  if (y + 35 > 250) {
     doc.addPage();
-    y = 20;
+    renderHeaderBanner(doc, headerTitle, refText, logoBase64);
+    y = 35;
   }
 
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(60, 60, 60);
   doc.text('Subtotal (Pre-Tax):', 100, y + 5);
@@ -247,19 +377,18 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
   doc.text(formatCurrency(quote.subtotal), pageWidth - 18, y + 5, { align: 'right' });
 
   if (quote.overallDiscountAmount > 0) {
-    y += 5;
+    y += 5.5;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(60, 60, 60);
     doc.text(`Overall Discount (${quote.overallDiscountPercent}%):`, 100, y + 5);
     doc.text(`- ${formatCurrency(quote.overallDiscountAmount)}`, pageWidth - 18, y + 5, { align: 'right' });
   }
 
-  y += 7;
-  // Box starts at X=95, width=100 (from 95mm to 195mm)
+  y += 7.5;
   doc.setFillColor(239, 234, 226);
-  doc.rect(95, y, 100, 10, 'F');
+  doc.roundedRect(95, y, 100, 10, 1.5, 1.5, 'F');
   doc.setDrawColor(209, 199, 183);
-  doc.rect(95, y, 100, 10, 'S');
+  doc.roundedRect(95, y, 100, 10, 1.5, 1.5, 'S');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
@@ -268,9 +397,15 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
   doc.setFontSize(9.5);
   doc.text(formatCurrency(quote.netPreTaxTotal), pageWidth - 18, y + 6.5, { align: 'right' });
 
-  y += 15;
+  y += 16;
 
-  // Note on Pre-Tax nature
+  // 7. Pre-Tax Disclaimer Note
+  if (y > 250) {
+    doc.addPage();
+    renderHeaderBanner(doc, headerTitle, refText, logoBase64);
+    y = 35;
+  }
+
   doc.setFont('helvetica', 'italic');
   doc.setFontSize(8);
   doc.setTextColor(100, 100, 100);
@@ -278,41 +413,53 @@ export async function downloadQuotationPDF(quote: Quotation, owner: OwnerUser): 
 
   y += 8;
 
-  // Terms & Payment Milestones
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(13, 12, 10);
-  doc.text('TERMS & CONDITIONS:', 15, y);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(60, 60, 60);
-  const termsText = quote.notes || '1. Valid for 30 days. 2. Subject to final site dimensions verification.';
-  doc.text(termsText, 15, y + 4, { maxWidth: pageWidth - 30 });
+  // 8. Terms & Conditions Section (Dynamic multi-line rendering)
+  const defaultNotes = '1. Valid for 30 days. 2. Subject to final site dimensions verification.';
+  y = renderMultiLineSection(
+    doc,
+    'TERMS & CONDITIONS:',
+    quote.notes || defaultNotes,
+    y,
+    logoBase64,
+    headerTitle,
+    refText,
+    false
+  );
 
-  y += 12;
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(13, 12, 10);
-  doc.text('PAYMENT TERMS:', 15, y);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(60, 60, 60);
-  doc.text(quote.paymentTerms || '50% Advance | 40% On Dispatch | 10% On Handover', 15, y + 4, { maxWidth: pageWidth - 30 });
+  // 9. Payment Terms Section (Dynamic multi-line rendering)
+  const defaultPayment = '50% Advance | 40% On Dispatch | 10% On Handover';
+  y = renderMultiLineSection(
+    doc,
+    'PAYMENT TERMS:',
+    quote.paymentTerms || defaultPayment,
+    y,
+    logoBase64,
+    headerTitle,
+    refText,
+    false
+  );
 
-  // Signature Block
-  y = 265;
+  // 10. Signature Block
+  if (y + 25 > 255) {
+    doc.addPage();
+    renderHeaderBanner(doc, headerTitle, refText, logoBase64);
+    y = 35;
+  } else {
+    y = Math.max(y + 8, 245);
+  }
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
   doc.text('For ARCHZONA STRUCTURES LLP', pageWidth - 15, y, { align: 'right' });
+
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
+  doc.setTextColor(60, 60, 60);
   doc.text('Authorized Signatory', pageWidth - 15, y + 10, { align: 'right' });
 
-  // Footer text
-  doc.setFontSize(7.5);
-  doc.setTextColor(140, 130, 115);
-  doc.text('Archzona Structures LLP | www.archzonestructures.com | info.archzona@gmail.com', pageWidth / 2, 287, { align: 'center' });
+  // 11. Final Footers Pass
+  applyFootersToAllPages(doc);
 
   doc.save(`${quote.id}_Archzona_Quotation.pdf`);
 }
@@ -328,63 +475,33 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
   });
 
   const pageWidth = doc.internal.pageSize.getWidth();
-  let y = 15;
-
-  // Header Banner / Brand Title
-  doc.setFillColor(13, 12, 10); // #0D0C0A Obsidian
-  doc.rect(0, 0, pageWidth, 28, 'F');
-
-  // Load Logo Icon from /logo.png
   const logoBase64 = await getLogoBase64();
-  if (logoBase64) {
-    try {
-      // Draw white rounded background badge for logo to pop on dark obsidian banner
-      doc.setFillColor(255, 255, 255);
-      doc.roundedRect(11, 2.5, 23, 23, 3, 3, 'F');
-      doc.addImage(logoBase64, 'PNG', 12, 3.5, 21, 21);
-    } catch (err) {
-      console.warn('jsPDF addImage logo failed:', err);
-    }
-  }
+  const headerTitle = 'TAX INVOICE';
+  const refText = `Invoice #: ${invoice.id}`;
 
-  const titleX = logoBase64 ? 38 : 15;
+  // 1. Initial Page Banner
+  renderHeaderBanner(doc, headerTitle, refText, logoBase64);
 
-  doc.setTextColor(247, 245, 240); // #F7F5F0 Chalk
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(17);
-  doc.text('ARCHZONA STRUCTURES', titleX, 13);
+  let y = 35;
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
-  doc.setTextColor(209, 199, 183); // #D1C7B7 Stone
-  doc.text('Architectural Pergolas, Gazebos, Exterior Cladding & Custom Structures', titleX, 19);
-
-  doc.setFontSize(13);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(247, 245, 240);
-  doc.text('TAX INVOICE', pageWidth - 15, 15, { align: 'right' });
-  doc.setFontSize(9.5);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`Invoice #: ${invoice.id}`, pageWidth - 15, 21, { align: 'right' });
-
-  y = 35;
-
-  // --- DYNAMIC HEADER SECTION (ISSUED BY vs BILLED TO) ---
+  // 2. Sender / Recipient Header Info
   doc.setTextColor(13, 12, 10);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
+  doc.setFontSize(9.5);
   doc.text('ISSUED BY:', 15, y);
   doc.text('BILLED TO:', 110, y);
 
-  // Left Column (Sender - Archzona)
+  // Left Column (Sender)
   let leftY = y + 5;
-  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.setTextColor(60, 60, 60);
-
+  doc.setTextColor(30, 30, 30);
   doc.text(owner.companyName, 15, leftY);
   leftY += 4.5;
 
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(60, 60, 60);
   const ownerAddressLines = doc.splitTextToSize(owner.address, 85);
   doc.text(ownerAddressLines, 15, leftY);
   leftY += (ownerAddressLines.length * 4.2);
@@ -395,11 +512,17 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
   doc.text(`GSTIN: ${owner.gstin}`, 15, leftY);
   leftY += 4.5;
 
-  // Right Column (Recipient - Client)
+  // Right Column (Recipient)
   let rightY = y + 5;
-  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(30, 30, 30);
   doc.text(invoice.client.name, 110, rightY);
   rightY += 4.5;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(60, 60, 60);
 
   if (invoice.client.companyName) {
     doc.text(invoice.client.companyName, 110, rightY);
@@ -428,14 +551,13 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
     rightY += 4.5;
   }
 
-  // Advance y past both header blocks
-  y = Math.max(leftY, rightY) + 5;
+  y = Math.max(leftY, rightY) + 4;
 
-  // Invoice Metadata Row
-  doc.setFillColor(239, 234, 226);
-  doc.rect(15, y, pageWidth - 30, 8, 'F');
+  // 3. Metadata Banner Bar
+  doc.setFillColor(239, 234, 226); // #EFEAE2
+  doc.roundedRect(15, y, pageWidth - 30, 8, 1.5, 1.5, 'F');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
   doc.text(`Invoice Date: ${invoice.issueDate}`, 20, y + 5.5);
   doc.text(`Due Date: ${invoice.dueDate}`, 80, y + 5.5);
@@ -443,31 +565,27 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
 
   y += 14;
 
-  // Table Header
-  doc.setFillColor(20, 19, 17);
-  doc.rect(15, y, pageWidth - 30, 8, 'F');
-  doc.setTextColor(247, 245, 240);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.text('#', 18, y + 5.5);
-  doc.text('DESCRIPTION & SPECIFICATIONS', 28, y + 5.5);
-  doc.text('QTY / UNIT', 115, y + 5.5, { align: 'center' });
-  doc.text('UNIT RATE', 145, y + 5.5, { align: 'right' });
-  doc.text('TAXABLE VALUE', pageWidth - 18, y + 5.5, { align: 'right' });
+  // 4. Line Items Table Header
+  y = renderTableHeader(doc, y, true);
 
-  y += 8;
-
-  // Table Body Rows
+  // 5. Line Items Body Rows
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
-  doc.setTextColor(30, 30, 30);
 
   invoice.items.forEach((item, index) => {
-    if (y > 240) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    const splitDesc = doc.splitTextToSize(item.description, 80);
+    const rowHeight = Math.max(6 + (splitDesc.length * 3.8), 10);
+
+    if (y + rowHeight > 250) {
       doc.addPage();
-      y = 20;
+      renderHeaderBanner(doc, headerTitle, refText, logoBase64);
+      y = renderTableHeader(doc, 33, true);
     }
 
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(8.5);
     doc.text(`${index + 1}`, 18, y + 5);
 
     doc.setFont('helvetica', 'bold');
@@ -475,10 +593,7 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(80, 80, 80);
-    const splitDesc = doc.splitTextToSize(item.description, 80);
     doc.text(splitDesc, 28, y + 9);
-
-    const descHeight = 5 + (splitDesc.length * 3.8);
 
     doc.setFontSize(8.5);
     doc.setTextColor(30, 30, 30);
@@ -486,106 +601,148 @@ export async function downloadInvoicePDF(invoice: Invoice, owner: OwnerUser): Pr
     doc.text(formatCurrency(item.unitRate), 145, y + 5, { align: 'right' });
     doc.text(formatCurrency(item.netAmount), pageWidth - 18, y + 5, { align: 'right' });
 
-    y += Math.max(descHeight, 10);
-    doc.setDrawColor(220, 220, 220);
+    y += rowHeight;
+
+    doc.setDrawColor(230, 225, 215);
     doc.line(15, y, pageWidth - 15, y);
   });
 
-  y += 4;
+  y += 6;
 
-  // Tax & Totals Breakdown (Box starts at X=95, width=100mm to prevent text overlap)
-  if (y > 215) {
+  // 6. Tax & Totals Breakdown & Bank Details Box
+  if (y + 50 > 250) {
     doc.addPage();
-    y = 20;
+    renderHeaderBanner(doc, headerTitle, refText, logoBase64);
+    y = 35;
   }
+
+  const startTotalsY = y;
+
+  // Bank Details on Left (X = 15 to X = 90)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(13, 12, 10);
+  doc.text('BANK PAYMENT DETAILS (NEFT/RTGS):', 15, startTotalsY + 4);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(60, 60, 60);
+  doc.text(`Bank: ${owner.bankDetails.bankName}`, 15, startTotalsY + 8.5);
+  doc.text(`Account Name: ${owner.bankDetails.accountName}`, 15, startTotalsY + 12.5);
+  doc.text(`Account #: ${owner.bankDetails.accountNumber}`, 15, startTotalsY + 16.5);
+  doc.text(`IFSC Code: ${owner.bankDetails.ifscCode}`, 15, startTotalsY + 20.5);
+  doc.text(`Branch: ${owner.bankDetails.branch}`, 15, startTotalsY + 24.5);
+
+  // Totals Breakdown on Right (X = 95 to X = 195)
+  let rightTotalsY = startTotalsY;
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(60, 60, 60);
-  doc.text('Taxable Subtotal:', 100, y + 5);
+  doc.text('Taxable Subtotal:', 100, rightTotalsY + 4);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(13, 12, 10);
-  doc.text(formatCurrency(invoice.subtotal), pageWidth - 18, y + 5, { align: 'right' });
+  doc.text(formatCurrency(invoice.subtotal), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
 
   if (invoice.taxType === 'CGST_SGST') {
-    y += 5;
+    rightTotalsY += 5;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(60, 60, 60);
-    doc.text(`CGST @ ${invoice.cgstPercent}%:`, 100, y + 5);
-    doc.text(formatCurrency(invoice.cgstAmount), pageWidth - 18, y + 5, { align: 'right' });
-    y += 5;
-    doc.text(`SGST @ ${invoice.sgstPercent}%:`, 100, y + 5);
-    doc.text(formatCurrency(invoice.sgstAmount), pageWidth - 18, y + 5, { align: 'right' });
+    doc.text(`CGST @ ${invoice.cgstPercent}%:`, 100, rightTotalsY + 4);
+    doc.text(formatCurrency(invoice.cgstAmount), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
+
+    rightTotalsY += 5;
+    doc.text(`SGST @ ${invoice.sgstPercent}%:`, 100, rightTotalsY + 4);
+    doc.text(formatCurrency(invoice.sgstAmount), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
   } else {
-    y += 5;
+    rightTotalsY += 5;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(60, 60, 60);
-    doc.text(`IGST @ ${invoice.igstPercent}%:`, 100, y + 5);
-    doc.text(formatCurrency(invoice.igstAmount), pageWidth - 18, y + 5, { align: 'right' });
+    doc.text(`IGST @ ${invoice.igstPercent}%:`, 100, rightTotalsY + 4);
+    doc.text(formatCurrency(invoice.igstAmount), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
   }
 
-  y += 7;
+  rightTotalsY += 7;
   doc.setFillColor(20, 19, 17);
-  doc.rect(95, y, 100, 10, 'F');
+  doc.roundedRect(95, rightTotalsY, 100, 10, 1.5, 1.5, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(247, 245, 240);
-  doc.text('GRAND TOTAL (INC. GST):', 99, y + 6.5);
+  doc.text('GRAND TOTAL (INC. GST):', 99, rightTotalsY + 6.5);
   doc.setFontSize(9.5);
-  doc.text(formatCurrency(invoice.grandTotal), pageWidth - 18, y + 6.5, { align: 'right' });
+  doc.text(formatCurrency(invoice.grandTotal), pageWidth - 18, rightTotalsY + 6.5, { align: 'right' });
 
-  y += 12;
+  rightTotalsY += 12;
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
-  doc.text('AMOUNT PAID:', 100, y + 4);
-  doc.text(formatCurrency(invoice.amountPaid), pageWidth - 18, y + 4, { align: 'right' });
+  doc.text('AMOUNT PAID:', 100, rightTotalsY + 4);
+  doc.text(formatCurrency(invoice.amountPaid), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
 
-  y += 5;
+  rightTotalsY += 5.5;
   doc.setFillColor(239, 234, 226);
-  doc.rect(95, y, 100, 9, 'F');
+  doc.roundedRect(95, rightTotalsY, 100, 9, 1.5, 1.5, 'F');
   doc.setDrawColor(209, 199, 183);
-  doc.rect(95, y, 100, 9, 'S');
+  doc.roundedRect(95, rightTotalsY, 100, 9, 1.5, 1.5, 'S');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(invoice.balanceDue > 0 ? 180 : 0, invoice.balanceDue > 0 ? 0 : 120, 0);
-  doc.text('BALANCE DUE:', 99, y + 6);
+  doc.text('BALANCE DUE:', 99, rightTotalsY + 6);
   doc.setFontSize(9.5);
-  doc.text(formatCurrency(invoice.balanceDue), pageWidth - 18, y + 6, { align: 'right' });
+  doc.text(formatCurrency(invoice.balanceDue), pageWidth - 18, rightTotalsY + 6, { align: 'right' });
 
-  // Left Column: Bank Details for Payment
-  const leftYBank = y - 27;
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(13, 12, 10);
-  doc.text('BANK PAYMENT DETAILS (NEFT/RTGS):', 15, leftYBank);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(60, 60, 60);
-  doc.text(`Bank: ${owner.bankDetails.bankName}`, 15, leftYBank + 4);
-  doc.text(`Account Name: ${owner.bankDetails.accountName}`, 15, leftYBank + 8);
-  doc.text(`Account #: ${owner.bankDetails.accountNumber}`, 15, leftYBank + 12);
-  doc.text(`IFSC Code: ${owner.bankDetails.ifscCode}`, 15, leftYBank + 16);
-  doc.text(`Branch: ${owner.bankDetails.branch}`, 15, leftYBank + 20);
+  y = Math.max(startTotalsY + 30, rightTotalsY + 15);
 
-  y += 16;
+  // 7. Invoice Notes / Terms if available
+  if (invoice.notes) {
+    y = renderMultiLineSection(
+      doc,
+      'INVOICE REMARKS & NOTES:',
+      invoice.notes,
+      y,
+      logoBase64,
+      headerTitle,
+      refText,
+      true
+    );
+  }
 
-  // Signature Block
-  y = 265;
+  if (invoice.paymentTerms) {
+    y = renderMultiLineSection(
+      doc,
+      'PAYMENT TERMS:',
+      invoice.paymentTerms,
+      y,
+      logoBase64,
+      headerTitle,
+      refText,
+      true
+    );
+  }
+
+  // 8. Signature Block
+  if (y + 25 > 255) {
+    doc.addPage();
+    renderHeaderBanner(doc, headerTitle, refText, logoBase64);
+    y = 35;
+  } else {
+    y = Math.max(y + 8, 245);
+  }
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
   doc.text('For ARCHZONA STRUCTURES LLP', pageWidth - 15, y, { align: 'right' });
+
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
+  doc.setTextColor(60, 60, 60);
   doc.text('Authorized Signatory', pageWidth - 15, y + 10, { align: 'right' });
 
-  // Footer text
-  doc.setFontSize(7.5);
-  doc.setTextColor(140, 130, 115);
-  doc.text('Archzona Structures LLP | www.archzonestructures.com | info.archzona@gmail.com', pageWidth / 2, 287, { align: 'center' });
+  // 9. Final Footers Pass
+  applyFootersToAllPages(doc);
 
   doc.save(`${invoice.id}_Archzona_Tax_Invoice.pdf`);
 }
