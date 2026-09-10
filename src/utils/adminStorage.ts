@@ -125,6 +125,14 @@ export function saveInvoice(invoice: Invoice): void {
   syncInvoiceToGSheet(updatedInvoice).catch(() => {});
 }
 
+export function saveAllQuotations(quotes: Quotation[]): void {
+  localStorage.setItem(STORAGE_KEYS.QUOTES, JSON.stringify(quotes));
+}
+
+export function saveAllInvoices(invoices: Invoice[]): void {
+  localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(invoices));
+}
+
 export function convertQuoteToInvoice(quoteId: string, taxType: 'CGST_SGST' | 'IGST' = 'CGST_SGST'): Invoice | null {
   const quotes = getQuotations();
   const quote = quotes.find((q) => q.id === quoteId);

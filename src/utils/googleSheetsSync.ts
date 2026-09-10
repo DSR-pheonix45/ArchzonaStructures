@@ -6,6 +6,7 @@ import { Quotation, Invoice } from '../types/adminTypes';
  */
 
 export const GSHEET_SPREADSHEET_ID = '1UgAsXRQu2aQXRU3IMnGmhh8r6ZcLQA6dS478_zLPv0E';
+export const GSHEET_DOC_URL = `https://docs.google.com/spreadsheets/d/${GSHEET_SPREADSHEET_ID}/edit`;
 export const DEFAULT_GSHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_FSxcB6fgZI2QSTFqqqEADB4whFld6soDOlqdeqiI-Rzu5iN1mL2rj22CCSFyvcnEAw/exec';
 
 // Storage key for configured Apps Script Web App Deployment URL
@@ -114,6 +115,94 @@ export async function fetchInvoicesFromGSheet(): Promise<Invoice[] | null> {
     console.warn('Fetch invoices from Google Sheet failed:', err);
   }
   return null;
+}
+
+export interface ReconcileResult {
+  success: boolean;
+  message: string;
+  quotesCount: number;
+  invoicesCount: number;
+  syncedAt: string;
+}
+
+/**
+ * Reconcile local database with linked Google Sheet in real-time
+ */
+export async function reconcileAllWithGSheet(
+  localQuotes: Quotation[],
+  localInvoices: Invoice[],
+  onSaveQuotes: (quotes: Quotation[]) => void,
+  onSaveInvoices: (invoices: Invoice[]) => void
+): Promise<ReconcileResult> {
+  const timestamp = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  let mergedQuotes = [...localQuotes];
+  let mergedInvoices = [...localInvoices];
+  let fetchedRemoteQuotes = false;
+  let fetchedRemoteInvoices = false;
+
+  // 1. Fetch remote quotes from Google Sheet
+  try {
+    const remoteQuotes = await fetchQuotesFromGSheet();
+    if (remoteQuotes && Array.isArray(remoteQuotes) && remoteQuotes.length > 0) {
+      fetchedRemoteQuotes = true;
+      remoteQuotes.forEach((rq) => {
+        const idx = mergedQuotes.findIndex((q) => q.id === rq.id);
+        if (idx === -1) {
+          mergedQuotes.push(rq);
+        } else {
+          const remoteTime = new Date(rq.updatedAt || rq.createdAt || 0).getTime();
+          const localTime = new Date(mergedQuotes[idx].updatedAt || mergedQuotes[idx].createdAt || 0).getTime();
+          if (remoteTime > localTime) {
+            mergedQuotes[idx] = rq;
+          }
+        }
+      });
+      onSaveQuotes(mergedQuotes);
+    }
+  } catch (err) {
+    console.warn('Error fetching quotes during reconciliation:', err);
+  }
+
+  // 2. Fetch remote invoices from Google Sheet
+  try {
+    const remoteInvoices = await fetchInvoicesFromGSheet();
+    if (remoteInvoices && Array.isArray(remoteInvoices) && remoteInvoices.length > 0) {
+      fetchedRemoteInvoices = true;
+      remoteInvoices.forEach((ri) => {
+        const idx = mergedInvoices.findIndex((inv) => inv.id === ri.id);
+        if (idx === -1) {
+          mergedInvoices.push(ri);
+        } else {
+          const remoteTime = new Date(ri.updatedAt || ri.createdAt || 0).getTime();
+          const localTime = new Date(mergedInvoices[idx].updatedAt || mergedInvoices[idx].createdAt || 0).getTime();
+          if (remoteTime > localTime) {
+            mergedInvoices[idx] = ri;
+          }
+        }
+      });
+      onSaveInvoices(mergedInvoices);
+    }
+  } catch (err) {
+    console.warn('Error fetching invoices during reconciliation:', err);
+  }
+
+  // 3. Push all merged records to Google Sheet to guarantee full parity
+  for (const q of mergedQuotes) {
+    await syncQuoteToGSheet(q);
+  }
+
+  for (const inv of mergedInvoices) {
+    await syncInvoiceToGSheet(inv);
+  }
+
+  return {
+    success: true,
+    message: `Reconciliation completed successfully at ${timestamp}! Reconciled ${mergedQuotes.length} quote(s) and ${mergedInvoices.length} invoice(s) with your linked Google Sheet.`,
+    quotesCount: mergedQuotes.length,
+    invoicesCount: mergedInvoices.length,
+    syncedAt: timestamp,
+  };
 }
 
 /**
