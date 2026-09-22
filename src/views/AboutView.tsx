@@ -15,7 +15,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate }) => {
         <div className="max-w-4xl space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#D1C7B7]/30 bg-[#141311] text-[10px] uppercase font-mono tracking-[0.25em] text-[#D1C7B7]">
             <span className="w-2 h-2 rounded-full bg-[#D1C7B7]" />
-            ABOUT ARCHZONA STRUCTURES
+            ABOUT ARCHZONE STRUCTURES BY ARCHZONA
           </div>
           <h1 className="font-serif-title text-4xl sm:text-6xl text-[#F7F5F0] leading-tight">
             CURATING THE TACTILE EDGE OF ARCHITECTURE.
@@ -24,7 +24,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate }) => {
             "Materials are not merely specifications on a quantity takeoff; they are the sensory interface between an inhabitant and the natural world."
           </p>
           <p className="text-base sm:text-lg font-sans-clean text-[#D1C7B7]/85 leading-relaxed font-light">
-            Founded to bridge the divide between contemporary spatial concepts and field execution reality, Archzona operates as an experiential partner for architects, landscape designers, hospitality developers, and private villa owners.
+            Operating as the specialized outdoor structural and spatial cladding sub-brand under parent company <strong className="text-[#F7F5F0]">ARCHZONA</strong>, <strong className="text-[#F7F5F0]">Archzone Structures</strong> bridges the divide between contemporary spatial concepts and field execution reality. We partner with architects, landscape designers, hospitality developers, and private villa owners to deliver engineered pergolas, tensile shade canopies, WPC composite decking, and facade solutions.
           </p>
         </div>
 
@@ -74,7 +74,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate }) => {
               Commerce Follows.
             </h2>
             <p className="text-sm sm:text-base font-sans-clean text-[#D1C7B7]/85 leading-relaxed font-light">
-              Too many construction catalogs treat materials like electronic parts on a shelf. But architecture lives in sunlight, footfall, and shadow. Archzona is designed to allow you to experience materials in space, curate a project schedule, and execute with master precision.
+              Too many construction catalogs treat materials like electronic parts on a shelf. But architecture lives in sunlight, footfall, and shadow. Archzone Structures by ARCHZONA is designed to allow you to experience materials in space, curate a project schedule, and execute with master precision.
             </p>
             <div className="pt-2">
               <button

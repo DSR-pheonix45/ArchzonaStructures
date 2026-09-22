@@ -136,7 +136,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, customS
         <div className="p-6 border-b border-[#D1C7B7]/20 bg-[#0D0C0A] flex items-center justify-between">
           <div>
             <span className="text-[10px] tracking-[0.25em] uppercase text-[#D1C7B7] font-mono font-semibold block">
-              ARCHZONA QUOTE WORKFLOW
+              ARCHZONE STRUCTURES BY ARCHZONA
             </span>
             <h2 className="font-serif-title text-2xl md:text-3xl text-[#F7F5F0]">
               {submittedResponse ? 'PROJECT RECEIVED' : 'REQUEST PROJECT QUOTE'}
@@ -168,7 +168,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, customS
                   Your material requirements have been compiled.
                 </h3>
                 <p className="text-sm font-sans-clean text-[#D1C7B7] max-w-lg mx-auto leading-relaxed">
-                  Archzona will review the project specifications and contact you regarding pricing, batch availability, detailing, and installation execution.
+                  Archzone Structures by ARCHZONA will review the project specifications and contact you regarding pricing, batch availability, detailing, and installation execution.
                 </p>
               </div>
 

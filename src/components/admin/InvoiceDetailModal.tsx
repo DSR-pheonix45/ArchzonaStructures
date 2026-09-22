@@ -143,6 +143,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
               <thead className="bg-[#0D0C0A] text-[#8C8273] uppercase tracking-wider border-b border-[#D1C7B7]/15">
                 <tr>
                   <th className="py-2.5 px-3">Item</th>
+                  <th className="py-2.5 px-3 text-center">HSN/SAC</th>
                   <th className="py-2.5 px-3 text-center">Qty</th>
                   <th className="py-2.5 px-3 text-right">Unit Rate</th>
                   <th className="py-2.5 px-3 text-right">Taxable Value</th>
@@ -155,6 +156,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
                       <p className="font-semibold">{item.name}</p>
                       <p className="text-[11px] text-[#8C8273]">{item.description}</p>
                     </td>
+                    <td className="py-2.5 px-3 text-center font-mono text-[#D1C7B7]">{item.hsnCode || '3925'}</td>
                     <td className="py-2.5 px-3 text-center font-mono">{item.quantity} {item.unit}</td>
                     <td className="py-2.5 px-3 text-right font-mono">₹{item.unitRate.toLocaleString('en-IN')}</td>
                     <td className="py-2.5 px-3 text-right font-mono font-bold">₹{item.netAmount.toLocaleString('en-IN')}</td>

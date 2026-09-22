@@ -22,18 +22,18 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
           {/* Main Brand Column (5 cols) */}
           <div className="md:col-span-5 space-y-6">
             <div className="flex flex-col">
-              <div className="flex items-center gap-3 mb-2">
-                <img src="/logo.png" alt="Archzona Logo" className="w-8 h-8 object-contain" />
-                <span className="font-serif-title text-4xl md:text-5xl font-light tracking-[0.25em] text-[#F7F5F0]">
-                  ARCHZONA
+              <div className="flex items-center gap-3 mb-1">
+                <img src="/logo.png" alt="Archzone Structures Logo" className="w-8 h-8 object-contain" />
+                <span className="font-serif-title text-2xl sm:text-3xl md:text-4xl font-light tracking-[0.18em] text-[#F7F5F0]">
+                  ARCHZONE STRUCTURES
                 </span>
               </div>
-              <span className="font-mono text-[10px] tracking-[0.38em] text-[#C5A880] uppercase -mt-1 font-semibold">
-                STRUCTURES
+              <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.38em] text-[#C5A880] uppercase font-semibold">
+                BY ARCHZONA
               </span>
             </div>
             <p className="text-sm font-sans-clean text-[#D1C7B7]/85 leading-relaxed max-w-md font-light">
-              A digital architectural experience centre curated for contemporary spatial creation. We bridge tactile material selection, engineered structure development, bespoke fabrication, and turnkey execution.
+              A digital architectural experience centre curated for contemporary spatial creation. Archzone Structures by ARCHZONA bridges tactile material selection, engineered structure development, bespoke fabrication, and turnkey execution.
             </p>
             <div className="pt-2 text-xs font-mono text-[#8C8273] space-y-1">
               <p>EXPERIENCE FIRST // COMMERCE FOLLOWS</p>
@@ -178,7 +178,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
 
         {/* Bottom copyright line */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-[#8C8273] gap-4">
-          <p>© {new Date().getFullYear()} ARCHZONA STRUCTURES. ALL RIGHTS RESERVED.</p>
+          <p>© {new Date().getFullYear()} ARCHZONE STRUCTURES BY ARCHZONA. ALL RIGHTS RESERVED.</p>
           <div className="flex items-center space-x-3 text-[10px] tracking-widest uppercase">
             <span className="px-2.5 py-0.5 rounded-full border border-[#D1C7B7]/20 bg-[#141311] text-[#D1C7B7]">RESORTS</span>
             <span className="px-2.5 py-0.5 rounded-full border border-[#D1C7B7]/20 bg-[#141311] text-[#D1C7B7]">VILLAS</span>

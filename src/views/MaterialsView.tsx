@@ -350,7 +350,7 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
                 THE MATERIAL UNIVERSE.
               </h1>
               <p className="text-base sm:text-lg font-sans-clean text-[#D1C7B7]/85 leading-relaxed font-light">
-                Not a commodity list. Archzona categorizes surfaces by their environmental resilience, tactile warmth, and structural integrity under tropical sun and heavy monsoon rainfall.
+                Not a commodity list. Archzone Structures by ARCHZONA categorizes surfaces by their environmental resilience, tactile warmth, and structural integrity under tropical sun and heavy monsoon rainfall.
               </p>
             </div>
 

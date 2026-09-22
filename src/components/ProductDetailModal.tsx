@@ -206,7 +206,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     }}
                     className="w-full py-2.5 bg-transparent border border-[#D1C7B7]/30 hover:border-[#D1C7B7] text-[#D1C7B7] hover:text-[#F7F5F0] rounded-xl font-sans-clean text-xs uppercase tracking-[0.18em] transition-all cursor-pointer"
                   >
-                    DISCUSS THIS PRODUCT WITH ARCHZONA
+                    DISCUSS THIS PRODUCT WITH ARCHZONE STRUCTURES
                   </button>
                 </div>
               </div>

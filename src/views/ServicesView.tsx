@@ -27,14 +27,14 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
             FROM MATERIAL TO SPACE.
           </h1>
           <p className="text-base sm:text-lg font-sans-clean text-[#D1C7B7]/85 leading-relaxed font-light">
-            Architectural projects frequently break down between the design table and the site: incorrect sub-framing, uncertified fasteners, poor drainage slopes, and finger-pointing between vendors and civil contractors. Archzona bridges this chasm with full lifecycle ownership.
+            Architectural projects frequently break down between the design table and the site: incorrect sub-framing, uncertified fasteners, poor drainage slopes, and finger-pointing between vendors and civil contractors. Archzone Structures by ARCHZONA bridges this chasm with full lifecycle ownership.
           </p>
         </div>
 
         {/* 6 Lifecycle Steps Visual Flow */}
         <div className="space-y-6">
           <span className="text-xs uppercase tracking-[0.2em] text-[#D1C7B7] font-mono font-semibold block">
-            THE ARCHZONA TURNKEY METHODOLOGY
+            THE ARCHZONE STRUCTURES TURNKEY METHODOLOGY
           </span>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -96,7 +96,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                 Zero Warranty Splits
               </span>
               <p className="text-[#D1C7B7]/80 leading-relaxed">
-                When Archzona executes, material warranties and installation guarantees are held under a single responsible entity.
+                When Archzone Structures by ARCHZONA executes, material warranties and installation guarantees are held under a single responsible entity.
               </p>
             </div>
             <div className="p-4 bg-[#0D0C0A] rounded-xl border border-[#D1C7B7]/20 space-y-2">

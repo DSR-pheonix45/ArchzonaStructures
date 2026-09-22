@@ -233,7 +233,7 @@ export const BlogsView: React.FC<BlogsViewProps> = ({
                 Planning an Architectural Project?
               </h3>
               <p className="text-sm md:text-base font-sans-clean text-[#D1C7B7]/85 max-w-xl mx-auto font-light">
-                Consult with Archzona structural engineers and material specialists for custom CAD specifications, BOQ estimation, and samples.
+                Consult with Archzone Structures by ARCHZONA structural engineers and material specialists for custom CAD specifications, BOQ estimation, and samples.
               </p>
               <button
                 onClick={onOpenQuote}
@@ -251,7 +251,7 @@ export const BlogsView: React.FC<BlogsViewProps> = ({
             <div className="space-y-4 max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#D1C7B7]/30 bg-[#141311] text-[10px] uppercase font-mono tracking-[0.25em] text-[#D1C7B7]">
                 <span className="w-2 h-2 rounded-full bg-[#C5A880]" />
-                ARCHZONA ARCHITECTURAL INSIGHTS
+                ARCHZONE STRUCTURES BY ARCHZONA INSIGHTS
               </div>
               <h1 className="font-serif-title text-5xl sm:text-7xl text-[#F7F5F0]">
                 MATERIAL & STRUCTURAL INTELLIGENCE

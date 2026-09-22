@@ -62,7 +62,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
     setIsSubmitted(true);
   };
 
-  const defaultWhatsAppIntro = 'Hello Archzona, I am reaching out regarding architectural materials & structure execution.';
+  const defaultWhatsAppIntro = 'Hello Archzone Structures by ARCHZONA, I am reaching out regarding architectural materials & structure execution.';
 
   const whatsAppDirectUrl = `https://wa.me/919870048082?text=${encodeURIComponent(defaultWhatsAppIntro)}`;
 
@@ -76,7 +76,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
   };
 
   const buildSubmittedMailtoUrl = () => {
-    const subject = `[Archzona Inquiry] Project Consultation from ${formData.name || 'Client'}`;
+    const subject = `[Archzone Structures Inquiry] Project Consultation from ${formData.name || 'Client'}`;
     let body = `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nFirm/Company: ${formData.firm}\nProject Type: ${formData.projectType}\nLocation: ${formData.location}\n\nMessage:\n${formData.message}`;
     if (attachedFile) {
       body += `\n\n[Attached File: ${attachedFile.name} (${(attachedFile.size / 1024).toFixed(1)} KB)]`;
@@ -91,7 +91,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
         <div className="max-w-3xl space-y-4 border-b border-[#D1C7B7]/20 pb-8">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#D1C7B7]/30 bg-[#141311] text-[10px] uppercase font-mono tracking-[0.25em] text-[#D1C7B7]">
             <span className="w-2 h-2 rounded-full bg-[#D1C7B7]" />
-            ENGAGE WITH ARCHZONA
+            ENGAGE WITH ARCHZONE STRUCTURES BY ARCHZONA
           </div>
           <h1 className="font-serif-title text-4xl sm:text-6xl text-[#F7F5F0]">
             START A CONVERSATION.
@@ -128,7 +128,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                     <span className="font-mono font-bold text-sm block text-emerald-300 group-hover:underline">
                       {ARCHZONA_PHONE_NARESH}
                     </span>
-                    <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Naresh K — Co-Founder, Archzona</span>
+                    <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Naresh K — Co-Founder, ARCHZONA</span>
                   </div>
                 </a>
 
@@ -144,7 +144,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                     <span className="font-mono font-bold text-sm block text-emerald-300 group-hover:underline">
                       {ARCHZONA_PHONE_HARISH}
                     </span>
-                    <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Harish K — Co-Founder, Archzona</span>
+                    <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Harish K — Co-Founder, ARCHZONA</span>
                   </div>
                 </a>
               </div>
@@ -175,7 +175,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-[#D1C7B7] shrink-0 mt-1" />
                 <div className="font-sans-clean text-xs leading-relaxed space-y-1">
-                  <p className="font-serif-title text-xl text-[#F7F5F0]">Archzona Structures</p>
+                  <p className="font-serif-title text-xl text-[#F7F5F0]">Archzone Structures by ARCHZONA</p>
                   <p className="text-[#D1C7B7]">{ARCHZONA_ADDRESS_LINE1}</p>
                   <p className="text-[#D1C7B7]">{ARCHZONA_ADDRESS_LINE2}</p>
                   <p className="text-[10px] text-[#8C8273] pt-1">Field installations across Maharashtra, Goa, Gujarat & Pan-India.</p>
@@ -212,7 +212,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                 <CheckCircle2 className="w-12 h-12 text-[#D1C7B7] mx-auto" />
                 <h4 className="font-serif-title text-2xl text-[#F7F5F0]">Inquiry Dispatched</h4>
                 <p className="text-xs font-sans-clean text-[#D1C7B7] max-w-md mx-auto leading-relaxed">
-                  Thank you, {formData.name || 'Client'}. Your project details have been sent to <strong className="text-[#F7F5F0]">info.archzona@gmail.com</strong>. An Archzona spatial partner will review your inquiry and connect with you shortly.
+                  Thank you, {formData.name || 'Client'}. Your project details have been sent to <strong className="text-[#F7F5F0]">info.archzona@gmail.com</strong>. An Archzone Structures spatial partner will review your inquiry and connect with you shortly.
                 </p>
                 {attachedFile && (
                   <p className="text-xs font-mono text-[#D4AF37]">

@@ -33,6 +33,7 @@ export const productsData: Product[] = [
       { title: 'Sub-Frame Installation Guide', type: 'PDF', size: '2.8 MB' },
     ],
     availability: 'Ready Stock',
+    hsnCode: '3925',
   },
   {
     id: 'prod-wpc-deck-charcoal',

@@ -1,4 +1,4 @@
-import { Quotation, Invoice, OwnerUser, PaymentRecord, AdminDashboardMetrics } from '../types/adminTypes';
+import { Quotation, Invoice, OwnerUser, PaymentRecord, AdminDashboardMetrics, DocumentType } from '../types/adminTypes';
 import { syncQuoteToGSheet, syncInvoiceToGSheet } from './googleSheetsSync';
 
 const STORAGE_KEYS = {
@@ -11,15 +11,15 @@ const STORAGE_KEYS = {
 export const DEFAULT_OWNER_PROFILE: OwnerUser = {
   id: 'owner-1',
   email: 'info.archzona@gmail.com',
-  name: 'Naresh & Harish (Archzona Owners)',
+  name: 'Naresh & Harish (Archzone Structures by ARCHZONA)',
   role: 'owner',
-  companyName: 'Archzona Structures LLP',
+  companyName: 'Archzone Structures by ARCHZONA',
   phone: '+91 98700 48082',
   address: '105, Prism Industrial Estate, Near Pendharkar College, Dombivli (E), Thane, Maharashtra 421201',
   gstin: '27AAFFA1234F1Z5',
   bankDetails: {
     bankName: 'HDFC Bank Ltd',
-    accountName: 'Archzona Structures LLP',
+    accountName: 'Archzone Structures by ARCHZONA',
     accountNumber: '50200088991122',
     ifscCode: 'HDFC0000123',
     branch: 'Dombivli East Branch',
@@ -172,6 +172,7 @@ export function convertQuoteToInvoice(quoteId: string, taxType: 'CGST_SGST' | 'I
 
   const newInvoice: Invoice = {
     id: invoiceId,
+    docType: 'tax_invoice',
     quoteId: quote.id,
     client: { ...quote.client },
     issueDate: todayStr,
@@ -256,11 +257,12 @@ export function getDashboardMetrics(): AdminDashboardMetrics {
   };
 }
 
-export function generateNextQuoteId(): string {
+export function generateNextQuoteId(docType: DocumentType = 'quote'): string {
   const quotes = getQuotations();
   const count = quotes.length + 1;
   const year = new Date().getFullYear();
-  return `AZ-QT-${year}-${count.toString().padStart(3, '0')}`;
+  const prefix = docType === 'proforma' ? 'AZ-PI' : docType === 'tax_invoice' ? 'AZ-INV' : 'AZ-QT';
+  return `${prefix}-${year}-${count.toString().padStart(3, '0')}`;
 }
 
 export function exportDataJSON(): string {

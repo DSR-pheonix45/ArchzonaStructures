@@ -5,62 +5,62 @@ import { structuresData } from '../data/structures';
 import { blogsData } from '../data/blogs';
 
 export function updatePageSEO(route: ViewRoute) {
-  let title = 'Archzona Structures | Digital Architectural Experience Centre';
-  let description = 'Architectural materials, outdoor structures, tensile car parking shades, bioclimatic pergolas, and automated smart parking in Thane & Dombivli.';
+  let title = 'Archzone Structures by ARCHZONA | Digital Architectural Experience Centre';
+  let description = 'Architectural materials, outdoor structures, tensile car parking shades, bioclimatic pergolas, and automated smart parking in Thane & Dombivli by ARCHZONA.';
 
   if (route.type === 'explore') {
     if (route.spaceSlug) {
       const sp = spacesData.find((s) => s.slug === route.spaceSlug);
       if (sp) {
-        title = `${sp.name} Architectural Space | Archzona Structures`;
+        title = `${sp.name} Architectural Space | Archzone Structures by ARCHZONA`;
         description = `${sp.tagline} ${sp.description.slice(0, 150)}...`;
       }
     } else {
-      title = 'Explore Architectural Spaces | Archzona Structures';
-      description = 'Explore architectural environments calibrated for Poolside, Villas, Resorts, Smart Parking, Terraces, and Commercial spaces.';
+      title = 'Explore Architectural Spaces | Archzone Structures by ARCHZONA';
+      description = 'Explore architectural environments calibrated for Poolside, Villas, Resorts, Smart Parking, Terraces, and Commercial spaces by ARCHZONA.';
     }
   } else if (route.type === 'materials') {
     if (route.materialSlug) {
       const mat = materialsData.find((m) => m.slug === route.materialSlug);
       if (mat) {
-        title = `${mat.name} (${mat.category}) | Archzona Materials`;
+        title = `${mat.name} (${mat.category}) | Archzone Materials by ARCHZONA`;
         description = `${mat.positioning} ${mat.description.slice(0, 140)}...`;
       }
     } else {
-      title = 'The Material Universe | WPC, HPL, ACP & Tensile Fabric | Archzona';
-      description = 'Discover curated architectural materials: WPC decking, HPL rainscreens, ACP panels, Tensile fabric shade membranes, microcement, and acoustic panels.';
+      title = 'The Material Universe | WPC, HPL, ACP & Tensile Fabric | Archzone Structures by ARCHZONA';
+      description = 'Discover curated architectural materials: WPC decking, HPL rainscreens, ACP panels, Tensile fabric shade membranes, microcement, and acoustic panels by ARCHZONA.';
     }
   } else if (route.type === 'structures') {
     if (route.structureSlug) {
       const st = structuresData.find((s) => s.slug === route.structureSlug);
       if (st) {
-        title = `${st.name} | Outdoor Architectural Structures | Archzona`;
+        title = `${st.name} | Outdoor Architectural Structures | Archzone Structures by ARCHZONA`;
         description = `${st.tagline} ${st.description.slice(0, 140)}...`;
       }
     } else {
-      title = 'Outdoor Architectural Structures | Pergolas, Gazebos & Tensile Canopies';
-      description = 'Custom engineered outdoor structures: Bioclimatic louvered pergolas, gazebos, tensile fabric canopies, and smart parking structures.';
+      title = 'Outdoor Architectural Structures | Pergolas, Gazebos & Tensile Canopies | Archzone Structures by ARCHZONA';
+      description = 'Custom engineered outdoor structures: Bioclimatic louvered pergolas, gazebos, tensile fabric canopies, and smart parking structures by ARCHZONA.';
     }
   } else if (route.type === 'blogs') {
     if (route.articleSlug) {
       const blog = blogsData.find((b) => b.slug === route.articleSlug);
       if (blog) {
-        title = `${blog.title} | Archzona Insights`;
+        title = `${blog.title} | Archzone Insights by ARCHZONA`;
         description = blog.excerpt;
       }
     } else {
-      title = 'Architectural Insights & Technical Blogs | Archzona Structures';
-      description = 'Deep technical articles on Tensile Fabric Car Parking Shades, WPC vs HPL vs ACP Cladding, Bioclimatic Louvered Pergolas, and Smart Stack Parking.';
+      title = 'Architectural Insights & Technical Blogs | Archzone Structures by ARCHZONA';
+      description = 'Deep technical articles on Tensile Fabric Car Parking Shades, WPC vs HPL vs ACP Cladding, Bioclimatic Louvered Pergolas, and Smart Stack Parking by ARCHZONA.';
     }
   } else if (route.type === 'contact') {
-    title = 'Contact Archzona Structures | Dombivli East, Thane | +91 98200 48805';
-    description = 'Visit our Digital Architectural Experience Centre at 105, Prism Industrial Estate, Dombivli East, Thane. Call +91 98200 48805 or +91 97020 51858.';
+    title = 'Contact Archzone Structures by ARCHZONA | Dombivli East, Thane | +91 98700 48082';
+    description = 'Visit our Digital Architectural Experience Centre at 105, Prism Industrial Estate, Dombivli East, Thane. Call +91 98700 48082 or +91 97020 51858.';
   } else if (route.type === 'services') {
-    title = 'Architectural Process & Turnkey Services | Archzona Structures';
-    description = 'From spatial consultation to material engineering, custom steel fabrication, and turnkey installation across Mumbai, Thane, and Maharashtra.';
+    title = 'Architectural Process & Turnkey Services | Archzone Structures by ARCHZONA';
+    description = 'From spatial consultation to material engineering, custom steel fabrication, and turnkey installation across Mumbai, Thane, and Maharashtra by ARCHZONA.';
   } else if (route.type === 'shop') {
-    title = 'Architectural Shop & Direct Procurement | Archzona Structures';
-    description = 'Direct project ordering portal for WPC decking, HPL laminates, Onduline roofing, tensile membranes, and acoustic timber panels.';
+    title = 'Architectural Shop & Direct Procurement | Archzone Structures by ARCHZONA';
+    description = 'Direct project ordering portal for WPC decking, HPL laminates, Onduline roofing, tensile membranes, and acoustic timber panels by ARCHZONA.';
   }
 
   document.title = title;

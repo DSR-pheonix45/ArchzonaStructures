@@ -132,7 +132,7 @@ export async function submitProjectInquiry(inquiry: ContactInquiry): Promise<Sub
  * Notes:
  */
 export function generateWhatsAppQuoteUrl(quote: QuoteRequest): string {
-  let text = `*ARCHZONA PROJECT QUOTE REQUEST*\n\n`;
+  let text = `*ARCHZONE STRUCTURES BY ARCHZONA - PROJECT QUOTE REQUEST*\n\n`;
   text += `*Project:* ${quote.projectName || 'Not specified'}\n`;
   text += `*Location:* ${quote.projectLocation || 'Not specified'}\n`;
   text += `*Client Name:* ${quote.clientName}\n`;
@@ -166,13 +166,13 @@ export function generateWhatsAppQuoteUrl(quote: QuoteRequest): string {
     text += `*Project Notes & Requirements:*\n${quote.notes}\n\n`;
   }
 
-  text += `_Sent via Archzona Structures Digital Experience Centre_`;
+  text += `_Sent via Archzone Structures by ARCHZONA Digital Experience Centre_`;
 
   return `https://wa.me/${ARCHZONA_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
 export function generateWhatsAppInquiryUrl(inquiry: ContactInquiry): string {
-  let text = `*ARCHZONA SPATIAL INQUIRY*\n\n`;
+  let text = `*ARCHZONE STRUCTURES BY ARCHZONA - SPATIAL INQUIRY*\n\n`;
   text += `*Name:* ${inquiry.name}\n`;
   text += `*Contact:* ${inquiry.phone} | ${inquiry.email}\n`;
   if (inquiry.company) text += `*Company:* ${inquiry.company}\n`;
@@ -181,7 +181,7 @@ export function generateWhatsAppInquiryUrl(inquiry: ContactInquiry): string {
   text += `*Approx. Size:* ${inquiry.approximateSize || 'Not specified'}\n\n`;
   text += `*Requirements:* ${inquiry.requirements}\n`;
   if (inquiry.message) text += `*Message:* ${inquiry.message}\n\n`;
-  text += `_Sent via Archzona Structures Digital Experience Centre_`;
+  text += `_Sent via Archzone Structures by ARCHZONA Digital Experience Centre_`;
 
   return `https://wa.me/${ARCHZONA_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }

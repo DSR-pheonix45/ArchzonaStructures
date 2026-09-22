@@ -100,7 +100,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
               </div>
               <h3 className="font-serif-title text-xl text-[#F7F5F0]">Product Catalogue Deck</h3>
               <p className="text-xs font-sans-clean text-[#D1C7B7]/70 leading-relaxed font-light">
-                Download the complete Archzona architectural material and structural specification manual (PDF, 2.5 MB).
+                Download the complete Archzone Structures by ARCHZONA architectural material and structural specification manual (PDF, 2.5 MB).
               </p>
             </div>
             <a

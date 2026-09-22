@@ -52,8 +52,8 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onCloseP
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-serif-title font-bold text-[#F7F5F0]">Archzona Owner Portal</h2>
-              <p className="text-xs text-[#8C8273]">admin.archzonestructures.com</p>
+              <h2 className="text-xl font-serif-title font-bold text-[#F7F5F0]">Archzone Structures Owner Portal</h2>
+              <p className="text-xs text-[#C5A880] font-mono uppercase tracking-wider font-semibold">by ARCHZONA</p>
             </div>
           </div>
           {onClosePublic && (

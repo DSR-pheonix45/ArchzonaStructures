@@ -50,15 +50,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate, onOpen
         >
           <img
             src="/logo.png?v=1"
-            alt="Archzona Logo"
+            alt="Archzone Structures by ARCHZONA Logo"
             className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0 group-hover:scale-110 transition-transform duration-300"
           />
           <div className="flex flex-col">
-            <span className="font-serif-title text-xl sm:text-2xl md:text-3xl font-light tracking-[0.2em] sm:tracking-[0.25em] text-[#F7F5F0] group-hover:text-[#D1C7B7] transition-colors">
-              ARCHZONA
+            <span className="font-serif-title text-sm sm:text-base md:text-lg lg:text-xl font-medium tracking-[0.12em] sm:tracking-[0.16em] text-[#F7F5F0] group-hover:text-[#D1C7B7] transition-colors leading-tight">
+              ARCHZONE STRUCTURES
             </span>
-            <span className="font-mono text-[8px] sm:text-[9px] tracking-[0.32em] sm:tracking-[0.38em] text-[#C5A880] uppercase -mt-0.5 sm:-mt-1 font-semibold">
-              STRUCTURES
+            <span className="font-mono text-[8px] sm:text-[9px] tracking-[0.28em] sm:tracking-[0.34em] text-[#C5A880] uppercase mt-0.5 font-semibold">
+              BY ARCHZONA
             </span>
           </div>
         </button>
@@ -106,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate, onOpen
             href="/Archzona_Product_Catalogue_Deck.pdf"
             download="Archzona_Product_Catalogue_Deck.pdf"
             className="hidden xl:inline-flex items-center space-x-1.5 text-[11px] uppercase tracking-[0.18em] px-4 py-2 rounded-full border border-[#D4AF37]/50 bg-[#D4AF37]/15 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0D0C0A] transition-all cursor-pointer font-sans-clean font-bold shadow-sm"
-            title="Download Official Archzona Product Catalogue Deck PDF"
+            title="Download Official Archzone Structures Product Catalogue Deck PDF"
           >
             <Download className="w-3.5 h-3.5" />
             <span>DOWNLOAD CATALOGUE</span>

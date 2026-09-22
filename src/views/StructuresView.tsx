@@ -275,7 +275,7 @@ export const StructuresView: React.FC<StructuresViewProps> = ({
                     onClick={() => onNavigate({ type: 'contact' })}
                     className="w-full py-3 bg-[#0D0C0A] border border-[#D1C7B7]/30 text-[#D1C7B7] hover:text-[#F7F5F0] hover:border-[#D1C7B7] rounded-xl font-sans-clean text-xs uppercase tracking-[0.18em] transition-colors cursor-pointer"
                   >
-                    CUSTOMISE WITH AN ARCHZONA ARCHITECT
+                    CUSTOMISE WITH AN ARCHZONE STRUCTURES ARCHITECT
                   </button>
                 </div>
               </div>

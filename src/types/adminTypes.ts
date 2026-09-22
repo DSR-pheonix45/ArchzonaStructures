@@ -1,3 +1,4 @@
+export type DocumentType = 'quote' | 'proforma' | 'tax_invoice';
 export type QuoteStatus = 'draft' | 'issued' | 'accepted' | 'invoiced' | 'declined';
 export type InvoiceStatus = 'unpaid' | 'partially_paid' | 'paid' | 'overdue';
 export type PaymentMethod = 'NEFT/RTGS' | 'UPI' | 'Cheque' | 'Cash' | 'Card';
@@ -24,6 +25,7 @@ export interface OwnerUser {
 export interface QuoteItem {
   id: string;
   productId?: string;
+  hsnCode?: string; // Material HSN / SAC Code (e.g. 7610, 3925, 6807, 6306, 4418)
   name: string;
   description: string;
   category?: string;
@@ -47,7 +49,8 @@ export interface ClientDetails {
 }
 
 export interface Quotation {
-  id: string; // e.g. 'AZ-QT-2026-001'
+  id: string; // e.g. 'AZ-QT-2026-001' or 'AZ-PI-2026-001'
+  docType?: DocumentType; // 'quote' | 'proforma' | 'tax_invoice'
   client: ClientDetails;
   date: string; // YYYY-MM-DD
   validUntil: string; // YYYY-MM-DD
@@ -56,6 +59,17 @@ export interface Quotation {
   overallDiscountPercent: number;
   overallDiscountAmount: number;
   netPreTaxTotal: number; // subtotal - overallDiscountAmount
+  // GST Tax Collection
+  gstEnabled?: boolean;
+  taxType?: 'CGST_SGST' | 'IGST';
+  cgstPercent?: number; // default 9
+  cgstAmount?: number;
+  sgstPercent?: number; // default 9
+  sgstAmount?: number;
+  igstPercent?: number; // default 18
+  igstAmount?: number;
+  totalTax?: number;
+  grandTotal?: number; // netPreTaxTotal + totalTax
   status: QuoteStatus;
   notes: string;
   paymentTerms: string;
@@ -77,6 +91,7 @@ export interface PaymentRecord {
 
 export interface Invoice {
   id: string; // e.g. 'AZ-INV-2026-001'
+  docType?: DocumentType; // 'tax_invoice' | 'proforma'
   quoteId: string; // Linked pre-tax quote ID
   client: ClientDetails;
   issueDate: string; // YYYY-MM-DD

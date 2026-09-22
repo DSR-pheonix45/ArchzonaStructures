@@ -181,9 +181,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
       <header className="sticky top-0 z-40 bg-[#141311]/95 backdrop-blur-md border-b border-[#D1C7B7]/20 px-4 lg:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <span className="font-serif-title font-bold text-xl text-[#F7F5F0] tracking-tight">ARCHZONA</span>
-            <span className="text-xs px-2 py-0.5 rounded bg-[#D1C7B7]/15 border border-[#D1C7B7]/30 text-[#D1C7B7] font-mono">
-              admin.archzonestructures.com
+            <span className="font-serif-title font-bold text-lg text-[#F7F5F0] tracking-tight">ARCHZONE STRUCTURES</span>
+            <span className="text-xs px-2 py-0.5 rounded bg-[#C5A880]/15 border border-[#C5A880]/30 text-[#C5A880] font-mono font-semibold">
+              BY ARCHZONA
             </span>
           </div>
         </div>
@@ -793,7 +793,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
         {activeTab === 'settings' && (
           <div className="p-6 rounded-2xl bg-[#141311] border border-[#D1C7B7]/20 space-y-6">
             <div>
-              <h3 className="text-lg font-serif-title font-bold text-[#F7F5F0]">Archzona Company & Bank Details</h3>
+              <h3 className="text-lg font-serif-title font-bold text-[#F7F5F0]">Archzone Structures Company & Bank Details</h3>
               <p className="text-xs text-[#8C8273]">
                 These details are printed on all generated pre-tax commercial quotations and official tax invoices.
               </p>

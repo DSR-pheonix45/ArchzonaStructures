@@ -92,6 +92,7 @@ export interface Product {
   images: string[];
   documents: { title: string; type: string; size: string }[];
   availability: 'Ready Stock' | 'Custom Fabrication' | 'Project Order';
+  hsnCode?: string;
 }
 
 export interface Structure {
