@@ -178,6 +178,21 @@ export function convertQuoteToInvoice(quoteId: string, taxType: 'CGST_SGST' | 'I
   dueDateObj.setDate(dueDateObj.getDate() + 14);
   const dueDateStr = dueDateObj.toISOString().split('T')[0];
 
+  // Transfer any advance payments previously recorded against this Quote/Proforma!
+  const priorPayments: PaymentRecord[] = (quote.payments || []).map((p) => ({
+    ...p,
+    invoiceId: invoiceId,
+  }));
+  const initialAmountPaid = priorPayments.reduce((sum, p) => sum + p.amount, 0);
+  const initialBalanceDue = Math.max(0, Math.round((grandTotal - initialAmountPaid) * 100) / 100);
+
+  let status: Invoice['status'] = 'unpaid';
+  if (initialBalanceDue <= 0) {
+    status = 'paid';
+  } else if (initialAmountPaid > 0) {
+    status = 'partially_paid';
+  }
+
   const newInvoice: Invoice = {
     id: invoiceId,
     docType: 'tax_invoice',
@@ -196,12 +211,12 @@ export function convertQuoteToInvoice(quoteId: string, taxType: 'CGST_SGST' | 'I
     igstAmount,
     totalTax,
     grandTotal,
-    amountPaid: 0,
-    balanceDue: grandTotal,
-    status: 'unpaid',
-    notes: `Tax Invoice generated against accepted quote ${quote.id}.`,
+    amountPaid: initialAmountPaid,
+    balanceDue: initialBalanceDue,
+    status,
+    notes: `Tax Invoice generated against agreed quote ${quote.id}.`,
     paymentTerms: quote.paymentTerms || 'Payment due within 14 days of invoice date.',
-    payments: [],
+    payments: priorPayments,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -217,7 +232,40 @@ export function convertQuoteToInvoice(quoteId: string, taxType: 'CGST_SGST' | 'I
   return newInvoice;
 }
 
-export function recordPayment(invoiceId: string, payment: Omit<PaymentRecord, 'id' | 'invoiceId' | 'recordedAt'>): Invoice | null {
+export function recordQuotePayment(
+  quoteId: string,
+  payment: Omit<PaymentRecord, 'id' | 'invoiceId' | 'recordedAt'>
+): Quotation | null {
+  const quotes = getQuotations();
+  const quote = quotes.find((q) => q.id === quoteId);
+  if (!quote) return null;
+
+  if (!quote.payments) quote.payments = [];
+
+  const newRecord: PaymentRecord = {
+    ...payment,
+    id: `pay-${Date.now().toString().slice(-6)}`,
+    invoiceId: quote.id,
+    recordedAt: new Date().toISOString(),
+  };
+
+  quote.payments.push(newRecord);
+  quote.amountPaid = quote.payments.reduce((sum, p) => sum + p.amount, 0);
+  const total = quote.grandTotal || quote.netPreTaxTotal;
+  quote.balanceDue = Math.max(0, Math.round((total - quote.amountPaid) * 100) / 100);
+
+  if (quote.status === 'draft' || quote.status === 'issued' || quote.status === 'under_negotiation') {
+    quote.status = 'accepted';
+  }
+
+  saveQuotation(quote);
+  return quote;
+}
+
+export function recordPayment(
+  invoiceId: string,
+  payment: Omit<PaymentRecord, 'id' | 'invoiceId' | 'recordedAt'>
+): Invoice | null {
   const invoices = getInvoices();
   const invoice = invoices.find((i) => i.id === invoiceId);
   if (!invoice) return null;
@@ -243,16 +291,109 @@ export function recordPayment(invoiceId: string, payment: Omit<PaymentRecord, 'i
   return invoice;
 }
 
+export function recordUniversalTransaction(payload: {
+  docId: string;
+  amount: number;
+  method: PaymentRecord['method'];
+  transactionRef: string;
+  bankAccount?: string;
+  notes?: string;
+  date?: string;
+  autoConvertToInvoice?: boolean;
+}): { quote?: Quotation | null; invoice?: Invoice | null } {
+  const { docId, amount, method, transactionRef, bankAccount, notes, date, autoConvertToInvoice } = payload;
+  const payDate = date || new Date().toISOString().split('T')[0];
+
+  // 1. Try finding as Invoice first
+  const invoices = getInvoices();
+  const invoiceMatch = invoices.find((i) => i.id === docId);
+
+  if (invoiceMatch) {
+    const updatedInv = recordPayment(docId, {
+      date: payDate,
+      amount,
+      method,
+      transactionRef,
+      bankAccount: bankAccount || 'Axis Bank',
+      notes,
+    });
+    return { invoice: updatedInv };
+  }
+
+  // 2. Otherwise try finding as Quotation / Proforma
+  const quotes = getQuotations();
+  const quoteMatch = quotes.find((q) => q.id === docId);
+
+  if (quoteMatch) {
+    const updatedQuote = recordQuotePayment(docId, {
+      date: payDate,
+      amount,
+      method,
+      transactionRef,
+      bankAccount: bankAccount || 'Axis Bank',
+      notes,
+    });
+
+    if (autoConvertToInvoice) {
+      const createdInvoice = convertQuoteToInvoice(docId);
+      return { quote: updatedQuote, invoice: createdInvoice };
+    }
+
+    return { quote: updatedQuote };
+  }
+
+  return {};
+}
+
+export function recordQuoteNegotiation(
+  quoteId: string,
+  note: string,
+  revisedTotal?: number,
+  actor: string = 'Admin / Party'
+): Quotation | null {
+  const quotes = getQuotations();
+  const quote = quotes.find((q) => q.id === quoteId);
+  if (!quote) return null;
+
+  if (!quote.negotiationHistory) quote.negotiationHistory = [];
+
+  quote.negotiationHistory.push({
+    id: `neg-${Date.now().toString().slice(-6)}`,
+    date: new Date().toISOString().split('T')[0],
+    note,
+    revisedTotal,
+    status: quote.status,
+    actor,
+  });
+
+  if (revisedTotal && revisedTotal > 0) {
+    quote.netPreTaxTotal = revisedTotal;
+    if (quote.gstEnabled) {
+      const taxRate = quote.taxType === 'IGST' ? 0.18 : 0.18;
+      quote.totalTax = Math.round(revisedTotal * taxRate * 100) / 100;
+      quote.grandTotal = Math.round((revisedTotal + quote.totalTax) * 100) / 100;
+    } else {
+      quote.grandTotal = revisedTotal;
+    }
+  }
+
+  quote.status = 'under_negotiation';
+  saveQuotation(quote);
+  return quote;
+}
+
 export function getDashboardMetrics(): AdminDashboardMetrics {
   const quotes = getQuotations();
   const invoices = getInvoices();
 
   const totalInvoiced = invoices.reduce((sum, inv) => sum + inv.grandTotal, 0);
-  const totalCollected = invoices.reduce((sum, inv) => sum + inv.amountPaid, 0);
+  const totalInvoiceCollected = invoices.reduce((sum, inv) => sum + inv.amountPaid, 0);
+  const totalQuoteAdvances = quotes.reduce((sum, q) => sum + (q.amountPaid || 0), 0);
+  const totalCollected = totalInvoiceCollected + totalQuoteAdvances;
   const outstandingBalance = invoices.reduce((sum, inv) => sum + inv.balanceDue, 0);
 
-  const pendingQuotesCount = quotes.filter((q) => q.status === 'issued' || q.status === 'draft').length;
-  const acceptedQuotesCount = quotes.filter((q) => q.status === 'accepted' || q.status === 'invoiced').length;
+  const pendingQuotesCount = quotes.filter((q) => q.status === 'issued' || q.status === 'draft' || q.status === 'under_negotiation').length;
+  const acceptedQuotesCount = quotes.filter((q) => q.status === 'accepted' || q.status === 'invoiced' || q.status === 'negotiated').length;
   const paidInvoicesCount = invoices.filter((i) => i.status === 'paid').length;
 
   return {

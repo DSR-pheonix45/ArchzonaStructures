@@ -411,7 +411,7 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
   y += 6;
 
   // 6. Tax & Totals Breakdown & Bank Details Box
-  if (y + 50 > 250) {
+  if (y + 60 > 250) {
     doc.addPage();
     renderHeaderBanner(doc, headerTitle, refText, logoBase64);
     y = 35;
@@ -420,22 +420,31 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
   const startTotalsY = y;
   const isGstActive = (docPayload as Quotation).gstEnabled || (docPayload as Invoice).taxType || docType === 'proforma' || docType === 'tax_invoice';
 
-  // Bank Details on Left (X = 15 to X = 90)
+  // Bank Details Box on Left (X = 15 to X = 92)
+  doc.setFillColor(247, 245, 240); // Soft stone background
+  doc.roundedRect(15, startTotalsY, 77, 36, 2, 2, 'F');
+  doc.setDrawColor(209, 199, 183);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(15, startTotalsY, 77, 36, 2, 2, 'S');
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(13, 12, 10);
-  doc.text('BANK PAYMENT DETAILS (NEFT/RTGS):', 15, startTotalsY + 4);
+  doc.text('BANK PAYMENT DETAILS (NEFT/RTGS):', 18, startTotalsY + 5.5);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.setTextColor(60, 60, 60);
-  doc.text(`Bank: ${cleanText(owner.bankDetails.bankName)}`, 15, startTotalsY + 8.5);
-  doc.text(`Account Name: ${cleanText(owner.bankDetails.accountName)}`, 15, startTotalsY + 12.5);
-  doc.text(`Account #: ${cleanText(owner.bankDetails.accountNumber)}`, 15, startTotalsY + 16.5);
-  doc.text(`IFSC Code: ${cleanText(owner.bankDetails.ifscCode)}`, 15, startTotalsY + 20.5);
-  doc.text(`Branch: ${cleanText(owner.bankDetails.branch)}`, 15, startTotalsY + 24.5);
+  doc.setTextColor(50, 50, 50);
+  doc.text(`Bank: ${cleanText(owner.bankDetails.bankName)}`, 18, startTotalsY + 11);
+  doc.text(`A/C Name: ${cleanText(owner.bankDetails.accountName)}`, 18, startTotalsY + 15.5);
+  doc.text(`A/C #: ${cleanText(owner.bankDetails.accountNumber)}`, 18, startTotalsY + 20);
+  doc.text(`IFSC Code: ${cleanText(owner.bankDetails.ifscCode)}`, 18, startTotalsY + 24.5);
+  doc.text(`Branch: ${cleanText(owner.bankDetails.branch)}`, 18, startTotalsY + 29);
+  if (owner.bankDetails.upiId) {
+    doc.text(`UPI ID: ${cleanText(owner.bankDetails.upiId)}`, 18, startTotalsY + 33.5);
+  }
 
-  // Totals Breakdown on Right (X = 95 to X = 195)
+  // Totals Breakdown on Right (X = 98 to X = 195)
   let rightTotalsY = startTotalsY;
 
   const subtotalVal = docPayload.subtotal || 0;
@@ -444,7 +453,7 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(60, 60, 60);
-  doc.text('Taxable Subtotal:', 100, rightTotalsY + 4);
+  doc.text('Taxable Subtotal:', 98, rightTotalsY + 4);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(13, 12, 10);
   doc.text(formatCurrency(netTaxableVal), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
@@ -459,11 +468,11 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
       rightTotalsY += 5;
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(60, 60, 60);
-      doc.text('CGST @ 9%:', 100, rightTotalsY + 4);
+      doc.text('CGST @ 9%:', 98, rightTotalsY + 4);
       doc.text(formatCurrency(cgstAmt), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
 
       rightTotalsY += 5;
-      doc.text('SGST @ 9%:', 100, rightTotalsY + 4);
+      doc.text('SGST @ 9%:', 98, rightTotalsY + 4);
       doc.text(formatCurrency(sgstAmt), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
     } else {
       const igstAmt = (docPayload as Invoice).igstAmount || (docPayload as Quotation).igstAmount || Math.round(netTaxableVal * 0.18 * 100) / 100;
@@ -471,7 +480,7 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
       rightTotalsY += 5;
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(60, 60, 60);
-      doc.text('IGST @ 18%:', 100, rightTotalsY + 4);
+      doc.text('IGST @ 18%:', 98, rightTotalsY + 4);
       doc.text(formatCurrency(igstAmt), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
     }
   }
@@ -489,7 +498,27 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
   doc.setFontSize(9.5);
   doc.text(formatCurrency(finalGrandTotal), pageWidth - 18, rightTotalsY + 6.5, { align: 'right' });
 
-  y = Math.max(startTotalsY + 30, rightTotalsY + 15);
+  // Advance Paid & Net Balance Due
+  const amountPaidVal = docPayload.amountPaid || 0;
+  const balanceDueVal = typeof docPayload.balanceDue === 'number' ? docPayload.balanceDue : Math.max(0, finalGrandTotal - amountPaidVal);
+
+  if (amountPaidVal > 0) {
+    rightTotalsY += 13;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(16, 124, 65); // Green accent
+    doc.text('Less: Advance Paid / Received:', 98, rightTotalsY + 4);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`(-) ${formatCurrency(amountPaidVal)}`, pageWidth - 18, rightTotalsY + 4, { align: 'right' });
+
+    rightTotalsY += 5;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(180, 83, 9); // Amber accent
+    doc.text('NET BALANCE DUE:', 98, rightTotalsY + 4);
+    doc.text(formatCurrency(balanceDueVal), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
+  }
+
+  y = Math.max(startTotalsY + 40, rightTotalsY + 15);
 
   // 7. Notes & Terms
   if (docPayload.notes) {

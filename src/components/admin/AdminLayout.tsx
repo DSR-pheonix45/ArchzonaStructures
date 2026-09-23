@@ -48,15 +48,18 @@ import {
 import { downloadQuotationPDF, downloadInvoicePDF } from '../../utils/pdfGenerator';
 import { QuoteBuilderView } from './QuoteBuilderView';
 import { InvoiceDetailModal } from './InvoiceDetailModal';
+import { RecordTransactionModal } from './RecordTransactionModal';
 
 interface AdminLayoutProps {
   onLogout: () => void;
 }
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'quotes' | 'invoices' | 'builder' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'quotes' | 'invoices' | 'ar' | 'builder' | 'settings'>('dashboard');
   const [editingQuote, setEditingQuote] = useState<Quotation | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [isRecordPayModalOpen, setIsRecordPayModalOpen] = useState(false);
+  const [recordPayDocId, setRecordPayDocId] = useState<string | undefined>(undefined);
 
   // Refresh trigger for data updates
   const [refreshKey, setRefreshKey] = useState(0);
@@ -210,6 +213,18 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
           >
             <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isReconciling ? 'animate-spin' : ''}`} />
             <span>{isReconciling ? 'Reconciling...' : 'Reconcile Now'}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setRecordPayDocId(undefined);
+              setIsRecordPayModalOpen(true);
+            }}
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center space-x-1.5 transition-all cursor-pointer shadow-md"
+            title="Log bank transfer payment from party"
+          >
+            <CreditCard className="w-4 h-4" />
+            <span>+ Record Payment</span>
           </button>
 
           <button
@@ -644,6 +659,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
                         </span>
                       </td>
                       <td className="py-3 px-3 text-right space-x-2">
+                        <button
+                          onClick={() => {
+                            setRecordPayDocId(q.id);
+                            setIsRecordPayModalOpen(true);
+                          }}
+                          className="px-2.5 py-1 bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 rounded text-[11px] font-bold cursor-pointer transition-all"
+                          title="Record bank advance payment transferred by party"
+                        >
+                          + Record Pay
+                        </button>
                         {q.status === 'accepted' && (
                           <button
                             onClick={() => handleConvertQuote(q.id)}
@@ -1219,6 +1244,20 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
             // refresh invoice state
             const updated = getInvoices().find((i) => i.id === selectedInvoice.id);
             if (updated) setSelectedInvoice(updated);
+          }}
+        />
+      )}
+
+      {/* Record Bank Transaction Entry Modal */}
+      {isRecordPayModalOpen && (
+        <RecordTransactionModal
+          initialDocId={recordPayDocId}
+          onClose={() => {
+            setIsRecordPayModalOpen(false);
+            setRecordPayDocId(undefined);
+          }}
+          onSaved={() => {
+            reloadData();
           }}
         />
       )}

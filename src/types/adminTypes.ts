@@ -1,5 +1,5 @@
 export type DocumentType = 'quote' | 'proforma' | 'tax_invoice';
-export type QuoteStatus = 'draft' | 'issued' | 'accepted' | 'invoiced' | 'declined';
+export type QuoteStatus = 'draft' | 'issued' | 'under_negotiation' | 'negotiated' | 'accepted' | 'invoiced' | 'declined';
 export type InvoiceStatus = 'unpaid' | 'partially_paid' | 'paid' | 'overdue';
 export type PaymentMethod = 'NEFT/RTGS' | 'UPI' | 'Cheque' | 'Cash' | 'Card';
 
@@ -48,6 +48,15 @@ export interface ClientDetails {
   projectLocation?: string;
 }
 
+export interface NegotiationRecord {
+  id: string;
+  date: string;
+  note: string;
+  revisedTotal?: number;
+  status: QuoteStatus;
+  actor: string;
+}
+
 export interface Quotation {
   id: string; // e.g. 'AZ-QT-2026-001' or 'AZ-PI-2026-001'
   docType?: DocumentType; // 'quote' | 'proforma' | 'tax_invoice'
@@ -76,15 +85,20 @@ export interface Quotation {
   createdAt: string;
   updatedAt: string;
   linkedInvoiceId?: string; // Set when converted to invoice
+  amountPaid?: number; // Advance funds transferred against Quote/Proforma
+  balanceDue?: number;
+  payments?: PaymentRecord[]; // Recorded advance payments
+  negotiationHistory?: NegotiationRecord[];
 }
 
 export interface PaymentRecord {
   id: string;
-  invoiceId: string;
+  invoiceId: string; // Document ID (Quote, Proforma, or Invoice)
   date: string;
   amount: number;
   method: PaymentMethod;
   transactionRef: string;
+  bankAccount?: string;
   notes?: string;
   recordedAt: string;
 }
@@ -125,3 +139,4 @@ export interface AdminDashboardMetrics {
   acceptedQuotesCount: number;
   paidInvoicesCount: number;
 }
+
