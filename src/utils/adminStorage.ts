@@ -18,12 +18,12 @@ export const DEFAULT_OWNER_PROFILE: OwnerUser = {
   address: '105, Prism Industrial Estate, Near Pendharkar College, Dombivli (E), Thane, Maharashtra 421201',
   gstin: '27AAFFA1234F1Z5',
   bankDetails: {
-    bankName: 'HDFC Bank Ltd',
-    accountName: 'Archzone Structures by ARCHZONA',
-    accountNumber: '50200088991122',
-    ifscCode: 'HDFC0000123',
-    branch: 'Dombivli East Branch',
-    upiId: 'archzona@hdfcbank',
+    bankName: 'Axis Bank',
+    accountName: 'archzona',
+    accountNumber: '923020053039794',
+    ifscCode: 'UTIB0000125',
+    branch: 'Main Branch',
+    upiId: 'archzona@axisbank',
   },
 };
 
@@ -36,7 +36,15 @@ const INITIAL_SEED_INVOICES: Invoice[] = [];
 export function getOwnerProfile(): OwnerUser {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.OWNER_PROFILE);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Ensure updated Axis Bank details take precedence over old dummy account
+      if (!parsed.bankDetails || parsed.bankDetails.accountNumber === '50200088991122' || parsed.bankDetails.bankName === 'HDFC Bank Ltd') {
+        parsed.bankDetails = DEFAULT_OWNER_PROFILE.bankDetails;
+        localStorage.setItem(STORAGE_KEYS.OWNER_PROFILE, JSON.stringify(parsed));
+      }
+      return parsed;
+    }
   } catch (err) {
     console.error('Error loading owner profile', err);
   }
