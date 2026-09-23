@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { X, CreditCard, Download, CheckCircle2, DollarSign, Calendar, Landmark, FileText } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, CreditCard, Download, CheckCircle2, DollarSign, Calendar, Landmark, FileText, Check } from 'lucide-react';
 import { Invoice, PaymentMethod } from '../../types/adminTypes';
 import { recordPayment, getOwnerProfile } from '../../utils/adminStorage';
 import { downloadInvoicePDF } from '../../utils/pdfGenerator';
+import { syncInvoiceToGSheet } from '../../utils/googleSheetsSync';
 
 interface InvoiceDetailModalProps {
   invoice: Invoice | null;
@@ -13,21 +14,28 @@ interface InvoiceDetailModalProps {
 export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice, onClose, onUpdate }) => {
   if (!invoice) return null;
 
+  const [currentInvoice, setCurrentInvoice] = useState<Invoice>(invoice);
+  useEffect(() => {
+    setCurrentInvoice(invoice);
+  }, [invoice]);
+
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [payAmount, setPayAmount] = useState<number>(invoice.balanceDue);
   const [payMethod, setPayMethod] = useState<PaymentMethod>('NEFT/RTGS');
   const [payRef, setPayRef] = useState('');
   const [payNotes, setPayNotes] = useState('');
   const [payDate, setPayDate] = useState(new Date().toISOString().split('T')[0]);
+  const [isSavingPay, setIsSavingPay] = useState(false);
 
-  const handleRecordPaymentSubmit = (e: React.FormEvent) => {
+  const handleRecordPaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (payAmount <= 0) {
       alert('Please enter a valid payment amount.');
       return;
     }
 
-    recordPayment(invoice.id, {
+    setIsSavingPay(true);
+    const updatedInvoice = recordPayment(currentInvoice.id, {
       date: payDate,
       amount: payAmount,
       method: payMethod,
@@ -35,12 +43,26 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
       notes: payNotes,
     });
 
+    if (updatedInvoice) {
+      setCurrentInvoice({ ...updatedInvoice });
+      // Sync immediately to Google Sheet Invoices tab!
+      try {
+        await syncInvoiceToGSheet(updatedInvoice);
+      } catch (err) {
+        console.warn('GSheet invoice payment sync error:', err);
+      }
+    }
+
+    setIsSavingPay(false);
     setShowPaymentForm(false);
+    setPayAmount(0);
+    setPayRef('');
+    setPayNotes('');
     onUpdate();
   };
 
   const handleDownloadPDF = () => {
-    downloadInvoicePDF(invoice, getOwnerProfile());
+    downloadInvoicePDF(currentInvoice, getOwnerProfile());
   };
 
   return (
@@ -53,11 +75,20 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-serif-title font-bold text-[#F7F5F0]">
-                Tax Invoice {invoice.id}
-              </h2>
+              <div className="flex items-center space-x-2">
+                <h2 className="text-xl font-serif-title font-bold text-[#F7F5F0]">
+                  Tax Invoice {currentInvoice.id}
+                </h2>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                  currentInvoice.status === 'paid' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' :
+                  currentInvoice.status === 'partially_paid' ? 'bg-amber-950 text-amber-300 border border-amber-800' :
+                  'bg-red-950 text-red-300 border border-red-800'
+                }`}>
+                  {currentInvoice.status.replace('_', ' ')}
+                </span>
+              </div>
               <p className="text-xs text-[#8C8273]">
-                Linked Quote: {invoice.quoteId} &bull; Issue Date: {invoice.issueDate}
+                Linked Quote: {currentInvoice.quoteId} &bull; Issue Date: {currentInvoice.issueDate}
               </p>
             </div>
           </div>
@@ -84,30 +115,30 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
           <div className="p-4 rounded-xl bg-[#0D0C0A] border border-[#D1C7B7]/15">
             <span className="text-[10px] text-[#8C8273] uppercase tracking-wider font-bold block">Grand Total (Inc. GST)</span>
             <span className="text-xl font-serif-title font-bold text-[#F7F5F0]">
-              ₹{invoice.grandTotal.toLocaleString('en-IN')}
+              ₹{currentInvoice.grandTotal.toLocaleString('en-IN')}
             </span>
             <span className="text-[10px] text-[#D1C7B7]/70 block pt-1">
-              Subtotal ₹{invoice.subtotal.toLocaleString('en-IN')} + GST ₹{invoice.totalTax.toLocaleString('en-IN')}
+              Subtotal ₹{currentInvoice.subtotal.toLocaleString('en-IN')} + GST ₹{currentInvoice.totalTax.toLocaleString('en-IN')}
             </span>
           </div>
 
           <div className="p-4 rounded-xl bg-[#0D0C0A] border border-[#D1C7B7]/15">
-            <span className="text-[10px] text-[#8C8273] uppercase tracking-wider font-bold block">Total Received</span>
+            <span className="text-[10px] text-[#8C8273] uppercase tracking-wider font-bold block">Amount Received</span>
             <span className="text-xl font-serif-title font-bold text-emerald-400">
-              ₹{invoice.amountPaid.toLocaleString('en-IN')}
+              ₹{currentInvoice.amountPaid.toLocaleString('en-IN')}
             </span>
             <span className="text-[10px] text-[#8C8273] block pt-1">
-              {invoice.payments.length} Payments Logged
+              {currentInvoice.payments.length} Payment Receipts Logged
             </span>
           </div>
 
           <div className="p-4 rounded-xl bg-[#0D0C0A] border border-[#D1C7B7]/15">
-            <span className="text-[10px] text-[#8C8273] uppercase tracking-wider font-bold block">Balance Outstanding</span>
-            <span className={`text-xl font-serif-title font-bold ${invoice.balanceDue > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
-              ₹{invoice.balanceDue.toLocaleString('en-IN')}
+            <span className="text-[10px] text-[#8C8273] uppercase tracking-wider font-bold block">Balance Outstanding (AR)</span>
+            <span className={`text-xl font-serif-title font-bold ${currentInvoice.balanceDue > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+              ₹{currentInvoice.balanceDue.toLocaleString('en-IN')}
             </span>
             <span className="text-[10px] text-[#8C8273] block pt-1">
-              Due Date: {invoice.dueDate}
+              Due Date: {currentInvoice.dueDate}
             </span>
           </div>
         </div>
@@ -116,26 +147,26 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#0D0C0A]/60 border border-[#D1C7B7]/15 rounded-xl p-4 text-xs">
           <div>
             <h4 className="font-semibold text-[#D1C7B7] uppercase tracking-wider mb-2">Billed Client Details</h4>
-            <p className="text-[#F7F5F0] font-bold">{invoice.client.name}</p>
-            {invoice.client.companyName && <p className="text-[#8C8273]">{invoice.client.companyName}</p>}
-            <p className="text-[#8C8273] mt-1">{invoice.client.billingAddress}</p>
-            <p className="text-[#8C8273] mt-1">Phone: {invoice.client.phone} | Email: {invoice.client.email}</p>
-            {invoice.client.gstin && <p className="text-[#D1C7B7] font-mono mt-1">Client GSTIN: {invoice.client.gstin}</p>}
+            <p className="text-[#F7F5F0] font-bold">{currentInvoice.client.name}</p>
+            {currentInvoice.client.companyName && <p className="text-[#8C8273]">{currentInvoice.client.companyName}</p>}
+            <p className="text-[#8C8273] mt-1">{currentInvoice.client.billingAddress}</p>
+            <p className="text-[#8C8273] mt-1">Phone: {currentInvoice.client.phone} | Email: {currentInvoice.client.email}</p>
+            {currentInvoice.client.gstin && <p className="text-[#D1C7B7] font-mono mt-1">Client GSTIN: {currentInvoice.client.gstin}</p>}
           </div>
 
           <div>
             <h4 className="font-semibold text-[#D1C7B7] uppercase tracking-wider mb-2">GST & Payment Terms</h4>
-            <p className="text-[#8C8273]">Tax Mode: <span className="text-[#F7F5F0] font-mono">{invoice.taxType}</span></p>
-            {invoice.taxType === 'CGST_SGST' ? (
-              <p className="text-[#8C8273]">CGST (9%): ₹{invoice.cgstAmount.toLocaleString('en-IN')} | SGST (9%): ₹{invoice.sgstAmount.toLocaleString('en-IN')}</p>
+            <p className="text-[#8C8273]">Tax Mode: <span className="text-[#F7F5F0] font-mono">{currentInvoice.taxType}</span></p>
+            {currentInvoice.taxType === 'CGST_SGST' ? (
+              <p className="text-[#8C8273]">CGST (9%): ₹{currentInvoice.cgstAmount.toLocaleString('en-IN')} | SGST (9%): ₹{currentInvoice.sgstAmount.toLocaleString('en-IN')}</p>
             ) : (
-              <p className="text-[#8C8273]">IGST (18%): ₹{invoice.igstAmount.toLocaleString('en-IN')}</p>
+              <p className="text-[#8C8273]">IGST (18%): ₹{currentInvoice.igstAmount.toLocaleString('en-IN')}</p>
             )}
-            <p className="text-[#8C8273] mt-2">Payment Terms: {invoice.paymentTerms}</p>
+            <p className="text-[#8C8273] mt-2">Payment Terms: {currentInvoice.paymentTerms}</p>
           </div>
         </div>
 
-        {/* Line Items Table */}
+        {/* Line Items Table with HSN */}
         <div className="mt-6">
           <h4 className="text-xs font-semibold uppercase tracking-wider text-[#D1C7B7] mb-3">Itemized Taxable Services & Products</h4>
           <div className="overflow-x-auto border border-[#D1C7B7]/15 rounded-xl">
@@ -150,7 +181,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#D1C7B7]/10 text-[#F7F5F0]">
-                {invoice.items.map((item, idx) => (
+                {currentInvoice.items.map((item, idx) => (
                   <tr key={idx}>
                     <td className="py-2.5 px-3">
                       <p className="font-semibold">{item.name}</p>
@@ -171,13 +202,13 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
         <div className="mt-6 pt-4 border-t border-[#D1C7B7]/15">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-[#D1C7B7]">Payment History Log</h4>
-            {invoice.balanceDue > 0 && !showPaymentForm && (
+            {currentInvoice.balanceDue > 0 && !showPaymentForm && (
               <button
                 onClick={() => {
-                  setPayAmount(invoice.balanceDue);
+                  setPayAmount(currentInvoice.balanceDue);
                   setShowPaymentForm(true);
                 }}
-                className="px-3 py-1.5 bg-[#D1C7B7] hover:bg-[#F7F5F0] text-[#0D0C0A] text-xs font-bold rounded-lg flex items-center space-x-1 transition-all cursor-pointer"
+                className="px-3 py-1.5 bg-[#D1C7B7] hover:bg-[#F7F5F0] text-[#0D0C0A] text-xs font-bold rounded-lg flex items-center space-x-1 transition-all cursor-pointer shadow-md"
               >
                 <CreditCard className="w-3.5 h-3.5" />
                 <span>+ Record Payment</span>
@@ -185,11 +216,11 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
             )}
           </div>
 
-          {/* Record Payment Form Modal View */}
+          {/* Record Payment Form View */}
           {showPaymentForm && (
-            <form onSubmit={handleRecordPaymentSubmit} className="mb-6 p-4 rounded-xl bg-[#0D0C0A] border border-[#D1C7B7]/30 space-y-4">
+            <form onSubmit={handleRecordPaymentSubmit} className="mb-6 p-4 rounded-xl bg-[#0D0C0A] border border-[#D1C7B7]/30 space-y-4 shadow-xl">
               <h5 className="text-xs font-bold text-[#F7F5F0] uppercase tracking-wider border-b border-[#D1C7B7]/15 pb-2">
-                Log Incoming Payment Transaction
+                Log Incoming Payment Transaction against Invoice {currentInvoice.id}
               </h5>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -198,7 +229,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
                   <input
                     type="number"
                     min="1"
-                    max={invoice.balanceDue}
+                    max={currentInvoice.balanceDue}
                     value={payAmount}
                     onChange={(e) => setPayAmount(parseFloat(e.target.value) || 0)}
                     className="w-full px-3 py-2 bg-[#141311] border border-[#D1C7B7]/20 rounded-lg text-xs text-[#F7F5F0] font-mono focus:border-[#D1C7B7] focus:outline-none"
@@ -226,7 +257,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
                     type="text"
                     value={payRef}
                     onChange={(e) => setPayRef(e.target.value)}
-                    placeholder="e.g. HDFCRN20260901..."
+                    placeholder="e.g. AXISRN20260923..."
                     className="w-full px-3 py-2 bg-[#141311] border border-[#D1C7B7]/20 rounded-lg text-xs text-[#F7F5F0] font-mono focus:border-[#D1C7B7] focus:outline-none"
                   />
                 </div>
@@ -238,7 +269,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
                   type="text"
                   value={payNotes}
                   onChange={(e) => setPayNotes(e.target.value)}
-                  placeholder="e.g. Received 50% advance payment via NEFT"
+                  placeholder="e.g. Received advance payment via NEFT"
                   className="w-full px-3 py-2 bg-[#141311] border border-[#D1C7B7]/20 rounded-lg text-xs text-[#F7F5F0] focus:border-[#D1C7B7] focus:outline-none"
                 />
               </div>
@@ -253,22 +284,23 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-[#D1C7B7] text-[#0D0C0A] font-bold text-xs rounded-lg hover:bg-[#F7F5F0] cursor-pointer"
+                  disabled={isSavingPay}
+                  className="px-4 py-1.5 bg-[#D1C7B7] text-[#0D0C0A] font-bold text-xs rounded-lg hover:bg-[#F7F5F0] cursor-pointer disabled:opacity-50"
                 >
-                  Save Payment Record
+                  {isSavingPay ? 'Saving & Syncing...' : 'Save Payment Record'}
                 </button>
               </div>
             </form>
           )}
 
-          {invoice.payments.length === 0 ? (
+          {currentInvoice.payments.length === 0 ? (
             <p className="text-xs text-[#8C8273] italic">No payment receipts logged yet for this invoice.</p>
           ) : (
             <div className="space-y-2">
-              {invoice.payments.map((pay) => (
+              {currentInvoice.payments.map((pay) => (
                 <div key={pay.id} className="p-3 rounded-lg bg-[#0D0C0A] border border-[#D1C7B7]/15 flex items-center justify-between text-xs">
                   <div>
-                    <span className="font-bold text-[#F7F5F0] font-mono">₹{pay.amount.toLocaleString('en-IN')}</span>
+                    <span className="font-bold text-emerald-400 font-mono">₹{pay.amount.toLocaleString('en-IN')}</span>
                     <span className="text-[#8C8273] ml-2">via {pay.method} (Ref: {pay.transactionRef})</span>
                     {pay.notes && <p className="text-[11px] text-[#D1C7B7]/70 mt-0.5">{pay.notes}</p>}
                   </div>
