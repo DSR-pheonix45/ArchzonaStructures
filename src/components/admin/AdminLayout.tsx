@@ -106,7 +106,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
   const [companySettings, setCompanySettings] = useState<OwnerUser>(ownerProfile);
   const [settingsMsg, setSettingsMsg] = useState('');
 
-  const filteredQuotes = quotes.filter((q) => {
+  const preTaxQuotes = quotes.filter((q) => q.status !== 'invoiced');
+
+  const filteredQuotes = preTaxQuotes.filter((q) => {
     const matchesSearch =
       q.id.toLowerCase().includes(quoteSearch.toLowerCase()) ||
       q.client.name.toLowerCase().includes(quoteSearch.toLowerCase()) ||
@@ -275,7 +277,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
             }`}
           >
             <FileSpreadsheet className="w-4 h-4" />
-            <span>Pre-Tax Quotes ({quotes.length})</span>
+            <span>Pre-Tax Quotes ({preTaxQuotes.length})</span>
           </button>
 
           <button
@@ -443,7 +445,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
                   <FileSpreadsheet className="w-4 h-4 text-[#D1C7B7]" />
                 </div>
                 <div className="text-2xl font-serif-title font-bold text-[#F7F5F0]">
-                  {quotes.length} <span className="text-xs font-sans text-[#8C8273]">Quotes</span>
+                  {preTaxQuotes.length} <span className="text-xs font-sans text-[#8C8273]">Quotes</span>
                 </div>
                 <span className="text-[11px] text-[#D1C7B7] block">{metrics.pendingQuotesCount} pending client approval</span>
               </div>
@@ -467,7 +469,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
                 </div>
 
                 <div className="space-y-3">
-                  {quotes.slice(0, 4).map((q) => (
+                  {preTaxQuotes.slice(0, 4).map((q) => (
                     <div key={q.id} className="p-3 rounded-xl bg-[#0D0C0A] border border-[#D1C7B7]/15 flex items-center justify-between text-xs">
                       <div>
                         <div className="flex items-center space-x-2">
@@ -620,7 +622,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onLogout }) => {
                   <option value="draft">Draft</option>
                   <option value="issued">Issued</option>
                   <option value="accepted">Accepted</option>
-                  <option value="invoiced">Invoiced</option>
                 </select>
               </div>
             </div>

@@ -17,10 +17,11 @@ export const RecordTransactionModal: React.FC<RecordTransactionModalProps> = ({
 }) => {
   const allQuotes = getQuotations();
   const allInvoices = getInvoices();
+  const activeQuotes = allQuotes.filter((q) => q.status !== 'invoiced');
 
   // Combine into unified document list
   const docOptions = [
-    ...allQuotes.map((q) => ({
+    ...activeQuotes.map((q) => ({
       id: q.id,
       docTypeLabel: q.docType === 'proforma' ? 'Proforma Invoice' : 'Pre-Tax Quote',
       clientName: q.client.name,

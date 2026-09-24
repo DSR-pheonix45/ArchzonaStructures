@@ -393,7 +393,7 @@ export function getDashboardMetrics(): AdminDashboardMetrics {
   const outstandingBalance = invoices.reduce((sum, inv) => sum + inv.balanceDue, 0);
 
   const pendingQuotesCount = quotes.filter((q) => q.status === 'issued' || q.status === 'draft' || q.status === 'under_negotiation').length;
-  const acceptedQuotesCount = quotes.filter((q) => q.status === 'accepted' || q.status === 'invoiced' || q.status === 'negotiated').length;
+  const acceptedQuotesCount = quotes.filter((q) => q.status === 'accepted' || q.status === 'negotiated').length;
   const paidInvoicesCount = invoices.filter((i) => i.status === 'paid').length;
 
   return {
