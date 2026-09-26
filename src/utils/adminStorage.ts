@@ -23,7 +23,6 @@ export const DEFAULT_OWNER_PROFILE: OwnerUser = {
     accountNumber: '923020053039794',
     ifscCode: 'UTIB0000125',
     branch: 'Main Branch',
-    upiId: 'archzona@axisbank',
   },
 };
 
@@ -38,6 +37,9 @@ export function getOwnerProfile(): OwnerUser {
     const raw = localStorage.getItem(STORAGE_KEYS.OWNER_PROFILE);
     if (raw) {
       const parsed = JSON.parse(raw);
+      if (parsed.bankDetails && parsed.bankDetails.upiId) {
+        delete parsed.bankDetails.upiId;
+      }
       // Ensure updated Axis Bank details take precedence over old dummy account
       if (!parsed.bankDetails || parsed.bankDetails.accountNumber === '50200088991122' || parsed.bankDetails.bankName === 'HDFC Bank Ltd') {
         parsed.bankDetails = DEFAULT_OWNER_PROFILE.bankDetails;

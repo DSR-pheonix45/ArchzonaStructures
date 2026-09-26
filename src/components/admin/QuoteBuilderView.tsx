@@ -35,8 +35,10 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
     if (!isEditing) {
       setQuoteId(getInitialDocId(newType));
     }
-    // Auto-enable GST for Proforma & Tax Invoice
-    if (newType === 'proforma' || newType === 'tax_invoice') {
+    // Commercial quotes NEVER have GST. Proforma and Tax Invoices default to GST enabled.
+    if (newType === 'quote') {
+      setGstEnabled(false);
+    } else if (newType === 'proforma' || newType === 'tax_invoice') {
       setGstEnabled(true);
     }
   };
@@ -52,7 +54,7 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
   const [isSaving, setIsSaving] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState('');
 
-  // GST State
+  // GST State - Commercial Quote cannot have GST enabled
   const [gstEnabled, setGstEnabled] = useState<boolean>(initialQuote?.gstEnabled ?? (docType !== 'quote'));
   const [taxType, setTaxType] = useState<'CGST_SGST' | 'IGST'>(initialQuote?.taxType || 'CGST_SGST');
 
@@ -163,6 +165,9 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
   const overallDiscountAmount = Math.round(subtotal * (overallDiscountPercent / 100) * 100) / 100;
   const netPreTaxTotal = Math.round((subtotal - overallDiscountAmount) * 100) / 100;
 
+  // Commercial Quotes NEVER have GST calculated.
+  const isGstActive = docType !== 'quote' && gstEnabled;
+
   let cgstPercent = 0;
   let sgstPercent = 0;
   let igstPercent = 0;
@@ -170,7 +175,7 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
   let sgstAmount = 0;
   let igstAmount = 0;
 
-  if (gstEnabled) {
+  if (isGstActive) {
     if (taxType === 'CGST_SGST') {
       cgstPercent = 9;
       sgstPercent = 9;
@@ -183,7 +188,7 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
   }
 
   const totalTax = cgstAmount + sgstAmount + igstAmount;
-  const grandTotal = Math.round((netPreTaxTotal + totalTax) * 100) / 100;
+  const grandTotal = isGstActive ? Math.round((netPreTaxTotal + totalTax) * 100) / 100 : netPreTaxTotal;
 
   const handleSave = async (saveStatus?: Quotation['status']) => {
     if (!client.name || !client.email) {
@@ -205,7 +210,7 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
       overallDiscountPercent,
       overallDiscountAmount,
       netPreTaxTotal,
-      gstEnabled,
+      gstEnabled: isGstActive,
       taxType,
       cgstPercent,
       cgstAmount,
@@ -248,7 +253,7 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
       overallDiscountPercent,
       overallDiscountAmount,
       netPreTaxTotal,
-      gstEnabled,
+      gstEnabled: isGstActive,
       taxType,
       cgstPercent,
       cgstAmount,
@@ -298,7 +303,7 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
               </span>
             </div>
             <p className="text-xs text-[#8C8273]">
-              Switch document mode, specify Material HSN codes, and collect GST (18%) with live calculations.
+              Switch document mode, specify Material HSN codes, and control GST calculation with live updates.
             </p>
           </div>
         </div>
@@ -390,34 +395,51 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
           </div>
 
           {/* GST Tax Collection Switch */}
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 flex-1">
             <label className="text-[11px] uppercase tracking-wider text-[#8C8273] font-mono font-bold block">
-              2. GST Collection Settings
+              2. GST Calculation Option
             </label>
-            <div className="flex flex-wrap items-center gap-3 bg-[#0D0C0A] px-4 py-2 rounded-xl border border-[#D1C7B7]/20">
-              <label className="flex items-center space-x-2 cursor-pointer font-bold text-xs text-[#F7F5F0]">
-                <input
-                  type="checkbox"
-                  checked={gstEnabled}
-                  onChange={(e) => setGstEnabled(e.target.checked)}
-                  className="w-4 h-4 rounded accent-emerald-500 cursor-pointer"
-                />
-                <span>Collect GST (18%)</span>
-              </label>
+            {docType === 'quote' ? (
+              <div className="flex items-center space-x-2 bg-[#0D0C0A] px-4 py-2.5 rounded-xl border border-[#D1C7B7]/20 text-xs text-[#8C8273]">
+                <ShieldCheck className="w-4 h-4 text-[#D1C7B7] shrink-0" />
+                <span>GST calculation is excluded for Commercial Quotes. Tax can be added when issuing Proforma / Tax Invoice.</span>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center gap-4 bg-[#0D0C0A] px-4 py-2 rounded-xl border border-[#D1C7B7]/20">
+                <label className="flex items-center space-x-2 cursor-pointer font-bold text-xs text-[#F7F5F0]">
+                  <input
+                    type="radio"
+                    name="gstRadioToggle"
+                    checked={gstEnabled === true}
+                    onChange={() => setGstEnabled(true)}
+                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                  />
+                  <span>Calculate & Add GST (18%)</span>
+                </label>
 
-              {gstEnabled ? (
-                <select
-                  value={taxType}
-                  onChange={(e) => setTaxType(e.target.value as 'CGST_SGST' | 'IGST')}
-                  className="bg-[#141311] border border-[#D1C7B7]/30 rounded-lg px-3 py-1 text-xs text-[#D1C7B7] focus:outline-none focus:border-[#D1C7B7]"
-                >
-                  <option value="CGST_SGST">Intra-State: CGST (9%) + SGST (9%)</option>
-                  <option value="IGST">Inter-State: IGST (18%)</option>
-                </select>
-              ) : (
-                <span className="text-[11px] text-[#8C8273] italic">* GST collection disabled (Pre-tax quote)</span>
-              )}
-            </div>
+                <label className="flex items-center space-x-2 cursor-pointer font-bold text-xs text-[#D1C7B7]">
+                  <input
+                    type="radio"
+                    name="gstRadioToggle"
+                    checked={gstEnabled === false}
+                    onChange={() => setGstEnabled(false)}
+                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                  />
+                  <span>Exclude GST (Final Product Amount Only)</span>
+                </label>
+
+                {gstEnabled && (
+                  <select
+                    value={taxType}
+                    onChange={(e) => setTaxType(e.target.value as 'CGST_SGST' | 'IGST')}
+                    className="bg-[#141311] border border-[#D1C7B7]/30 rounded-lg px-3 py-1 text-xs text-[#D1C7B7] focus:outline-none focus:border-[#D1C7B7] ml-auto"
+                  >
+                    <option value="CGST_SGST">Intra-State: CGST (9%) + SGST (9%)</option>
+                    <option value="IGST">Inter-State: IGST (18%)</option>
+                  </select>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -562,15 +584,15 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
 
           <div className="p-4 rounded-xl bg-[#0D0C0A] border border-[#D1C7B7]/15 space-y-1 text-xs">
             <span className="text-[#8C8273] uppercase tracking-widest text-[10px] font-bold block">
-              {gstEnabled ? 'Grand Total (Inc. GST)' : 'Pre-Tax Net Total'}
+              {isGstActive ? 'Grand Total (Inc. GST)' : docType === 'quote' ? 'Total Estimated Amount' : 'Final Product Amount'}
             </span>
             <span className="text-2xl font-serif-title font-bold text-[#F7F5F0]">
-              ₹{(gstEnabled ? grandTotal : netPreTaxTotal).toLocaleString('en-IN')}
+              ₹{(isGstActive ? grandTotal : netPreTaxTotal).toLocaleString('en-IN')}
             </span>
             <span className="text-[10px] text-[#D1C7B7]/70 block pt-1">
-              {gstEnabled
+              {isGstActive
                 ? `Taxable: ₹${netPreTaxTotal.toLocaleString('en-IN')} + GST: ₹${totalTax.toLocaleString('en-IN')}`
-                : '* Excludes GST 18%'}
+                : docType === 'quote' ? '* Commercial Quote (Pre-tax)' : '* GST Excluded'}
             </span>
           </div>
         </div>
@@ -618,22 +640,22 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-[#D1C7B7]/15 text-[#8C8273] uppercase tracking-wider">
-                <th className="py-2.5 px-2 w-8">#</th>
-                <th className="py-2.5 px-2">Item Name & Description</th>
-                <th className="py-2.5 px-2 w-24">HSN/SAC</th>
-                <th className="py-2.5 px-2 w-28">Unit</th>
-                <th className="py-2.5 px-2 w-20">Qty</th>
-                <th className="py-2.5 px-2 w-28">Rate (₹)</th>
-                <th className="py-2.5 px-2 w-16">Disc %</th>
-                <th className="py-2.5 px-2 w-32 text-right">Net Amount (₹)</th>
-                <th className="py-2.5 px-2 w-10 text-center">Action</th>
+                <th className="py-2.5 px-3 w-8">#</th>
+                <th className="py-2.5 px-3">Item Name & Description</th>
+                <th className="py-2.5 px-3 w-24 text-center">HSN/SAC</th>
+                <th className="py-2.5 px-3 w-20 text-center">Qty</th>
+                <th className="py-2.5 px-3 w-28 text-center">Unit</th>
+                <th className="py-2.5 px-3 w-28 text-right">Rate (₹)</th>
+                <th className="py-2.5 px-3 w-16 text-right">Disc %</th>
+                <th className="py-2.5 px-3 w-32 text-right">Net Amount (₹)</th>
+                <th className="py-2.5 px-3 w-10 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#D1C7B7]/10 text-[#F7F5F0]">
               {items.map((item, index) => (
                 <tr key={item.id} className="hover:bg-[#0D0C0A]/40 transition-colors">
-                  <td className="py-3 px-2 font-mono text-[#8C8273]">{index + 1}</td>
-                  <td className="py-3 px-2 space-y-1">
+                  <td className="py-3 px-3 font-mono text-[#8C8273]">{index + 1}</td>
+                  <td className="py-3 px-3 space-y-1">
                     <input
                       type="text"
                       value={item.name}
@@ -649,16 +671,25 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
                       className="w-full px-2 py-1 bg-[#0D0C0A] border border-[#D1C7B7]/15 rounded text-[11px] text-[#D1C7B7] focus:border-[#D1C7B7] focus:outline-none"
                     />
                   </td>
-                  <td className="py-3 px-2">
+                  <td className="py-3 px-3">
                     <input
                       type="text"
                       value={item.hsnCode || ''}
                       onChange={(e) => handleItemChange(index, 'hsnCode', e.target.value)}
                       placeholder="e.g. 7610"
-                      className="w-full px-2 py-1.5 bg-[#0D0C0A] border border-[#D1C7B7]/20 rounded text-xs text-[#D1C7B7] font-mono focus:border-[#D1C7B7] focus:outline-none"
+                      className="w-full px-2 py-1.5 bg-[#0D0C0A] border border-[#D1C7B7]/20 rounded text-xs text-[#D1C7B7] font-mono focus:border-[#D1C7B7] focus:outline-none text-center"
                     />
                   </td>
-                  <td className="py-3 px-2">
+                  <td className="py-3 px-3">
+                    <input
+                      type="number"
+                      min="1"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                      className="w-full px-2 py-1.5 bg-[#0D0C0A] border border-[#D1C7B7]/20 rounded text-xs text-[#F7F5F0] focus:border-[#D1C7B7] focus:outline-none text-center font-mono"
+                    />
+                  </td>
+                  <td className="py-3 px-3">
                     <select
                       value={item.unit}
                       onChange={(e) => handleItemChange(index, 'unit', e.target.value)}
@@ -672,16 +703,7 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
                       <option value="Lump Sum">Lump Sum</option>
                     </select>
                   </td>
-                  <td className="py-3 px-2">
-                    <input
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                      className="w-full px-2 py-1.5 bg-[#0D0C0A] border border-[#D1C7B7]/20 rounded text-xs text-[#F7F5F0] focus:border-[#D1C7B7] focus:outline-none text-right font-mono"
-                    />
-                  </td>
-                  <td className="py-3 px-2">
+                  <td className="py-3 px-3">
                     <input
                       type="number"
                       min="0"
@@ -690,7 +712,7 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
                       className="w-full px-2 py-1.5 bg-[#0D0C0A] border border-[#D1C7B7]/20 rounded text-xs text-[#F7F5F0] focus:border-[#D1C7B7] focus:outline-none text-right font-mono"
                     />
                   </td>
-                  <td className="py-3 px-2">
+                  <td className="py-3 px-3">
                     <input
                       type="number"
                       min="0"
@@ -700,10 +722,10 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
                       className="w-full px-2 py-1.5 bg-[#0D0C0A] border border-[#D1C7B7]/20 rounded text-xs text-[#F7F5F0] focus:border-[#D1C7B7] focus:outline-none text-right font-mono"
                     />
                   </td>
-                  <td className="py-3 px-2 text-right font-mono font-bold text-[#F7F5F0]">
+                  <td className="py-3 px-3 text-right font-mono font-bold text-[#F7F5F0]">
                     ₹{item.netAmount.toLocaleString('en-IN')}
                   </td>
-                  <td className="py-3 px-2 text-center">
+                  <td className="py-3 px-3 text-center">
                     <button
                       onClick={() => handleRemoveItem(index)}
                       disabled={items.length <= 1}
@@ -740,10 +762,10 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
 
           <div className="text-right space-y-1 text-xs">
             <div className="text-[#8C8273]">
-              Taxable Subtotal: <span className="text-[#F7F5F0] font-mono">₹{netPreTaxTotal.toLocaleString('en-IN')}</span>
+              {isGstActive ? 'Taxable Subtotal:' : 'Total Amount:'} <span className="text-[#F7F5F0] font-mono">₹{netPreTaxTotal.toLocaleString('en-IN')}</span>
             </div>
 
-            {gstEnabled && (
+            {isGstActive && (
               <>
                 {taxType === 'CGST_SGST' ? (
                   <div className="text-[#D1C7B7]">
@@ -758,7 +780,11 @@ export const QuoteBuilderView: React.FC<QuoteBuilderViewProps> = ({ initialQuote
             )}
 
             <div className="text-lg font-serif-title font-bold text-[#F7F5F0]">
-              {gstEnabled ? `Grand Total (Inc. GST): ₹${grandTotal.toLocaleString('en-IN')}` : `Net Total: ₹${netPreTaxTotal.toLocaleString('en-IN')}`}
+              {isGstActive
+                ? `Grand Total (Inc. GST): ₹${grandTotal.toLocaleString('en-IN')}`
+                : docType === 'quote'
+                ? `Total Estimated Amount: ₹${netPreTaxTotal.toLocaleString('en-IN')}`
+                : `Final Product Amount: ₹${netPreTaxTotal.toLocaleString('en-IN')}`}
             </div>
           </div>
         </div>

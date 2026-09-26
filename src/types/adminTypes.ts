@@ -18,7 +18,6 @@ export interface OwnerUser {
     accountNumber: string;
     ifscCode: string;
     branch: string;
-    upiId?: string;
   };
 }
 

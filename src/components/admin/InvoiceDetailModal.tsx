@@ -113,12 +113,16 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
         {/* Invoice Summary Row */}
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-[#0D0C0A] border border-[#D1C7B7]/15">
-            <span className="text-[10px] text-[#8C8273] uppercase tracking-wider font-bold block">Grand Total (Inc. GST)</span>
+            <span className="text-[10px] text-[#8C8273] uppercase tracking-wider font-bold block">
+              {currentInvoice.totalTax > 0 ? 'Grand Total (Inc. GST)' : 'Final Product Amount'}
+            </span>
             <span className="text-xl font-serif-title font-bold text-[#F7F5F0]">
               ₹{currentInvoice.grandTotal.toLocaleString('en-IN')}
             </span>
             <span className="text-[10px] text-[#D1C7B7]/70 block pt-1">
-              Subtotal ₹{currentInvoice.subtotal.toLocaleString('en-IN')} + GST ₹{currentInvoice.totalTax.toLocaleString('en-IN')}
+              {currentInvoice.totalTax > 0
+                ? `Subtotal ₹${currentInvoice.subtotal.toLocaleString('en-IN')} + GST ₹${currentInvoice.totalTax.toLocaleString('en-IN')}`
+                : '* GST Excluded'}
             </span>
           </div>
 
@@ -156,11 +160,17 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
 
           <div>
             <h4 className="font-semibold text-[#D1C7B7] uppercase tracking-wider mb-2">GST & Payment Terms</h4>
-            <p className="text-[#8C8273]">Tax Mode: <span className="text-[#F7F5F0] font-mono">{currentInvoice.taxType}</span></p>
-            {currentInvoice.taxType === 'CGST_SGST' ? (
-              <p className="text-[#8C8273]">CGST (9%): ₹{currentInvoice.cgstAmount.toLocaleString('en-IN')} | SGST (9%): ₹{currentInvoice.sgstAmount.toLocaleString('en-IN')}</p>
+            {currentInvoice.totalTax > 0 ? (
+              <>
+                <p className="text-[#8C8273]">Tax Mode: <span className="text-[#F7F5F0] font-mono">{currentInvoice.taxType}</span></p>
+                {currentInvoice.taxType === 'CGST_SGST' ? (
+                  <p className="text-[#8C8273]">CGST (9%): ₹{currentInvoice.cgstAmount.toLocaleString('en-IN')} | SGST (9%): ₹{currentInvoice.sgstAmount.toLocaleString('en-IN')}</p>
+                ) : (
+                  <p className="text-[#8C8273]">IGST (18%): ₹{currentInvoice.igstAmount.toLocaleString('en-IN')}</p>
+                )}
+              </>
             ) : (
-              <p className="text-[#8C8273]">IGST (18%): ₹{currentInvoice.igstAmount.toLocaleString('en-IN')}</p>
+              <p className="text-[#8C8273]">GST Status: <span className="text-[#F7F5F0]">Excluded / Pre-Tax Product Amount</span></p>
             )}
             <p className="text-[#8C8273] mt-2">Payment Terms: {currentInvoice.paymentTerms}</p>
           </div>
@@ -168,7 +178,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
 
         {/* Line Items Table with HSN */}
         <div className="mt-6">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-[#D1C7B7] mb-3">Itemized Taxable Services & Products</h4>
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-[#D1C7B7] mb-3">Itemized Services & Products</h4>
           <div className="overflow-x-auto border border-[#D1C7B7]/15 rounded-xl">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#0D0C0A] text-[#8C8273] uppercase tracking-wider border-b border-[#D1C7B7]/15">
@@ -176,8 +186,9 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
                   <th className="py-2.5 px-3">Item</th>
                   <th className="py-2.5 px-3 text-center">HSN/SAC</th>
                   <th className="py-2.5 px-3 text-center">Qty</th>
+                  <th className="py-2.5 px-3 text-center">Unit</th>
                   <th className="py-2.5 px-3 text-right">Unit Rate</th>
-                  <th className="py-2.5 px-3 text-right">Taxable Value</th>
+                  <th className="py-2.5 px-3 text-right">{currentInvoice.totalTax > 0 ? 'Taxable Value' : 'Amount'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#D1C7B7]/10 text-[#F7F5F0]">
@@ -188,7 +199,8 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
                       <p className="text-[11px] text-[#8C8273]">{item.description}</p>
                     </td>
                     <td className="py-2.5 px-3 text-center font-mono text-[#D1C7B7]">{item.hsnCode || '3925'}</td>
-                    <td className="py-2.5 px-3 text-center font-mono">{item.quantity} {item.unit}</td>
+                    <td className="py-2.5 px-3 text-center font-mono">{item.quantity}</td>
+                    <td className="py-2.5 px-3 text-center font-mono text-[#D1C7B7]">{item.unit}</td>
                     <td className="py-2.5 px-3 text-right font-mono">₹{item.unitRate.toLocaleString('en-IN')}</td>
                     <td className="py-2.5 px-3 text-right font-mono font-bold">₹{item.netAmount.toLocaleString('en-IN')}</td>
                   </tr>

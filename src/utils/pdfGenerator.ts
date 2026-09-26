@@ -116,23 +116,24 @@ function renderHeaderBanner(doc: jsPDF, title: string, refText: string, logoBase
 }
 
 /**
- * Helper to render Table Header with HSN/SAC Column
+ * Helper to render Table Header with HSN/SAC Column and spaced QTY & UNIT
  */
-function renderTableHeader(doc: jsPDF, y: number, isInvoice: boolean): number {
+function renderTableHeader(doc: jsPDF, y: number, isInvoice: boolean, isGstActive: boolean): number {
   const pageWidth = doc.internal.pageSize.getWidth();
   doc.setFillColor(20, 19, 17);
   doc.rect(15, y, pageWidth - 30, 8, 'F');
 
   doc.setTextColor(247, 245, 240);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
+  doc.setFontSize(8);
 
-  doc.text('#', 17, y + 5.5);
-  doc.text(isInvoice ? 'DESCRIPTION & SPECIFICATIONS' : 'ITEM DESCRIPTION', 26, y + 5.5);
-  doc.text('HSN/SAC', 110, y + 5.5, { align: 'center' });
-  doc.text('QTY / UNIT', 133, y + 5.5, { align: 'center' });
-  doc.text('UNIT RATE', 156, y + 5.5, { align: 'right' });
-  doc.text(isInvoice ? 'TAXABLE VALUE' : 'AMOUNT (₹)', pageWidth - 18, y + 5.5, { align: 'right' });
+  doc.text('#', 16, y + 5.5);
+  doc.text(isInvoice ? 'DESCRIPTION & SPECIFICATIONS' : 'ITEM DESCRIPTION', 23, y + 5.5);
+  doc.text('HSN/SAC', 95, y + 5.5, { align: 'center' });
+  doc.text('QTY', 108, y + 5.5, { align: 'center' });
+  doc.text('UNIT', 122, y + 5.5, { align: 'center' });
+  doc.text('UNIT RATE', 160, y + 5.5, { align: 'right' });
+  doc.text(isInvoice && isGstActive ? 'TAXABLE VALUE' : 'AMOUNT (₹)', 195, y + 5.5, { align: 'right' });
 
   return y + 8;
 }
@@ -257,6 +258,14 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
   const docType: DocumentType = (docPayload as Quotation).docType ||
     (docPayload.id.includes('INV') ? 'tax_invoice' : docPayload.id.includes('PI') ? 'proforma' : 'quote');
 
+  const isQuote = docType === 'quote';
+  // Commercial quotes NEVER have GST. Proforma and Tax Invoices only have GST if gstEnabled is explicitly true.
+  const isGstActive = !isQuote && !!(
+    (docPayload as Quotation).gstEnabled !== undefined
+      ? (docPayload as Quotation).gstEnabled
+      : ((docPayload as Invoice).totalTax ?? 0) > 0
+  );
+
   const headerTitleMap: Record<DocumentType, string> = {
     quote: 'COMMERCIAL QUOTATION',
     proforma: 'PROFORMA INVOICE',
@@ -358,31 +367,31 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
 
   y += 14;
 
-  // 4. Line Items Table Header with HSN
-  y = renderTableHeader(doc, y, docType !== 'quote');
+  // 4. Line Items Table Header with HSN & Spaced QTY/UNIT
+  y = renderTableHeader(doc, y, docType !== 'quote', isGstActive);
 
-  // 5. Line Items Body Rows with Material HSN
+  // 5. Line Items Body Rows
   docPayload.items.forEach((item, index) => {
     const cleanedItemName = cleanText(item.name);
     const cleanedItemDesc = cleanText(item.description);
-    const splitDesc = doc.splitTextToSize(cleanedItemDesc, 78);
+    const splitDesc = doc.splitTextToSize(cleanedItemDesc, 64);
     const rowHeight = Math.max(6 + (splitDesc.length * 3.8), 10);
 
     // Check pagination
     if (y + rowHeight > 250) {
       doc.addPage();
       renderHeaderBanner(doc, headerTitle, refText, logoBase64);
-      y = renderTableHeader(doc, 33, docType !== 'quote');
+      y = renderTableHeader(doc, 33, docType !== 'quote', isGstActive);
     }
 
     doc.setTextColor(30, 30, 30);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
-    doc.text(`${index + 1}`, 17, y + 5);
+    doc.text(`${index + 1}`, 16, y + 5);
 
     // Item Title
     doc.setFont('helvetica', 'bold');
-    doc.text(cleanedItemName, 26, y + 5);
+    doc.text(cleanedItemName, 23, y + 5);
 
     // Multiline item description
     doc.setFont('helvetica', 'normal');
@@ -390,16 +399,17 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
     doc.setTextColor(80, 80, 80);
     let descY = y + 9;
     for (const dLine of splitDesc) {
-      doc.text(String(dLine).replace(/[\r\n]/g, ''), 26, descY);
+      doc.text(String(dLine).replace(/[\r\n]/g, ''), 23, descY);
       descY += 3.8;
     }
 
     doc.setFontSize(8.5);
     doc.setTextColor(30, 30, 30);
-    doc.text(item.hsnCode || '3925', 110, y + 5, { align: 'center' });
-    doc.text(`${item.quantity} ${item.unit}`, 133, y + 5, { align: 'center' });
-    doc.text(formatCurrency(item.unitRate), 156, y + 5, { align: 'right' });
-    doc.text(formatCurrency(item.netAmount), pageWidth - 18, y + 5, { align: 'right' });
+    doc.text(item.hsnCode || '3925', 95, y + 5, { align: 'center' });
+    doc.text(`${item.quantity}`, 108, y + 5, { align: 'center' });
+    doc.text(`${item.unit}`, 122, y + 5, { align: 'center' });
+    doc.text(formatCurrency(item.unitRate), 160, y + 5, { align: 'right' });
+    doc.text(formatCurrency(item.netAmount), 195, y + 5, { align: 'right' });
 
     y += rowHeight;
 
@@ -418,14 +428,13 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
   }
 
   const startTotalsY = y;
-  const isGstActive = (docPayload as Quotation).gstEnabled || (docPayload as Invoice).taxType || docType === 'proforma' || docType === 'tax_invoice';
 
-  // Bank Details Box on Left (X = 15 to X = 92)
+  // Bank Details Box on Left (X = 15 to X = 92) - UPI ID REMOVED
   doc.setFillColor(247, 245, 240); // Soft stone background
-  doc.roundedRect(15, startTotalsY, 77, 36, 2, 2, 'F');
+  doc.roundedRect(15, startTotalsY, 77, 30, 2, 2, 'F');
   doc.setDrawColor(209, 199, 183);
   doc.setLineWidth(0.3);
-  doc.roundedRect(15, startTotalsY, 77, 36, 2, 2, 'S');
+  doc.roundedRect(15, startTotalsY, 77, 30, 2, 2, 'S');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
@@ -435,32 +444,30 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(50, 50, 50);
-  doc.text(`Bank: ${cleanText(owner.bankDetails.bankName)}`, 18, startTotalsY + 11);
-  doc.text(`A/C Name: ${cleanText(owner.bankDetails.accountName)}`, 18, startTotalsY + 15.5);
-  doc.text(`A/C #: ${cleanText(owner.bankDetails.accountNumber)}`, 18, startTotalsY + 20);
-  doc.text(`IFSC Code: ${cleanText(owner.bankDetails.ifscCode)}`, 18, startTotalsY + 24.5);
-  doc.text(`Branch: ${cleanText(owner.bankDetails.branch)}`, 18, startTotalsY + 29);
-  if (owner.bankDetails.upiId) {
-    doc.text(`UPI ID: ${cleanText(owner.bankDetails.upiId)}`, 18, startTotalsY + 33.5);
-  }
+  doc.text(`Bank: ${cleanText(owner.bankDetails.bankName)}`, 18, startTotalsY + 10.5);
+  doc.text(`A/C Name: ${cleanText(owner.bankDetails.accountName)}`, 18, startTotalsY + 15);
+  doc.text(`A/C #: ${cleanText(owner.bankDetails.accountNumber)}`, 18, startTotalsY + 19.5);
+  doc.text(`IFSC Code: ${cleanText(owner.bankDetails.ifscCode)}`, 18, startTotalsY + 24);
+  doc.text(`Branch: ${cleanText(owner.bankDetails.branch)}`, 18, startTotalsY + 28.5);
 
   // Totals Breakdown on Right (X = 98 to X = 195)
   let rightTotalsY = startTotalsY;
 
   const subtotalVal = docPayload.subtotal || 0;
   const netTaxableVal = (docPayload as Quotation).netPreTaxTotal || subtotalVal;
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
-  doc.setTextColor(60, 60, 60);
-  doc.text('Taxable Subtotal:', 98, rightTotalsY + 4);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(13, 12, 10);
-  doc.text(formatCurrency(netTaxableVal), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
-
-  const taxType = (docPayload as Invoice).taxType || (docPayload as Quotation).taxType || 'CGST_SGST';
+  const finalDocTotal = (docPayload as Invoice).grandTotal || (docPayload as Quotation).grandTotal || (isGstActive ? Math.round(netTaxableVal * 1.18 * 100) / 100 : netTaxableVal);
 
   if (isGstActive) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(60, 60, 60);
+    doc.text('Taxable Subtotal:', 98, rightTotalsY + 4);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(13, 12, 10);
+    doc.text(formatCurrency(netTaxableVal), 195, rightTotalsY + 4, { align: 'right' });
+
+    const taxType = (docPayload as Invoice).taxType || (docPayload as Quotation).taxType || 'CGST_SGST';
+
     if (taxType === 'CGST_SGST') {
       const cgstAmt = (docPayload as Invoice).cgstAmount || (docPayload as Quotation).cgstAmount || Math.round(netTaxableVal * 0.09 * 100) / 100;
       const sgstAmt = (docPayload as Invoice).sgstAmount || (docPayload as Quotation).sgstAmount || Math.round(netTaxableVal * 0.09 * 100) / 100;
@@ -469,11 +476,11 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(60, 60, 60);
       doc.text('CGST @ 9%:', 98, rightTotalsY + 4);
-      doc.text(formatCurrency(cgstAmt), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
+      doc.text(formatCurrency(cgstAmt), 195, rightTotalsY + 4, { align: 'right' });
 
       rightTotalsY += 5;
       doc.text('SGST @ 9%:', 98, rightTotalsY + 4);
-      doc.text(formatCurrency(sgstAmt), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
+      doc.text(formatCurrency(sgstAmt), 195, rightTotalsY + 4, { align: 'right' });
     } else {
       const igstAmt = (docPayload as Invoice).igstAmount || (docPayload as Quotation).igstAmount || Math.round(netTaxableVal * 0.18 * 100) / 100;
 
@@ -481,26 +488,35 @@ export async function downloadDocumentPDF(docPayload: Quotation | Invoice, owner
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(60, 60, 60);
       doc.text('IGST @ 18%:', 98, rightTotalsY + 4);
-      doc.text(formatCurrency(igstAmt), pageWidth - 18, rightTotalsY + 4, { align: 'right' });
+      doc.text(formatCurrency(igstAmt), 195, rightTotalsY + 4, { align: 'right' });
     }
+
+    rightTotalsY += 7;
+    doc.setFillColor(20, 19, 17);
+    doc.roundedRect(95, rightTotalsY, 100, 10, 1.5, 1.5, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(247, 245, 240);
+
+    doc.text('GRAND TOTAL (INC. GST):', 99, rightTotalsY + 6.5);
+    doc.setFontSize(9.5);
+    doc.text(formatCurrency(finalDocTotal), 195, rightTotalsY + 6.5, { align: 'right' });
+  } else {
+    // Non-GST Commercial Quote OR Non-GST Proforma/Invoice
+    doc.setFillColor(20, 19, 17);
+    doc.roundedRect(95, rightTotalsY, 100, 10, 1.5, 1.5, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(247, 245, 240);
+
+    doc.text(isQuote ? 'TOTAL ESTIMATED AMOUNT:' : 'FINAL PRODUCT AMOUNT:', 99, rightTotalsY + 6.5);
+    doc.setFontSize(9.5);
+    doc.text(formatCurrency(finalDocTotal), 195, rightTotalsY + 6.5, { align: 'right' });
   }
-
-  rightTotalsY += 7;
-  doc.setFillColor(20, 19, 17);
-  doc.roundedRect(95, rightTotalsY, 100, 10, 1.5, 1.5, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(247, 245, 240);
-
-  const finalGrandTotal = (docPayload as Invoice).grandTotal || (docPayload as Quotation).grandTotal || (isGstActive ? Math.round(netTaxableVal * 1.18 * 100) / 100 : netTaxableVal);
-
-  doc.text(isGstActive ? 'GRAND TOTAL (INC. GST):' : 'NET ESTIMATED TOTAL:', 99, rightTotalsY + 6.5);
-  doc.setFontSize(9.5);
-  doc.text(formatCurrency(finalGrandTotal), pageWidth - 18, rightTotalsY + 6.5, { align: 'right' });
 
   // Advance Paid & Net Balance Due
   const amountPaidVal = docPayload.amountPaid || 0;
-  const balanceDueVal = typeof docPayload.balanceDue === 'number' ? docPayload.balanceDue : Math.max(0, finalGrandTotal - amountPaidVal);
+  const balanceDueVal = typeof docPayload.balanceDue === 'number' ? docPayload.balanceDue : Math.max(0, finalDocTotal - amountPaidVal);
 
   if (amountPaidVal > 0) {
     rightTotalsY += 13;
