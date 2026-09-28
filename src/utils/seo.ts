@@ -53,8 +53,8 @@ export function updatePageSEO(route: ViewRoute) {
       description = 'Deep technical articles on Tensile Fabric Car Parking Shades, WPC vs HPL vs ACP Cladding, Bioclimatic Louvered Pergolas, and Smart Stack Parking by ARCHZONA.';
     }
   } else if (route.type === 'contact') {
-    title = 'Contact Archzone Structures by ARCHZONA | Dombivli East, Thane | +91 98700 48082';
-    description = 'Visit our Digital Architectural Experience Centre at 105, Prism Industrial Estate, Dombivli East, Thane. Call +91 98700 48082 or +91 97020 51858.';
+    title = 'Contact ARCHZONA | 105, PRISM INDUSTRIAL ESTATE, DOMBIVLI (EAST) 421201 | +91 97020 51858';
+    description = 'Visit ARCHZONA at 105, PRISM INDUSTRIAL ESTATE, BEHIND PENDARKAR COLLEGE, DOMBIVLI (EAST) 421201. Call +91 97020 51858 or email info.archzona@gmail.com. GSTIN: 27ACDFA4175F1ZJ.';
   } else if (route.type === 'services') {
     title = 'Architectural Process & Turnkey Services | Archzone Structures by ARCHZONA';
     description = 'From spatial consultation to material engineering, custom steel fabrication, and turnkey installation across Mumbai, Thane, and Maharashtra by ARCHZONA.';

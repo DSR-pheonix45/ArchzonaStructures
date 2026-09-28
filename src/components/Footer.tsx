@@ -122,20 +122,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
             </h4>
             <div className="space-y-3 font-sans-clean text-sm text-[#D1C7B7]">
               <a
-                href={`tel:${ARCHZONA_PHONE_NARESH.replace(/\s+/g, '')}`}
+                href={`tel:${ARCHZONA_PHONE.replace(/\s+/g, '')}`}
                 className="flex items-center space-x-3 hover:text-[#F7F5F0] transition-colors group p-2 rounded-lg hover:bg-[#141311] border border-transparent hover:border-[#D1C7B7]/20"
               >
                 <Phone className="w-4 h-4 text-[#D1C7B7] group-hover:text-[#F7F5F0]" />
-                <span className="font-mono">{ARCHZONA_PHONE_NARESH}</span>
-                <span className="text-[10px] text-[#8C8273]">(Naresh K)</span>
-              </a>
-              <a
-                href={`tel:${ARCHZONA_PHONE_HARISH.replace(/\s+/g, '')}`}
-                className="flex items-center space-x-3 hover:text-[#F7F5F0] transition-colors group p-2 rounded-lg hover:bg-[#141311] border border-transparent hover:border-[#D1C7B7]/20"
-              >
-                <Phone className="w-4 h-4 text-[#D1C7B7] group-hover:text-[#F7F5F0]" />
-                <span className="font-mono">{ARCHZONA_PHONE_HARISH}</span>
-                <span className="text-[10px] text-[#8C8273]">(Harish K)</span>
+                <span className="font-mono">{ARCHZONA_PHONE}</span>
+                <span className="text-[10px] text-[#8C8273]">(Mobile & WhatsApp)</span>
               </a>
               <a
                 href={`mailto:${ARCHZONA_EMAIL}`}
@@ -147,9 +139,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenAdmin }) => {
               <div className="flex flex-col space-y-1.5 pt-1 px-2">
                 <div className="flex items-start space-x-3 text-[#8C8273]">
                   <MapPin className="w-4 h-4 text-[#D1C7B7] shrink-0 mt-0.5" />
-                  <span className="text-xs text-[#D1C7B7]">
-                    {ARCHZONA_ADDRESS_LINE1}, Thane, Maharashtra, India
-                  </span>
+                  <div className="text-xs text-[#D1C7B7] space-y-0.5">
+                    <p>{ARCHZONA_ADDRESS_LINE1}, {ARCHZONA_ADDRESS_LINE2}</p>
+                    <p className="text-[11px] font-mono text-[#D4AF37]">GSTIN: 27ACDFA4175F1ZJ</p>
+                  </div>
                 </div>
                 <a
                   href={ARCHZONA_MAPS_URL}

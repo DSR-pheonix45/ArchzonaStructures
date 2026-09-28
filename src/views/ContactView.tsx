@@ -62,9 +62,9 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
     setIsSubmitted(true);
   };
 
-  const defaultWhatsAppIntro = 'Hello Archzone Structures by ARCHZONA, I am reaching out regarding architectural materials & structure execution.';
+  const defaultWhatsAppIntro = 'Hello ARCHZONA, I am reaching out regarding architectural materials & structure execution.';
 
-  const whatsAppDirectUrl = `https://wa.me/919870048082?text=${encodeURIComponent(defaultWhatsAppIntro)}`;
+  const whatsAppDirectUrl = `https://wa.me/${ARCHZONA_WHATSAPP_NUMBER}?text=${encodeURIComponent(defaultWhatsAppIntro)}`;
 
   const buildSubmittedWhatsAppUrl = () => {
     let text = defaultWhatsAppIntro;
@@ -72,11 +72,11 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
     if (formData.location) text += `\nLocation: ${formData.location}`;
     if (formData.message) text += `\nMessage: ${formData.message}`;
     if (attachedFile) text += `\n[Attached Drawing: ${attachedFile.name} (${(attachedFile.size / 1024).toFixed(1)} KB)]`;
-    return `https://wa.me/919870048082?text=${encodeURIComponent(text)}`;
+    return `https://wa.me/${ARCHZONA_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
   };
 
   const buildSubmittedMailtoUrl = () => {
-    const subject = `[Archzone Structures Inquiry] Project Consultation from ${formData.name || 'Client'}`;
+    const subject = `[ARCHZONA Inquiry] Project Consultation from ${formData.name || 'Client'}`;
     let body = `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nFirm/Company: ${formData.firm}\nProject Type: ${formData.projectType}\nLocation: ${formData.location}\n\nMessage:\n${formData.message}`;
     if (attachedFile) {
       body += `\n\n[Attached File: ${attachedFile.name} (${(attachedFile.size / 1024).toFixed(1)} KB)]`;
@@ -91,7 +91,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
         <div className="max-w-3xl space-y-4 border-b border-[#D1C7B7]/20 pb-8">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#D1C7B7]/30 bg-[#141311] text-[10px] uppercase font-mono tracking-[0.25em] text-[#D1C7B7]">
             <span className="w-2 h-2 rounded-full bg-[#D1C7B7]" />
-            ENGAGE WITH ARCHZONE STRUCTURES BY ARCHZONA
+            ENGAGE WITH ARCHZONA
           </div>
           <h1 className="font-serif-title text-4xl sm:text-6xl text-[#F7F5F0]">
             START A CONVERSATION.
@@ -116,9 +116,9 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                   INSTANT ARCHITECTURAL DESKS (DIRECT CONTACT)
                 </span>
                 
-                {/* Contact Point 1: Naresh K */}
+                {/* Contact Point 1: Direct Mobile */}
                 <a
-                  href={`https://wa.me/${ARCHZONA_WHATSAPP_NARESH}?text=${encodeURIComponent(defaultWhatsAppIntro)}`}
+                  href={`https://wa.me/${ARCHZONA_WHATSAPP_NUMBER}?text=${encodeURIComponent(defaultWhatsAppIntro)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-white hover:bg-emerald-500/20 transition-all cursor-pointer group"
@@ -126,25 +126,9 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
                   <MessageSquare className="w-5 h-5 text-emerald-400 shrink-0" />
                   <div className="flex-1">
                     <span className="font-mono font-bold text-sm block text-emerald-300 group-hover:underline">
-                      {ARCHZONA_PHONE_NARESH}
+                      {ARCHZONA_PHONE}
                     </span>
-                    <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Naresh K — Co-Founder, ARCHZONA</span>
-                  </div>
-                </a>
-
-                {/* Contact Point 2: Harish K */}
-                <a
-                  href={`https://wa.me/${ARCHZONA_WHATSAPP_HARISH}?text=${encodeURIComponent(defaultWhatsAppIntro)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-white hover:bg-emerald-500/20 transition-all cursor-pointer group"
-                >
-                  <MessageSquare className="w-5 h-5 text-emerald-400 shrink-0" />
-                  <div className="flex-1">
-                    <span className="font-mono font-bold text-sm block text-emerald-300 group-hover:underline">
-                      {ARCHZONA_PHONE_HARISH}
-                    </span>
-                    <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Harish K — Co-Founder, ARCHZONA</span>
+                    <span className="text-[11px] text-[#D1C7B7] font-sans-clean">Mobile & WhatsApp — ARCHZONA</span>
                   </div>
                 </a>
               </div>
@@ -175,10 +159,11 @@ export const ContactView: React.FC<ContactViewProps> = ({ initialSubject }) => {
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-[#D1C7B7] shrink-0 mt-1" />
                 <div className="font-sans-clean text-xs leading-relaxed space-y-1">
-                  <p className="font-serif-title text-xl text-[#F7F5F0]">Archzone Structures by ARCHZONA</p>
+                  <p className="font-serif-title text-xl text-[#F7F5F0]">ARCHZONA</p>
                   <p className="text-[#D1C7B7]">{ARCHZONA_ADDRESS_LINE1}</p>
                   <p className="text-[#D1C7B7]">{ARCHZONA_ADDRESS_LINE2}</p>
-                  <p className="text-[10px] text-[#8C8273] pt-1">Field installations across Maharashtra, Goa, Gujarat & Pan-India.</p>
+                  <p className="text-[11px] font-mono text-[#D4AF37] pt-1">GSTIN: 27ACDFA4175F1ZJ</p>
+                  <p className="text-[10px] text-[#8C8273]">Field installations across Maharashtra, Goa, Gujarat & Pan-India.</p>
                 </div>
               </div>
               <div className="pt-2">

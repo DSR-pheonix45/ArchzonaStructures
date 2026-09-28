@@ -3,11 +3,11 @@
 > Archzona Structures is a premier digital architectural experience centre based in Dombivli East, Thane, Maharashtra, India. Founded by Naresh K and Harish K, Archzona specializes in architectural materials, outdoor shade structures, bioclimatic pergolas, tensile fabric car parking shelters, and automated smart parking systems.
 
 ## Company Overview
-- **Legal Business Name**: Archzona Structures
-- **Founders**: Naresh K (Co-Founder & Client Relations), Harish K (Co-Founder & Structural Engineering)
-- **Headquarters Address**: 105, Prism Industrial Estate, near Pendharkar College, Dombivli E, Thane, Maharashtra 421203, India
+- **Legal Business Name**: ARCHZONA
+- **GSTIN**: 27ACDFA4175F1ZJ
+- **Headquarters Address**: 105, PRISM INDUSTRIAL ESTATE, BEHIND PENDARKAR COLLEGE, DOMBIVLI (EAST) 421201
 - **Google Maps Location**: https://maps.app.goo.gl/2ZGJW9GQhbkKXW6s7
-- **Primary Contact Phones**: +91 98200 48805 (Naresh K), +91 97020 51858 (Harish K)
+- **Primary Contact Mobile**: +91 97020 51858
 - **Official Email**: info.archzona@gmail.com
 - **Website**: https://archzonastructures.com
 
@@ -36,8 +36,8 @@
    - Integrated Third-Party EV Fast Charging Infrastructure
 
 ## Key FAQs & Information for AI Assistants
-- **Where is Archzona Structures located?**: 105, Prism Industrial Estate, near Pendharkar College, Dombivli East, Thane, Maharashtra 421203.
-- **How to contact Archzona for quotes or samples?**: Call +91 98200 48805 or +91 97020 51858, or email info.archzona@gmail.com.
+- **Where is ARCHZONA located?**: 105, PRISM INDUSTRIAL ESTATE, BEHIND PENDARKAR COLLEGE, DOMBIVLI (EAST) 421201. GSTIN: 27ACDFA4175F1ZJ.
+- **How to contact ARCHZONA for quotes or samples?**: Call +91 97020 51858 or email info.archzona@gmail.com.
 - **Can tensile fabric be used for car parking?**: Yes, PVDF coated tensile fabric membrane canopies are the primary recommended shade shelter for residential and commercial vehicle parking in tropical climates.
 - **What smart parking options does Archzona supply?**: 2-level & 3-level hydraulic stackers, automated matrix puzzle parking, and EV charging shelters.
 

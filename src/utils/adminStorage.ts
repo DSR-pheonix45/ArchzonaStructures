@@ -11,12 +11,12 @@ const STORAGE_KEYS = {
 export const DEFAULT_OWNER_PROFILE: OwnerUser = {
   id: 'owner-1',
   email: 'info.archzona@gmail.com',
-  name: 'Naresh & Harish (Archzone Structures by ARCHZONA)',
+  name: 'ARCHZONA',
   role: 'owner',
-  companyName: 'Archzone Structures by ARCHZONA',
-  phone: '+91 98700 48082',
-  address: '105, Prism Industrial Estate, Near Pendharkar College, Dombivli (E), Thane, Maharashtra 421201',
-  gstin: '27AAFFA1234F1Z5',
+  companyName: 'ARCHZONA',
+  phone: '+91 97020 51858',
+  address: '105, PRISM INDUSTRIAL ESTATE, BEHIND PENDARKAR COLLEGE, DOMBIVLI (EAST) 421201',
+  gstin: '27ACDFA4175F1ZJ',
   bankDetails: {
     bankName: 'Axis Bank',
     accountName: 'archzona',
@@ -40,9 +40,21 @@ export function getOwnerProfile(): OwnerUser {
       if (parsed.bankDetails && parsed.bankDetails.upiId) {
         delete parsed.bankDetails.upiId;
       }
-      // Ensure updated Axis Bank details take precedence over old dummy account
+      let shouldSave = false;
+      // Ensure updated GSTIN / Phone / Address take precedence over old default data
+      if (parsed.gstin !== DEFAULT_OWNER_PROFILE.gstin || parsed.phone !== DEFAULT_OWNER_PROFILE.phone || parsed.address !== DEFAULT_OWNER_PROFILE.address) {
+        parsed.gstin = DEFAULT_OWNER_PROFILE.gstin;
+        parsed.phone = DEFAULT_OWNER_PROFILE.phone;
+        parsed.address = DEFAULT_OWNER_PROFILE.address;
+        parsed.email = DEFAULT_OWNER_PROFILE.email;
+        parsed.companyName = DEFAULT_OWNER_PROFILE.companyName;
+        shouldSave = true;
+      }
       if (!parsed.bankDetails || parsed.bankDetails.accountNumber === '50200088991122' || parsed.bankDetails.bankName === 'HDFC Bank Ltd') {
         parsed.bankDetails = DEFAULT_OWNER_PROFILE.bankDetails;
+        shouldSave = true;
+      }
+      if (shouldSave) {
         localStorage.setItem(STORAGE_KEYS.OWNER_PROFILE, JSON.stringify(parsed));
       }
       return parsed;

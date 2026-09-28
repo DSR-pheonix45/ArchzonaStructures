@@ -31,7 +31,7 @@ function addHeader(doc, pageNum, title) {
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   doc.text(`ARCHZONA PRODUCT CATALOGUE DECK  |  PAGE ${pageNum} OF 26`, 22, 202);
-  doc.text(`CONTACT: +91 9870048082 | INFO.ARCHZONA@GMAIL.COM`, 185, 202);
+  doc.text(`CONTACT: +91 9702051858 | INFO.ARCHZONA@GMAIL.COM`, 185, 202);
 }
 
 // ----------------------------------------------------
@@ -68,8 +68,8 @@ doc.rect(45, 122, 80, 0.8, 'F');
 
 doc.setTextColor(140, 130, 115);
 doc.setFontSize(10);
-doc.text('Resort & Bungalow Development | Architectural Roofing | Composite Cladding | WPC & Terrazzo', 45, 140);
-doc.text('Thane, Maharashtra, India | Phone: +91 9870048082 | Email: Info.archzona@gmail.com', 45, 148);
+doc.text('105, PRISM INDUSTRIAL ESTATE, BEHIND PENDARKAR COLLEGE, DOMBIVLI (EAST) 421201', 45, 140);
+doc.text('Mobile: +91 9702051858 | Email: info.archzona@gmail.com | GSTIN: 27ACDFA4175F1ZJ', 45, 148);
 
 // ----------------------------------------------------
 // PAGE 2: ABOUT US
@@ -1025,19 +1025,20 @@ doc.roundedRect(30, 35, 237, 140, 4, 4, 'D');
 doc.setTextColor(255, 255, 255);
 doc.setFontSize(32);
 doc.setFont('helvetica', 'bold');
-doc.text('CONTACT ARCHZONA STRUCTURES', 45, 60);
+doc.text('CONTACT ARCHZONA', 45, 60);
 
 doc.setTextColor(212, 175, 55);
 doc.setFontSize(14);
 doc.setFont('helvetica', 'bold');
-doc.text('HEADQUARTERS & EXPERIENCE CENTRE', 45, 75);
+doc.text('HEADQUARTERS & OFFICE', 45, 75);
 
 doc.setTextColor(209, 199, 183);
 doc.setFontSize(11);
 doc.setFont('helvetica', 'normal');
-doc.text('1/19 Ganesh Apt, C.D. Rd, Ram Nagar, Dombivli (E), Thane, Maharashtra, India', 45, 90);
-doc.text('Phone: +91 9870048082', 45, 102);
-doc.text('Email: Info.archzona@gmail.com', 45, 114);
+doc.text('105, PRISM INDUSTRIAL ESTATE, BEHIND PENDARKAR COLLEGE, DOMBIVLI (EAST) 421201', 45, 90);
+doc.text('Mobile: +91 97020 51858', 45, 100);
+doc.text('Email: info.archzona@gmail.com', 45, 110);
+doc.text('GSTIN: 27ACDFA4175F1ZJ', 45, 120);
 
 doc.setFillColor(212, 175, 55);
 doc.rect(45, 126, 120, 0.8, 'F');
