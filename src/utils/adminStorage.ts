@@ -37,23 +37,32 @@ export function getOwnerProfile(): OwnerUser {
     const raw = localStorage.getItem(STORAGE_KEYS.OWNER_PROFILE);
     if (raw) {
       const parsed = JSON.parse(raw);
+      let shouldSave = false;
+
       if (parsed.bankDetails && parsed.bankDetails.upiId) {
         delete parsed.bankDetails.upiId;
-      }
-      let shouldSave = false;
-      // Ensure updated GSTIN / Phone / Address take precedence over old default data
-      if (parsed.gstin !== DEFAULT_OWNER_PROFILE.gstin || parsed.phone !== DEFAULT_OWNER_PROFILE.phone || parsed.address !== DEFAULT_OWNER_PROFILE.address) {
-        parsed.gstin = DEFAULT_OWNER_PROFILE.gstin;
-        parsed.phone = DEFAULT_OWNER_PROFILE.phone;
-        parsed.address = DEFAULT_OWNER_PROFILE.address;
-        parsed.email = DEFAULT_OWNER_PROFILE.email;
-        parsed.companyName = DEFAULT_OWNER_PROFILE.companyName;
         shouldSave = true;
       }
-      if (!parsed.bankDetails || parsed.bankDetails.accountNumber === '50200088991122' || parsed.bankDetails.bankName === 'HDFC Bank Ltd') {
-        parsed.bankDetails = DEFAULT_OWNER_PROFILE.bankDetails;
-        shouldSave = true;
+
+      // One-time migration for the incorrect GSTIN
+      if (parsed.gstin === '27AAFFA1234F1Z5' || parsed.gstin !== '27ACDFA4175F1ZJ') {
+         // Force update to the new requested GSTIN, but allow future edits if they change it again
+         if (parsed.gstin === '27AAFFA1234F1Z5' || !parsed.gstin) {
+            parsed.gstin = '27ACDFA4175F1ZJ';
+            shouldSave = true;
+         }
       }
+      
+      // Also ensure correct company name and phone for the migration if they have the old ones
+      if (parsed.companyName === 'Archzona Structures LLP') {
+          parsed.companyName = 'ARCHZONA';
+          shouldSave = true;
+      }
+      if (parsed.phone === '+91 98700 48082') {
+          parsed.phone = '+91 97020 51858';
+          shouldSave = true;
+      }
+
       if (shouldSave) {
         localStorage.setItem(STORAGE_KEYS.OWNER_PROFILE, JSON.stringify(parsed));
       }
